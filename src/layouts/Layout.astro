@@ -1,0 +1,59 @@
+---
+// src/layouts/Layout.astro
+import '../styles/global.css';
+import FooterBanner from '../components/FooterBanner.astro';
+
+interface Props {
+  title: string;
+}
+const { title } = Astro.props;
+---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{title} — Chitra-Chaalak</title>
+</head>
+<body>
+  <!--
+    THE STAGE: every page is authored at a fixed 1920x1080 canvas —
+    this matches the hi-fi reference exactly, so every margin and gap
+    is a literal pixel value taken from that reference, not a guess.
+    The stage-wrap below scales the whole stage uniformly to fit
+    whatever screen it's on (letterboxed if the aspect ratio differs),
+    so nothing ever scrolls and every ratio stays exact.
+  -->
+  <div class="cc-stage-wrap" id="cc-stage-wrap">
+    <div class="cc-stage" id="cc-stage">
+      <div class="cc-scanlines"></div>
+      <div class="cc-vignette"></div>
+      <div class="cc-flicker"></div>
+
+      <slot />
+
+      <FooterBanner />
+    </div>
+  </div>
+</body>
+</html>
+
+<script>
+  // Scales #cc-stage (fixed 1920x1080) to fit the viewport exactly,
+  // preserving aspect ratio — "letterboxing" with the page background
+  // color if the screen's ratio doesn't match 16:9.
+  function ccFitStage() {
+    const wrap = document.getElementById('cc-stage-wrap');
+    const stage = document.getElementById('cc-stage');
+    if (!wrap || !stage) return;
+
+    const scale = Math.min(
+      window.innerWidth / 1920,
+      window.innerHeight / 1080
+    );
+    stage.style.transform = `scale(${scale})`;
+  }
+
+  ccFitStage();
+  window.addEventListener('resize', ccFitStage);
+</script>

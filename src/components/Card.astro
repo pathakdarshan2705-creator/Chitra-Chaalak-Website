@@ -1,0 +1,264 @@
+---
+// src/components/Card.astro
+//
+// Usage:
+// <Card
+//   href="/blog/some-post"
+//   title="Some Post Title"
+//   meta="04 AUG 2026 · ESSAY"
+//   imageSrc="/images/some-post.jpg"
+//   imageAlt="Description of the image"
+// />
+//
+// Behavior:
+// - single click  -> toggles this card's "selected" state (yellow + scanline)
+// - double click  -> navigates to `href`
+// - hover         -> glitch flicker (RGB split, static, yellow edge flash)
+//
+// Selection is per-card by default. If a parent list wants
+// "only one selected at a time" (like the blog list), pass
+// group="blog-list" — cards sharing a group value will
+// deselect each other on click.
+
+interface Props {
+  href: string;
+  title: string;
+  meta?: string;
+  imageSrc: string;
+  imageAlt?: string;
+  stateTag?: string;
+  group?: string;
+}
+
+const { href, title, meta, imageSrc, imageAlt = '', stateTag, group } = Astro.props;
+---
+<div
+  class="cc-card"
+  data-href={href}
+  data-group={group ?? ''}
+  tabindex="0"
+  role="button"
+  aria-label={`${title}. Click to preview, double-click to open.`}
+>
+  {stateTag && <span class="cc-card__tag">{stateTag}</span>}
+  <div class="cc-card__img">
+    <img src={imageSrc} alt={imageAlt} loading="lazy" />
+  </div>
+  <div class="cc-card__body">
+    <div class="cc-card__title">{title}</div>
+    {meta && <div class="cc-card__meta">{meta}</div>}
+  </div>
+</div>
+
+<style>
+  .cc-card{
+    position:relative;
+    display:flex;
+    gap:14px;
+    align-items:flex-start;
+    background:var(--blue-card);
+    border:1px solid rgba(166,232,255,0.3);
+    padding:14px;
+    cursor:pointer;
+    overflow:hidden;
+    outline:none;
+  }
+
+  .cc-card:focus-visible{
+    box-shadow:0 0 0 2px var(--yellow);
+  }
+
+  .cc-card__img{
+    flex:0 0 96px;
+    height:72px;
+    background:var(--blue-panel-light);
+    overflow:hidden;
+  }
+
+  .cc-card__img img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:block;
+  }
+
+  .cc-card__body{ min-width:0; }
+
+  .cc-card__title{
+    font-family:var(--font-ui);
+    font-weight:600;
+    font-size:13px;
+    text-transform:uppercase;
+    letter-spacing:0.5px;
+    color:var(--blue-lightest);
+    margin-bottom:4px;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+
+  .cc-card__meta{
+    font-family:var(--font-body);
+    font-size:13px;
+    color:var(--blue-lightest);
+    opacity:0.7;
+  }
+
+  .cc-card__tag{
+    position:absolute;
+    top:8px;
+    right:8px;
+    font-family:var(--font-ui);
+    font-size:9px;
+    letter-spacing:1px;
+    text-transform:uppercase;
+    color:var(--navy-deep);
+    background:var(--blue-lightest);
+    padding:2px 6px;
+    opacity:0.8;
+    z-index:4;
+  }
+
+  /* ---------- hover: glitch (RGB split + static + edge flash) ---------- */
+  .cc-card:hover{
+    background:var(--blue-card-hover);
+    animation:cc-glitch 0.4s steps(4) 1, cc-white-flash 0.4s ease-out 1;
+  }
+
+  .cc-card:hover .cc-card__title,
+  .cc-card:hover .cc-card__meta{
+    animation:cc-rgb-split 0.4s steps(4) 1;
+  }
+
+  .cc-card:hover::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    background:repeating-linear-gradient(
+      0deg,
+      rgba(255,255,255,0.1) 0px,
+      transparent 2px,
+      transparent 4px
+    );
+    animation:cc-static-noise 0.1s steps(2) infinite;
+    pointer-events:none;
+    z-index:2;
+  }
+
+  .cc-card:hover::after{
+    content:"";
+    position:absolute;
+    inset:0;
+    border:2px solid var(--yellow);
+    opacity:0;
+    animation:cc-edge-flash 0.4s steps(4) 1;
+    pointer-events:none;
+    z-index:3;
+  }
+
+  @keyframes cc-glitch{
+    0%{ transform:translate(0,0); filter:none; }
+    15%{ transform:translate(-2px,1px); filter:hue-rotate(15deg); }
+    30%{ transform:translate(2px,-1px); filter:none; }
+    45%{ transform:translate(-1px,0); filter:hue-rotate(-10deg); }
+    60%{ transform:translate(1px,-1px); filter:none; }
+    100%{ transform:translate(0,0); filter:none; }
+  }
+
+  @keyframes cc-white-flash{
+    0%{ box-shadow:inset 0 0 0 999px rgba(255,255,255,0); }
+    10%{ box-shadow:inset 0 0 0 999px rgba(255,255,255,0.22); }
+    25%{ box-shadow:inset 0 0 0 999px rgba(255,255,255,0); }
+  }
+
+  @keyframes cc-edge-flash{
+    0%,100%{ opacity:0; }
+    12%,28%{ opacity:0.7; }
+    20%{ opacity:0; }
+  }
+
+  @keyframes cc-rgb-split{
+    0%{ text-shadow:none; }
+    15%{ text-shadow:-1.5px 0 #ff2d55, 1.5px 0 #2dd4ff; }
+    30%{ text-shadow:1px 0 #ff2d55, -1px 0 #2dd4ff; }
+    100%{ text-shadow:none; }
+  }
+
+  @keyframes cc-static-noise{
+    0%{ opacity:0.5; }
+    50%{ opacity:0.9; }
+    100%{ opacity:0.5; }
+  }
+
+  /* ---------- selected: yellow + scanline sweep ---------- */
+  .cc-card.is-selected{
+    background:var(--yellow);
+    color:var(--navy-deep);
+  }
+
+  .cc-card.is-selected .cc-card__title,
+  .cc-card.is-selected .cc-card__meta{
+    color:var(--navy-deep);
+    opacity:1;
+  }
+
+  .cc-card.is-selected::after{
+    content:"";
+    position:absolute;
+    left:0; right:0;
+    height:6px;
+    background:rgba(255,255,255,0.6);
+    top:-6px;
+    opacity:1;
+    animation:cc-scanline-sweep 1.8s linear infinite;
+  }
+
+  @keyframes cc-scanline-sweep{
+    0%{ top:-6px; }
+    100%{ top:100%; }
+  }
+</style>
+
+<script>
+  // Event delegation, registered once no matter how many <Card />
+  // instances render on the page (Astro would otherwise inline this
+  // script once per usage, so we guard against double-binding).
+  if (!(window as any).__ccCardHandlersInit) {
+    (window as any).__ccCardHandlersInit = true;
+
+    document.addEventListener('click', (e) => {
+      const card = (e.target as HTMLElement).closest('.cc-card') as HTMLElement | null;
+      if (!card) return;
+
+      const group = card.dataset.group;
+      if (group) {
+        // enforce single-selection within the same group
+        document
+          .querySelectorAll(`.cc-card[data-group="${group}"].is-selected`)
+          .forEach((el) => {
+            if (el !== card) el.classList.remove('is-selected');
+          });
+      }
+      card.classList.toggle('is-selected');
+    });
+
+    document.addEventListener('dblclick', (e) => {
+      const card = (e.target as HTMLElement).closest('.cc-card') as HTMLElement | null;
+      if (!card) return;
+      const href = card.dataset.href;
+      if (href) window.location.href = href;
+    });
+
+    // keyboard support: Enter selects, Enter twice quickly / Space+Enter
+    // isn't a real "double-click" equivalent, so Enter opens directly
+    // for keyboard users rather than requiring a double-press.
+    document.addEventListener('keydown', (e) => {
+      if (e.key !== 'Enter' && e.key !== ' ') return;
+      const card = (e.target as HTMLElement).closest('.cc-card') as HTMLElement | null;
+      if (!card) return;
+      e.preventDefault();
+      const href = card.dataset.href;
+      if (href) window.location.href = href;
+    });
+  }
+</script>

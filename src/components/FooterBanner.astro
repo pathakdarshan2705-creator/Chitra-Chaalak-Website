@@ -1,0 +1,82 @@
+---
+// src/components/FooterBanner.astro
+// Persistent across every page — mount this once, in Layout.astro.
+---
+<div class="cc-footer">
+  <div class="cc-footer__segment">
+    <span class="cc-footer__dot"></span>
+    <span id="cc-footer-date">--</span>
+  </div>
+  <div class="cc-footer__segment">
+    <span id="cc-footer-time">--:--:--</span>
+  </div>
+  <div class="cc-footer__segment">
+    <span id="cc-footer-steps">STEPS: ----</span>
+  </div>
+</div>
+
+<style>
+  .cc-footer{
+    position:absolute;
+    left:0;
+    right:0;
+    bottom:var(--footer-bottom-margin);
+    height:var(--footer-height);
+    background:var(--blue-lightest);
+    color:var(--navy-deep);
+    font-family:var(--font-ui);
+    font-size:13px;
+    font-weight:600;
+    letter-spacing:1px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:0 24px;
+    z-index:1000;
+    border-top:2px solid var(--yellow);
+  }
+
+  .cc-footer__segment{
+    display:flex;
+    align-items:center;
+    gap:6px;
+  }
+
+  .cc-footer__dot{
+    width:6px; height:6px;
+    background:var(--yellow);
+    border-radius:50%;
+    animation:cc-pulse-dot 1.5s ease-in-out infinite;
+  }
+
+  @keyframes cc-pulse-dot{
+    0%,100%{ opacity:1; }
+    50%{ opacity:0.2; }
+  }
+
+  @media (max-width:600px){
+    .cc-footer{
+      font-size:10px;
+      padding:0 12px;
+      gap:8px;
+    }
+    .cc-footer__segment{ gap:4px; }
+  }
+</style>
+
+<script>
+  // Runs once per page load. Date/time are live; steps is a placeholder
+  // until the Phase 4 phone-sync endpoint is wired in — swap the
+  // hardcoded value below for a fetch() call to that endpoint then.
+  function ccUpdateFooter(){
+    const now = new Date();
+    const dateStr = now.toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' }).toUpperCase();
+    const timeStr = now.toLocaleTimeString('en-GB', { hour12:false });
+    const dateEl = document.getElementById('cc-footer-date');
+    const timeEl = document.getElementById('cc-footer-time');
+    if (dateEl) dateEl.textContent = dateStr;
+    if (timeEl) timeEl.textContent = timeStr;
+  }
+  ccUpdateFooter();
+  setInterval(ccUpdateFooter, 1000);
+</script>

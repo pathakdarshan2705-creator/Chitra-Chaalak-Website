@@ -1,0 +1,61 @@
+---
+// src/components/ContactCard.astro
+//
+// Static, not a page — just a panel of social links.
+// Replace the `links` array with your real handles/URLs.
+
+const links = [
+  { label: 'Instagram', href: 'https://instagram.com/yourhandle' },
+  { label: 'Email', href: 'mailto:you@example.com' },
+  { label: 'LinkedIn', href: 'https://linkedin.com/in/yourhandle' },
+  { label: 'Behance', href: 'https://behance.net/yourhandle' },
+];
+---
+<div class="cc-contact">
+  <div class="cc-contact__label">Get in touch</div>
+  <ul class="cc-contact__list">
+    {links.map((link) => (
+      <li>
+        <a href={link.href} target="_blank" rel="noopener noreferrer">{link.label}</a>
+      </li>
+    ))}
+  </ul>
+</div>
+
+<style>
+  .cc-contact{
+    background:var(--blue-column);
+    border:1px solid rgba(166,232,255,0.3);
+    padding:16px;
+  }
+
+  .cc-contact__label{
+    font-family:var(--font-ui);
+    font-size:11px;
+    letter-spacing:1.5px;
+    text-transform:uppercase;
+    color:var(--yellow);
+    margin-bottom:10px;
+  }
+
+  .cc-contact__list{
+    list-style:none;
+    margin:0;
+    padding:0;
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+  }
+
+  .cc-contact__list a{
+    font-family:var(--font-body);
+    font-size:16px;
+    font-weight:600;
+    color:var(--blue-lightest);
+    transition:color 0.1s steps(2);
+  }
+
+  .cc-contact__list a:hover{
+    color:var(--yellow);
+  }
+</style>

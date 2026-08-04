@@ -1,17 +1,262 @@
 ---
+// src/pages/index.astro
+import Layout from '../layouts/Layout.astro';
+import Card from '../components/Card.astro';
+import CassetteCard from '../components/CassetteCard.astro';
+import ContactCard from '../components/ContactCard.astro';
+import { getCollection } from 'astro:content';
 
+// Blog now comes from src/content/blog/*.md — add a new .md file there
+// and it shows up here automatically, newest first, capped at 15 per
+// your original spec (older entries only reachable via "View All").
+const allBlogPosts = await getCollection('blog');
+const blogPosts = allBlogPosts
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
+  .slice(0, 15)
+  .map((post) => ({
+    title: post.data.title,
+    meta: `${post.data.date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).toUpperCase()} · ${post.data.topic}`,
+    imageSrc: post.data.image,
+    href: `/blog/${post.slug}`,
+  }));
+
+// Updates, films, tour, and collections stay hardcoded placeholders for
+// now — same content-collection treatment (a markdown folder + schema)
+// applies to each whenever you're ready to build that section for real.
+
+const updates = [
+  { title: 'Travelling to Kutch', meta: '04 AUG 2026', imageSrc: '/images/placeholder.jpg', href: '#' },
+  { title: 'Football match today', meta: '03 AUG 2026', imageSrc: '/images/placeholder.jpg', href: '#' },
+  { title: 'New stone from Hampi', meta: '01 AUG 2026', imageSrc: '/images/placeholder.jpg', href: '#' },
+];
+
+const films = [
+  { title: 'Pyaasa (1957)', meta: 'RECOMMENDATION', imageSrc: '/images/placeholder.jpg', href: '#' },
+  { title: 'Andhadhun (2018)', meta: 'RECOMMENDATION', imageSrc: '/images/placeholder.jpg', href: '#' },
+  { title: 'Charulata (1964)', meta: 'RECOMMENDATION', imageSrc: '/images/placeholder.jpg', href: '#' },
+];
+
+const visualTour = [
+  { title: 'Mumbai', meta: 'VISUAL TOUR', imageSrc: '/images/placeholder.jpg', href: '#' },
+];
+
+const collections = [
+  { title: 'Camera Collection', meta: 'COLLECTIONS', imageSrc: '/images/placeholder.jpg', href: '#' },
+];
+
+const portfolioSections = [
+  { label: 'Filmmaking', href: '/portfolio/filmmaking' },
+  { label: 'Photography', href: '/portfolio/photography' },
+  { label: 'Design', href: '/portfolio/design' },
+  { label: 'Art', href: '/portfolio/art' },
+];
 ---
+<Layout title="Home">
+  <div class="cc-home">
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+    <!-- LEFT COLUMN: daily updates -->
+    <aside class="cc-col cc-col--updates">
+      <div class="cc-panel-header">
+        <span class="cc-section-label" style="margin:0; border:none; padding:0;">Updates</span>
+        <button class="cc-btn cc-btn--small">View All</button>
+      </div>
+      <div class="cc-card-list" id="updates-list">
+        {updates.map((u) => (
+          <Card title={u.title} meta={u.meta} imageSrc={u.imageSrc} href={u.href} group="updates" />
+        ))}
+      </div>
+      <div class="cc-panel-controls">
+        <button class="cc-btn" data-scroll-target="updates-list" data-dir="-1">▲</button>
+        <button class="cc-btn" data-scroll-target="updates-list" data-dir="1">▼</button>
+      </div>
+    </aside>
+
+    <!-- CENTER COLUMN: films, blog, tour + collections -->
+    <main class="cc-col cc-col--center">
+
+      <section class="cc-panel">
+        <div class="cc-panel-header">
+          <span class="cc-section-label" style="margin:0; border:none; padding:0;">Film Recommendations</span>
+          <button class="cc-btn cc-btn--small">View All</button>
+        </div>
+        <div class="cc-card-row" id="films-list">
+          {films.map((f) => (
+            <Card title={f.title} meta={f.meta} imageSrc={f.imageSrc} href={f.href} group="films" />
+          ))}
+        </div>
+        <div class="cc-panel-controls">
+          <button class="cc-btn" data-scroll-target="films-list" data-dir="-1">▲</button>
+          <button class="cc-btn" data-scroll-target="films-list" data-dir="1">▼</button>
+        </div>
+      </section>
+
+      <section class="cc-panel cc-panel--blog">
+        <div class="cc-panel-header">
+          <span class="cc-section-label" style="margin:0; border:none; padding:0;">Blog</span>
+          <button class="cc-btn cc-btn--small">View All</button>
+        </div>
+        <div class="cc-card-list" id="blog-list">
+          {blogPosts.map((b) => (
+            <Card title={b.title} meta={b.meta} imageSrc={b.imageSrc} href={b.href} group="blog" />
+          ))}
+        </div>
+        <div class="cc-panel-controls">
+          <button class="cc-btn" data-scroll-target="blog-list" data-dir="-1">▲</button>
+          <button class="cc-btn" data-scroll-target="blog-list" data-dir="1">▼</button>
+        </div>
+      </section>
+
+      <div class="cc-split-row">
+        <section class="cc-panel">
+          <div class="cc-panel-header">
+            <span class="cc-section-label" style="margin:0; border:none; padding:0;">Visual Tour</span>
+            <button class="cc-btn cc-btn--small">View All</button>
+          </div>
+          {visualTour.map((v) => (
+            <Card title={v.title} meta={v.meta} imageSrc={v.imageSrc} href={v.href} group="tour" />
+          ))}
+        </section>
+
+        <section class="cc-panel">
+          <div class="cc-panel-header">
+            <span class="cc-section-label" style="margin:0; border:none; padding:0;">Collections</span>
+            <button class="cc-btn cc-btn--small">View All</button>
+          </div>
+          {collections.map((c) => (
+            <Card title={c.title} meta={c.meta} imageSrc={c.imageSrc} href={c.href} group="collections" />
+          ))}
+        </section>
+      </div>
+
+    </main>
+
+    <!-- RIGHT COLUMN: portfolio cassettes + contact -->
+    <aside class="cc-col cc-col--portfolio">
+      <div class="cc-panel-header">
+        <span class="cc-section-label" style="margin:0; border:none; padding:0;">Portfolio</span>
+        <button class="cc-btn cc-btn--small">View All</button>
+      </div>
+      <div class="cc-cassette-stack">
+        {portfolioSections.map((p) => (
+          <CassetteCard label={p.label} href={p.href} />
+        ))}
+      </div>
+      <ContactCard />
+    </aside>
+
+  </div>
+</Layout>
+
+<style>
+  /* Positioned as an absolutely-placed content area within .cc-stage
+     (1920x1080, see Layout.astro). Values are the exact px measurements
+     taken from the hi-fi reference — see --page-margin-left etc in
+     global.css. Height is capped to the space above the footer, so
+     the columns' own internal lists scroll (cc-card-list already does)
+     rather than the page. */
+  .cc-home{
+    position:absolute;
+    top:0;
+    left:var(--page-margin-left);
+    width:calc(var(--stage-w) - var(--page-margin-left) - var(--page-margin-right));
+    height:994px; /* measured: columns run 0-994px, footer starts at 995px */
+    display:grid;
+    grid-template-columns:
+      var(--col-updates-w)
+      var(--gap-left-center)
+      var(--col-center-w)
+      var(--gap-center-right)
+      var(--col-portfolio-w);
+    align-items:start;
+  }
+
+  .cc-col{
+    background:var(--blue-column);
+    padding:16px;
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+    height:100%;
+    overflow:hidden;
+  }
+
+  .cc-col--updates{ grid-column:1; }
+  .cc-col--center{ grid-column:3; }
+  .cc-col--portfolio{ grid-column:5; }
+  /* grid-columns 2 and 4 are intentionally empty — they're the
+     measured gaps, not gutter shorthand, so left/center/right can
+     each have a different gap width exactly matching the reference */
+
+  .cc-panel{
+    background:var(--blue-column);
+    display:flex;
+    flex-direction:column;
+    min-height:0;
+  }
+
+  .cc-panel--blog{
+    flex:1 1 auto;
+    min-height:0;
+  }
+
+  .cc-panel-header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:12px;
+  }
+
+  .cc-btn--small{
+    font-size:10px;
+    padding:6px 12px;
+  }
+
+  .cc-card-list{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    flex:1 1 auto;
+    min-height:0;
+    overflow-y:auto;
+    scrollbar-width:none;
+  }
+
+  .cc-card-list::-webkit-scrollbar{ display:none; }
+
+  .cc-card-row{
+    display:grid;
+    grid-template-columns:repeat(3, 1fr);
+    gap:12px;
+  }
+
+  .cc-panel-controls{
+    display:flex;
+    gap:8px;
+    margin-top:10px;
+  }
+
+  .cc-split-row{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:20px;
+  }
+
+  .cc-cassette-stack{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+  }
+</style>
+
+<script>
+  // Up/down controls scroll their associated list by one card's worth.
+  document.querySelectorAll<HTMLButtonElement>('[data-scroll-target]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const targetId = btn.dataset.scrollTarget;
+      const dir = Number(btn.dataset.dir ?? '1');
+      const list = targetId ? document.getElementById(targetId) : null;
+      if (!list) return;
+      list.scrollBy({ top: dir * 100, behavior: 'smooth' });
+    });
+  });
+</script>
