@@ -1,8 +1,8 @@
 ---
 // src/components/ContactCard.astro
-//
-// Static, not a page — just a panel of social links.
-// Replace the `links` array with your real handles/URLs.
+// Static — not a page. Swap the `links` array for your real handles.
+
+import Icon from './Icons.astro';
 
 const links = [
   { label: 'Instagram', href: 'https://instagram.com/yourhandle' },
@@ -12,7 +12,10 @@ const links = [
 ];
 ---
 <div class="cc-contact">
-  <div class="cc-contact__label">Get in touch</div>
+  <div class="cc-contact__header">
+    <span class="cc-contact__label">Get in Touch</span>
+    <span class="cc-contact__phone"><Icon name="phone" size={18} /></span>
+  </div>
   <ul class="cc-contact__list">
     {links.map((link) => (
       <li>
@@ -26,7 +29,14 @@ const links = [
   .cc-contact{
     background:var(--blue-column);
     border:1px solid rgba(166,232,255,0.3);
-    padding:16px;
+    padding:14px;
+  }
+
+  .cc-contact__header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:10px;
   }
 
   .cc-contact__label{
@@ -35,7 +45,11 @@ const links = [
     letter-spacing:1.5px;
     text-transform:uppercase;
     color:var(--yellow);
-    margin-bottom:10px;
+  }
+
+  .cc-contact__phone{
+    color:var(--blue-lightest);
+    opacity:0.8;
   }
 
   .cc-contact__list{
@@ -49,7 +63,7 @@ const links = [
 
   .cc-contact__list a{
     font-family:var(--font-body);
-    font-size:16px;
+    font-size:clamp(14px, 1.1vw, 16px);
     font-weight:600;
     color:var(--blue-lightest);
     transition:color 0.1s steps(2);

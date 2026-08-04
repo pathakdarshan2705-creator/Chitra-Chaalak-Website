@@ -1,0 +1,201 @@
+---
+// src/components/TransmissionCard.astro
+//
+// This IS the whole Updates section — not a Panel + Card list, since
+// the reference gives Updates its own distinct chrome: yellow dot +
+// dots-icon header, dashed-divider list with triangle bullets, and
+// a SIGNAL meter + LIVE badge footer instead of the usual ▲▼/Enter/i.
+//
+// <TransmissionCard title="Daily Transmission" date="04 AUG 2026" items={[...]} />
+
+import Icon from './Icons.astro';
+
+interface Props {
+  title?: string;
+  date?: string;
+  items: string[];
+}
+
+const { title = 'Daily Transmission', date, items } = Astro.props;
+---
+<div class="cc-transmission">
+  <div class="cc-transmission__header">
+    <span class="cc-transmission__dot" aria-hidden="true"></span>
+    <span class="cc-transmission__title">{title}</span>
+    <span class="cc-transmission__dots"><Icon name="dots" size={16} /></span>
+  </div>
+
+  {date && <div class="cc-transmission__date">{date}</div>}
+
+  <ul class="cc-transmission__list">
+    {items.map((item) => (
+      <li>
+        <span class="cc-transmission__bullet"><Icon name="triangle" size={12} /></span>
+        <span>{item}</span>
+      </li>
+    ))}
+  </ul>
+
+  <div class="cc-transmission__footer">
+    <div class="cc-transmission__signal">
+      <span class="cc-transmission__signal-label">Signal</span>
+      <span class="cc-transmission__bars" aria-hidden="true">
+        {Array.from({ length: 10 }).map((_, i) => (
+          <span class="cc-transmission__bar" style={`animation-delay:${i * 0.08}s`}></span>
+        ))}
+      </span>
+    </div>
+    <span class="cc-transmission__live">Live</span>
+  </div>
+</div>
+
+<style>
+  .cc-transmission{
+    background:var(--blue-card);
+    border:2px solid var(--blue-panel-light);
+    height:100%;
+    display:flex;
+    flex-direction:column;
+    min-height:0;
+    overflow:hidden;
+  }
+
+  .cc-transmission__header{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    background:var(--navy-deep);
+    padding:12px 14px;
+    flex-shrink:0;
+    border-bottom:1px solid var(--blue-panel-light);
+  }
+
+  .cc-transmission__dot{
+    width:9px; height:9px;
+    border-radius:50%;
+    background:var(--yellow);
+    flex-shrink:0;
+    animation:cc-pulse-dot 1.5s ease-in-out infinite;
+  }
+
+  @keyframes cc-pulse-dot{
+    0%,100%{ opacity:1; }
+    50%{ opacity:0.25; }
+  }
+
+  .cc-transmission__title{
+    font-family:var(--font-ui);
+    font-weight:700;
+    font-size:clamp(12px, 1vw, 15px);
+    letter-spacing:1.5px;
+    text-transform:uppercase;
+    color:var(--yellow);
+    flex:1;
+  }
+
+  .cc-transmission__dots{
+    color:var(--blue-panel-light);
+    flex-shrink:0;
+  }
+
+  .cc-transmission__date{
+    font-family:var(--font-ui);
+    font-size:clamp(10px, 0.8vw, 12px);
+    color:var(--blue-lightest);
+    opacity:0.75;
+    padding:10px 14px 0;
+    flex-shrink:0;
+  }
+
+  .cc-transmission__list{
+    list-style:none;
+    margin:0;
+    padding:6px 14px 10px;
+    flex:1 1 auto;
+    min-height:0;
+    overflow-y:auto;
+    scrollbar-width:none;
+  }
+
+  .cc-transmission__list::-webkit-scrollbar{ display:none; }
+
+  .cc-transmission__list li{
+    display:flex;
+    align-items:flex-start;
+    gap:8px;
+    padding:12px 0;
+    border-bottom:1px dashed rgba(166,232,255,0.4);
+    font-family:var(--font-body);
+    font-weight:600;
+    font-size:clamp(13px, 1.1vw, 16px);
+    color:var(--blue-lightest);
+  }
+
+  .cc-transmission__list li:last-child{
+    border-bottom:none;
+  }
+
+  .cc-transmission__bullet{
+    color:var(--yellow);
+    flex-shrink:0;
+    margin-top:3px;
+  }
+
+  .cc-transmission__footer{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    background:var(--navy-deep);
+    padding:10px 14px;
+    flex-shrink:0;
+    border-top:1px solid var(--blue-panel-light);
+  }
+
+  .cc-transmission__signal{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    min-width:0;
+  }
+
+  .cc-transmission__signal-label{
+    font-family:var(--font-ui);
+    font-size:10px;
+    letter-spacing:1px;
+    text-transform:uppercase;
+    color:var(--blue-lightest);
+    flex-shrink:0;
+  }
+
+  .cc-transmission__bars{
+    display:flex;
+    gap:2px;
+    overflow:hidden;
+  }
+
+  .cc-transmission__bar{
+    width:6px;
+    height:12px;
+    background:var(--yellow);
+    flex-shrink:0;
+    animation:cc-signal-flicker 2.4s ease-in-out infinite;
+  }
+
+  @keyframes cc-signal-flicker{
+    0%,100%{ opacity:1; }
+    50%{ opacity:0.35; }
+  }
+
+  .cc-transmission__live{
+    font-family:var(--font-ui);
+    font-weight:700;
+    font-size:11px;
+    letter-spacing:1px;
+    text-transform:uppercase;
+    background:var(--yellow);
+    color:var(--navy-deep);
+    padding:5px 12px;
+    flex-shrink:0;
+  }
+</style>

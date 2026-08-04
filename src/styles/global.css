@@ -1,6 +1,6 @@
 /* ==========================================================
    Chitra-Chaalak — Global Design Tokens
-   Import this once in Layout.astro:  import '../styles/global.css';
+   Import once in Layout.astro: import '../styles/global.css';
    ========================================================== */
 
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Rajdhani:wght@400;500;600;700&display=swap');
@@ -11,28 +11,25 @@
   --blue-column: #0054cc;    /* column / section bg */
   --blue-card: #1f6bff;      /* card fill, default */
   --blue-card-hover: #2d83ff;/* card fill, hover */
-  --blue-panel-light: #67c8ff; /* inner panel / image placeholder fill */
+  --blue-panel-light: #67c8ff; /* inner panel / border / chrome fill */
   --blue-lightest: #a6e8ff;  /* lightest — text on dark */
-  --yellow: #fff000;         /* accent — selected / active only */
+  --yellow: #fff000;         /* accent — selected / active / live only */
 
   /* ---- type roles ---- */
-  --font-ui: 'IBM Plex Mono', monospace;     /* buttons, headings, footer data */
+  --font-ui: 'IBM Plex Mono', monospace;     /* buttons, headings, chrome, footer data */
   --font-body: 'Rajdhani', sans-serif;       /* blog, captions, updates, body copy */
 
-  /* ---- layout ---- */
-  --footer-height: 56px;
-
-  /* ---- exact measurements from the 1920x1080 hi-fi reference ---- */
-  --stage-w: 1920px;
-  --stage-h: 1080px;
+  /* ---- page margins & gaps ----
+     Measured from the 1920x1080 hi-fi reference. These stay fixed
+     px regardless of screen width (standard practice — gutters don't
+     scale, content does). Column widths are fr-based in index.astro,
+     derived from the same reference's measured ratio: 396 : 1012 : 380 */
   --page-margin-left: 29px;
-  --page-margin-right: 38px;
-  --col-updates-w: 396px;
-  --col-center-w: 1012px;
-  --col-portfolio-w: 380px;
-  --gap-left-center: 29px;
-  --gap-center-right: 37px;
-  --footer-bottom-margin: 28px;
+  --page-margin-right: 32px;
+  --col-gap-left: 28px;
+  --col-gap-right: 32px;
+  --footer-height: 52px;
+  --footer-bottom-margin: 24px;
 }
 
 *, *::before, *::after{
@@ -43,35 +40,13 @@ html, body{
   margin:0;
   padding:0;
   height:100%;
-  overflow:hidden; /* the stage below fits exactly — the page itself never scrolls */
 }
 
 body{
-  background:var(--navy-deep); /* letterbox color if screen ratio != 16:9 */
+  background:var(--navy-deep) url('/assets/bg-texture.png') center center / cover no-repeat fixed;
   color:var(--blue-lightest);
   font-family:var(--font-body);
-}
-
-/* full-viewport flex wrapper that centers and letterboxes the stage */
-.cc-stage-wrap{
-  width:100vw;
-  height:100vh;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  overflow:hidden;
-}
-
-/* the fixed 1920x1080 canvas every page is authored at — scaled to
-   fit by the script in Layout.astro, never resized/reflowed itself */
-.cc-stage{
-  position:relative;
-  width:var(--stage-w);
-  height:var(--stage-h);
-  flex-shrink:0;
-  transform-origin:center center;
-  background:var(--navy-deep) url('/assets/bg-texture.png') center center / cover no-repeat;
-  overflow:hidden;
+  overflow:hidden; /* the app shell below owns internal scrolling per-section, not the page */
 }
 
 a{ color:inherit; text-decoration:none; }
@@ -82,14 +57,36 @@ button{
 }
 
 /* ==========================================================
+   App shell — full-viewport flex column: content area (flexible)
+   + footer (fixed height, own bottom margin). Fully fluid, no
+   fixed-canvas scaling.
+   ========================================================== */
+
+.cc-app{
+  height:100vh;
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+}
+
+.cc-app__content{
+  flex:1 1 auto;
+  min-height:0;
+  overflow:hidden;
+  padding:24px var(--page-margin-right) 0 var(--page-margin-left);
+}
+
+.cc-app__footer-spacer{
+  flex-shrink:0;
+  height:var(--footer-bottom-margin);
+}
+
+/* ==========================================================
    Ambient motion — comfortable, not disruptive.
-   Two layers: a slow continuous scanline drift (too gradual to
-   read as "motion") and a soft breathing vignette glow.
-   These mount once in Layout.astro, not per-page.
    ========================================================== */
 
 .cc-scanlines{
-  position:absolute;
+  position:fixed;
   inset:0;
   pointer-events:none;
   background:repeating-linear-gradient(
@@ -110,7 +107,7 @@ button{
 }
 
 .cc-vignette{
-  position:absolute;
+  position:fixed;
   inset:0;
   pointer-events:none;
   z-index:997;
@@ -123,9 +120,8 @@ button{
   50%{ opacity:1; }
 }
 
-/* subtle CRT flicker, very occasional, very faint */
 .cc-flicker{
-  position:absolute;
+  position:fixed;
   inset:0;
   pointer-events:none;
   background:var(--blue-lightest);
@@ -139,6 +135,70 @@ button{
   97%{ opacity:0.02; }
   98%{ opacity:0; }
   99%{ opacity:0.015; }
+}
+
+/* Static CRT screen vignette — darkened, slightly warped-feeling
+   corners, like light falling off toward the edge of a tube. No
+   animation: this is a cosmetic constant, not a motion effect. */
+.cc-crt-edge{
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:996;
+  box-shadow:
+    inset 0 0 140px rgba(0,10,40,0.55),
+    inset 0 0 40px rgba(0,10,40,0.35);
+}
+
+/* ==========================================================
+   Preview popover — shown on hovering a panel's info icon.
+   ========================================================== */
+
+.cc-preview-popover{
+  position:fixed;
+  transform:translate(-50%, -100%);
+  z-index:1200;
+  pointer-events:none;
+  opacity:0;
+  transition:opacity 0.12s steps(3);
+}
+
+.cc-preview-popover.is-visible{
+  opacity:1;
+}
+
+.cc-preview-popover__frame{
+  width:220px;
+  background:var(--blue-card);
+  border:2px solid var(--yellow);
+  box-shadow:0 0 0 1px var(--navy-deep), 0 8px 24px rgba(0,10,40,0.6);
+  padding:8px;
+}
+
+.cc-preview-popover__img{
+  width:100%;
+  height:120px;
+  object-fit:cover;
+  display:block;
+  background:var(--blue-panel-light);
+  margin-bottom:8px;
+}
+
+.cc-preview-popover__title{
+  font-family:var(--font-ui);
+  font-weight:700;
+  font-size:12px;
+  letter-spacing:0.5px;
+  text-transform:uppercase;
+  color:var(--yellow);
+  margin-bottom:2px;
+}
+
+.cc-preview-popover__meta{
+  font-family:var(--font-body);
+  font-size:13px;
+  color:var(--blue-lightest);
+  opacity:0.8;
 }
 
 /* ==========================================================
@@ -161,15 +221,3 @@ button{
 
 .cc-btn:hover{ background:var(--yellow); }
 .cc-btn:active{ transform:translate(1px,1px); }
-
-.cc-section-label{
-  font-family:var(--font-ui);
-  font-weight:600;
-  font-size:14px;
-  letter-spacing:2px;
-  text-transform:uppercase;
-  color:var(--yellow);
-  margin-bottom:20px;
-  padding-bottom:10px;
-  border-bottom:1px solid var(--blue-card);
-}

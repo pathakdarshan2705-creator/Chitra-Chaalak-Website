@@ -1,24 +1,11 @@
 ---
 // src/components/Card.astro
 //
-// Usage:
-// <Card
-//   href="/blog/some-post"
-//   title="Some Post Title"
-//   meta="04 AUG 2026 · ESSAY"
-//   imageSrc="/images/some-post.jpg"
-//   imageAlt="Description of the image"
-// />
+// <Card href="/blog/some-post" title="..." meta="..." imageSrc="..." group="blog" />
 //
-// Behavior:
-// - single click  -> toggles this card's "selected" state (yellow + scanline)
-// - double click  -> navigates to `href`
-// - hover         -> glitch flicker (RGB split, static, yellow edge flash)
-//
-// Selection is per-card by default. If a parent list wants
-// "only one selected at a time" (like the blog list), pass
-// group="blog-list" — cards sharing a group value will
-// deselect each other on click.
+// Single click toggles selected (yellow + scanline). Passing the same
+// `group` to every card in a list makes selection exclusive within
+// that list. Double-click navigates to `href`. Keyboard: Tab + Enter.
 
 interface Props {
   href: string;
@@ -26,21 +13,22 @@ interface Props {
   meta?: string;
   imageSrc: string;
   imageAlt?: string;
-  stateTag?: string;
   group?: string;
 }
 
-const { href, title, meta, imageSrc, imageAlt = '', stateTag, group } = Astro.props;
+const { href, title, meta, imageSrc, imageAlt = '', group } = Astro.props;
 ---
 <div
   class="cc-card"
   data-href={href}
   data-group={group ?? ''}
+  data-title={title}
+  data-meta={meta ?? ''}
+  data-image={imageSrc}
   tabindex="0"
   role="button"
   aria-label={`${title}. Click to preview, double-click to open.`}
 >
-  {stateTag && <span class="cc-card__tag">{stateTag}</span>}
   <div class="cc-card__img">
     <img src={imageSrc} alt={imageAlt} loading="lazy" />
   </div>
@@ -54,14 +42,15 @@ const { href, title, meta, imageSrc, imageAlt = '', stateTag, group } = Astro.pr
   .cc-card{
     position:relative;
     display:flex;
-    gap:14px;
+    gap:12px;
     align-items:flex-start;
     background:var(--blue-card);
     border:1px solid rgba(166,232,255,0.3);
-    padding:14px;
+    padding:12px;
     cursor:pointer;
     overflow:hidden;
     outline:none;
+    width:100%;
   }
 
   .cc-card:focus-visible{
@@ -69,8 +58,8 @@ const { href, title, meta, imageSrc, imageAlt = '', stateTag, group } = Astro.pr
   }
 
   .cc-card__img{
-    flex:0 0 96px;
-    height:72px;
+    flex:0 0 clamp(56px, 8vw, 96px);
+    aspect-ratio:4 / 3;
     background:var(--blue-panel-light);
     overflow:hidden;
   }
@@ -87,7 +76,7 @@ const { href, title, meta, imageSrc, imageAlt = '', stateTag, group } = Astro.pr
   .cc-card__title{
     font-family:var(--font-ui);
     font-weight:600;
-    font-size:13px;
+    font-size:clamp(11px, 0.85vw, 13px);
     text-transform:uppercase;
     letter-spacing:0.5px;
     color:var(--blue-lightest);
@@ -99,27 +88,12 @@ const { href, title, meta, imageSrc, imageAlt = '', stateTag, group } = Astro.pr
 
   .cc-card__meta{
     font-family:var(--font-body);
-    font-size:13px;
+    font-size:clamp(11px, 0.85vw, 13px);
     color:var(--blue-lightest);
     opacity:0.7;
   }
 
-  .cc-card__tag{
-    position:absolute;
-    top:8px;
-    right:8px;
-    font-family:var(--font-ui);
-    font-size:9px;
-    letter-spacing:1px;
-    text-transform:uppercase;
-    color:var(--navy-deep);
-    background:var(--blue-lightest);
-    padding:2px 6px;
-    opacity:0.8;
-    z-index:4;
-  }
-
-  /* ---------- hover: glitch (RGB split + static + edge flash) ---------- */
+  /* ---------- hover: glitch ---------- */
   .cc-card:hover{
     background:var(--blue-card-hover);
     animation:cc-glitch 0.4s steps(4) 1, cc-white-flash 0.4s ease-out 1;
@@ -220,9 +194,7 @@ const { href, title, meta, imageSrc, imageAlt = '', stateTag, group } = Astro.pr
 </style>
 
 <script>
-  // Event delegation, registered once no matter how many <Card />
-  // instances render on the page (Astro would otherwise inline this
-  // script once per usage, so we guard against double-binding).
+  // Delegated once, no matter how many <Card /> instances render.
   if (!(window as any).__ccCardHandlersInit) {
     (window as any).__ccCardHandlersInit = true;
 
@@ -232,7 +204,6 @@ const { href, title, meta, imageSrc, imageAlt = '', stateTag, group } = Astro.pr
 
       const group = card.dataset.group;
       if (group) {
-        // enforce single-selection within the same group
         document
           .querySelectorAll(`.cc-card[data-group="${group}"].is-selected`)
           .forEach((el) => {
@@ -249,9 +220,6 @@ const { href, title, meta, imageSrc, imageAlt = '', stateTag, group } = Astro.pr
       if (href) window.location.href = href;
     });
 
-    // keyboard support: Enter selects, Enter twice quickly / Space+Enter
-    // isn't a real "double-click" equivalent, so Enter opens directly
-    // for keyboard users rather than requiring a double-press.
     document.addEventListener('keydown', (e) => {
       if (e.key !== 'Enter' && e.key !== ' ') return;
       const card = (e.target as HTMLElement).closest('.cc-card') as HTMLElement | null;

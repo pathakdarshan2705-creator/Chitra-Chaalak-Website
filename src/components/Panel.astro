@@ -1,0 +1,297 @@
+---
+// src/components/Panel.astro
+//
+// The recurring "TV panel" shell — film, blog, tour, collections,
+// and portfolio all wrap their content in this.
+//
+// <Panel title="Film Recommendations" viewAllHref="/films" showControls group="films">
+//   ...cards with group="films"...
+// </Panel>
+//
+// Controls are fully wired to the same selection state as click/dblclick
+// on the cards themselves:
+// - Up/Down move the current selection within `group` (wrapping, and
+//   scrolling it into view if the list scrolls).
+// - Enter: first press selects the first item if nothing's selected yet
+//   (a TV remote convention — highlight, then confirm), pressing it
+//   again while something's selected opens it.
+// - Info: hovering it shows a floating preview of the selected card
+//   (falls back to the first card if nothing's selected yet).
+
+import Icon from './Icons.astro';
+
+interface Props {
+  title: string;
+  viewAllHref?: string;
+  showControls?: boolean;
+  group?: string;
+  notchSize?: number;
+}
+
+const {
+  title,
+  viewAllHref,
+  showControls = false,
+  group,
+  notchSize = 20,
+} = Astro.props;
+---
+<div class="cc-panel" style={`--notch: ${notchSize}px`}>
+  <div class="cc-panel__header">
+    <span class="cc-panel__arrow"><Icon name="arrow" size={16} /></span>
+    <span class="cc-panel__title">{title}</span>
+    {viewAllHref && (
+      <a class="cc-panel__viewall" href={viewAllHref}>View All</a>
+    )}
+  </div>
+
+  <div class="cc-panel__body">
+    <slot />
+  </div>
+
+  {showControls && (
+    <div class="cc-panel__controls">
+      <div class="cc-panel__scroll-btns">
+        <button class="cc-icon-btn" data-select-group={group} data-dir="-1" aria-label="Select previous">
+          <Icon name="chevron-up" size={14} />
+        </button>
+        <button class="cc-icon-btn" data-select-group={group} data-dir="1" aria-label="Select next">
+          <Icon name="chevron-down" size={14} />
+        </button>
+      </div>
+      <button class="cc-panel__enter" data-enter-group={group}>Enter</button>
+      <button class="cc-icon-btn cc-panel__info" data-info-group={group} aria-label="Preview selected">
+        <Icon name="info" size={17} />
+      </button>
+    </div>
+  )}
+</div>
+
+<style>
+  .cc-panel{
+    --notch: 20px;
+    position:relative;
+    background:var(--blue-card);
+    border:1px solid var(--blue-panel-light);
+    clip-path:polygon(
+      0 0,
+      calc(100% - var(--notch)) 0,
+      100% var(--notch),
+      100% 100%,
+      0 100%
+    );
+    display:flex;
+    flex-direction:column;
+    min-height:0;
+    width:100%;
+    box-shadow: inset 0 0 24px rgba(166,232,255,0.06);
+  }
+
+  .cc-panel__header{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    background:var(--blue-panel-light);
+    color:var(--navy-deep);
+    padding:7px 12px;
+    padding-right:calc(var(--notch) + 10px);
+    flex-shrink:0;
+  }
+
+  .cc-panel__arrow{
+    display:flex;
+    align-items:center;
+    flex-shrink:0;
+  }
+
+  .cc-panel__title{
+    font-family:var(--font-ui);
+    font-weight:700;
+    font-size:clamp(10px, 0.8vw, 13px);
+    letter-spacing:1px;
+    text-transform:uppercase;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    flex:1;
+  }
+
+  .cc-panel__viewall{
+    font-family:var(--font-ui);
+    font-weight:600;
+    font-size:9px;
+    letter-spacing:0.5px;
+    text-transform:uppercase;
+    background:var(--navy-deep);
+    color:var(--blue-lightest);
+    padding:4px 10px;
+    flex-shrink:0;
+    transition:background 0.1s steps(2), color 0.1s steps(2);
+  }
+
+  .cc-panel__viewall:hover{
+    background:var(--yellow);
+    color:var(--navy-deep);
+  }
+
+  .cc-panel__body{
+    flex:1 1 auto;
+    min-height:0;
+    padding:12px;
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+  }
+
+  .cc-panel__controls{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    background:var(--blue-panel-light);
+    color:var(--navy-deep);
+    padding:5px 12px;
+    border-top:2px solid var(--navy-deep);
+    flex-shrink:0;
+  }
+
+  .cc-panel__scroll-btns{
+    display:flex;
+    gap:4px;
+  }
+
+  .cc-icon-btn{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    width:22px;
+    height:20px;
+    background:var(--blue-card);
+    color:var(--blue-lightest);
+    border:none;
+    cursor:pointer;
+    transition:background 0.1s steps(2);
+  }
+
+  .cc-icon-btn:hover{ background:var(--yellow); color:var(--navy-deep); }
+
+  .cc-panel__enter{
+    font-family:var(--font-ui);
+    font-weight:700;
+    font-size:12px;
+    letter-spacing:1px;
+    text-transform:uppercase;
+    flex:1;
+    text-align:center;
+    background:none;
+    border:none;
+    color:var(--navy-deep);
+    padding:4px 0;
+    cursor:pointer;
+    transition:color 0.1s steps(2), text-shadow 0.1s steps(2);
+  }
+
+  .cc-panel__enter:hover{
+    color:var(--blue-card);
+    text-shadow:0 0 1px var(--navy-deep);
+  }
+
+  .cc-panel__info{
+    flex-shrink:0;
+  }
+</style>
+
+<script>
+  if (!(window as any).__ccPanelControlsInit) {
+    (window as any).__ccPanelControlsInit = true;
+
+    function cardsInGroup(group: string): HTMLElement[] {
+      return Array.from(document.querySelectorAll(`.cc-card[data-group="${group}"]`));
+    }
+
+    function selectedInGroup(group: string): HTMLElement | null {
+      return document.querySelector(`.cc-card[data-group="${group}"].is-selected`);
+    }
+
+    function setSelected(group: string, card: HTMLElement) {
+      cardsInGroup(group).forEach((el) => el.classList.remove('is-selected'));
+      card.classList.add('is-selected');
+      card.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    }
+
+    document.addEventListener('click', (e) => {
+      const btn = (e.target as HTMLElement).closest('[data-select-group]') as HTMLElement | null;
+      if (!btn) return;
+      const group = btn.dataset.selectGroup;
+      if (!group) return;
+      const cards = cardsInGroup(group);
+      if (cards.length === 0) return;
+
+      const current = selectedInGroup(group);
+      const currentIndex = current ? cards.indexOf(current) : -1;
+      const dir = Number(btn.dataset.dir ?? '1');
+      let nextIndex = currentIndex + dir;
+      if (nextIndex < 0) nextIndex = cards.length - 1;
+      if (nextIndex >= cards.length) nextIndex = 0;
+
+      setSelected(group, cards[nextIndex]);
+    });
+
+    document.addEventListener('click', (e) => {
+      const btn = (e.target as HTMLElement).closest('[data-enter-group]') as HTMLElement | null;
+      if (!btn) return;
+      const group = btn.dataset.enterGroup;
+      if (!group) return;
+      const cards = cardsInGroup(group);
+      if (cards.length === 0) return;
+
+      const current = selectedInGroup(group);
+      if (current) {
+        const href = current.dataset.href;
+        if (href) window.location.href = href;
+      } else {
+        setSelected(group, cards[0]);
+      }
+    });
+
+    let popover: HTMLElement | null = document.getElementById('cc-preview-popover');
+
+    function showPreview(anchor: HTMLElement, group: string) {
+      if (!popover) return;
+      const cards = cardsInGroup(group);
+      if (cards.length === 0) return;
+      const source = selectedInGroup(group) ?? cards[0];
+
+      const img = popover.querySelector('.cc-preview-popover__img') as HTMLImageElement | null;
+      const titleEl = popover.querySelector('.cc-preview-popover__title') as HTMLElement | null;
+      const metaEl = popover.querySelector('.cc-preview-popover__meta') as HTMLElement | null;
+      if (img) img.src = source.dataset.image ?? '';
+      if (titleEl) titleEl.textContent = source.dataset.title ?? '';
+      if (metaEl) metaEl.textContent = source.dataset.meta ?? '';
+
+      const rect = anchor.getBoundingClientRect();
+      popover.style.left = `${rect.left + rect.width / 2}px`;
+      popover.style.top = `${rect.top - 8}px`;
+      popover.hidden = false;
+      popover.classList.add('is-visible');
+    }
+
+    function hidePreview() {
+      if (!popover) return;
+      popover.classList.remove('is-visible');
+      popover.hidden = true;
+    }
+
+    document.addEventListener('mouseenter', (e) => {
+      const btn = (e.target as HTMLElement).closest?.('[data-info-group]') as HTMLElement | null;
+      if (!btn) return;
+      const group = btn.dataset.infoGroup;
+      if (group) showPreview(btn, group);
+    }, true);
+
+    document.addEventListener('mouseleave', (e) => {
+      const btn = (e.target as HTMLElement).closest?.('[data-info-group]') as HTMLElement | null;
+      if (!btn) return;
+      hidePreview();
+    }, true);
+  }
+</script>

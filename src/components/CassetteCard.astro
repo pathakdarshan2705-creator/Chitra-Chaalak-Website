@@ -1,11 +1,9 @@
 ---
 // src/components/CassetteCard.astro
-//
-// Usage:
 // <CassetteCard href="/portfolio/filmmaking" label="Filmmaking" />
-//
-// Unlike Card.astro, this isn't a list row — it's a direct portfolio
-// entry point, so a single click opens it (no select/preview step).
+// A direct portfolio entry point — single click opens (no select step).
+
+import Icon from './Icons.astro';
 
 interface Props {
   href: string;
@@ -14,9 +12,7 @@ interface Props {
 const { href, label } = Astro.props;
 ---
 <a class="cc-cassette" href={href} aria-label={`Open ${label} portfolio`}>
-  <span class="cc-cassette__dots" aria-hidden="true">
-    <span></span><span></span><span></span>
-  </span>
+  <span class="cc-cassette__dots" aria-hidden="true"><Icon name="dots" size={16} /></span>
   <div class="cc-cassette__body">
     <span class="cc-cassette__reel"></span>
     <span class="cc-cassette__bar"></span>
@@ -31,41 +27,37 @@ const { href, label } = Astro.props;
     display:block;
     background:var(--blue-card);
     border:1px solid rgba(166,232,255,0.3);
-    padding:16px;
+    padding:14px;
     overflow:hidden;
+    width:100%;
   }
 
   .cc-cassette__dots{
-    display:flex;
-    gap:3px;
-    margin-bottom:10px;
-  }
-
-  .cc-cassette__dots span{
-    width:4px; height:4px;
-    background:var(--blue-lightest);
-    opacity:0.6;
+    display:block;
+    color:var(--blue-lightest);
+    opacity:0.7;
+    margin-bottom:8px;
   }
 
   .cc-cassette__body{
     display:flex;
     align-items:center;
     justify-content:center;
-    gap:0;
     background:var(--blue-column);
-    padding:14px 0;
-    margin-bottom:10px;
+    padding:clamp(10px, 1.5vw, 16px) 0;
+    margin-bottom:8px;
   }
 
   .cc-cassette__reel{
-    width:26px; height:26px;
+    width:clamp(18px, 2vw, 26px);
+    height:clamp(18px, 2vw, 26px);
     border-radius:50%;
     border:5px solid var(--blue-lightest);
     background:var(--navy-deep);
   }
 
   .cc-cassette__bar{
-    width:40px;
+    width:clamp(28px, 3vw, 40px);
     height:6px;
     background:var(--blue-lightest);
     margin:0 -2px;
@@ -74,13 +66,12 @@ const { href, label } = Astro.props;
   .cc-cassette__label{
     font-family:var(--font-ui);
     font-weight:600;
-    font-size:12px;
+    font-size:clamp(11px, 0.9vw, 13px);
     letter-spacing:0.5px;
     text-transform:uppercase;
     color:var(--blue-lightest);
   }
 
-  /* same glitch hover language as Card.astro, for consistency */
   .cc-cassette:hover{
     background:var(--blue-card-hover);
     animation:cc-glitch 0.4s steps(4) 1, cc-white-flash 0.4s ease-out 1;

@@ -16,44 +16,25 @@ const { title } = Astro.props;
   <title>{title} — Chitra-Chaalak</title>
 </head>
 <body>
-  <!--
-    THE STAGE: every page is authored at a fixed 1920x1080 canvas —
-    this matches the hi-fi reference exactly, so every margin and gap
-    is a literal pixel value taken from that reference, not a guess.
-    The stage-wrap below scales the whole stage uniformly to fit
-    whatever screen it's on (letterboxed if the aspect ratio differs),
-    so nothing ever scrolls and every ratio stays exact.
-  -->
-  <div class="cc-stage-wrap" id="cc-stage-wrap">
-    <div class="cc-stage" id="cc-stage">
-      <div class="cc-scanlines"></div>
-      <div class="cc-vignette"></div>
-      <div class="cc-flicker"></div>
+  <div class="cc-scanlines"></div>
+  <div class="cc-vignette"></div>
+  <div class="cc-flicker"></div>
+  <div class="cc-crt-edge"></div>
 
-      <slot />
-
-      <FooterBanner />
+  <div id="cc-preview-popover" class="cc-preview-popover" hidden>
+    <div class="cc-preview-popover__frame">
+      <img class="cc-preview-popover__img" src="" alt="" />
+      <div class="cc-preview-popover__title"></div>
+      <div class="cc-preview-popover__meta"></div>
     </div>
+  </div>
+
+  <div class="cc-app">
+    <div class="cc-app__content">
+      <slot />
+    </div>
+    <div class="cc-app__footer-spacer"></div>
+    <FooterBanner />
   </div>
 </body>
 </html>
-
-<script>
-  // Scales #cc-stage (fixed 1920x1080) to fit the viewport exactly,
-  // preserving aspect ratio — "letterboxing" with the page background
-  // color if the screen's ratio doesn't match 16:9.
-  function ccFitStage() {
-    const wrap = document.getElementById('cc-stage-wrap');
-    const stage = document.getElementById('cc-stage');
-    if (!wrap || !stage) return;
-
-    const scale = Math.min(
-      window.innerWidth / 1920,
-      window.innerHeight / 1080
-    );
-    stage.style.transform = `scale(${scale})`;
-  }
-
-  ccFitStage();
-  window.addEventListener('resize', ccFitStage);
-</script>
