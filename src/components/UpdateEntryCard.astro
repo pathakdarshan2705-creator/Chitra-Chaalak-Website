@@ -1,0 +1,151 @@
+---
+// src/components/UpdateEntryCard.astro
+// One day's update entry — multiple bullet lines inside one card.
+// Participates in the standard cc-card click/select/enter system.
+import Icon from './Icons.astro';
+interface Props {
+  date: string;
+  items: string[];
+  href: string;
+  group?: string;
+  isLatest?: boolean;
+}
+const { date, items, href, group, isLatest = false } = Astro.props;
+---
+<div
+  class="cc-card cc-update-entry"
+  data-href={href}
+  data-group={group ?? ''}
+  data-title={date}
+  data-meta={items[0]}
+  data-image=""
+  tabindex="0"
+  role="button"
+>
+  <div class="cc-update-entry__header">
+    <span class="cc-update-entry__dot"></span>
+    <span class="cc-update-entry__date">{date}</span>
+    {isLatest && <span class="cc-update-entry__live" id="cc-live-badge">LIVE</span>}
+    <span class="cc-update-entry__dots"><Icon name="dots" size={12} /></span>
+  </div>
+  <ul class="cc-update-entry__list">
+    {items.map(item => (
+      <li>
+        <span class="cc-update-entry__bullet"><Icon name="triangle" size={10} /></span>
+        <span>{item}</span>
+      </li>
+    ))}
+  </ul>
+  {isLatest && (
+    <div class="cc-update-entry__signal">
+      <span class="cc-update-entry__signal-label">SIGNAL</span>
+      <span class="cc-update-entry__bars">
+        {Array.from({length:8}).map((_,i) => (
+          <span class="cc-update-entry__bar" style={`animation-delay:${i*0.09}s`}></span>
+        ))}
+      </span>
+    </div>
+  )}
+  <span class="cc-card__corner-br"></span>
+</div>
+
+<style>
+  .cc-update-entry {
+    flex-direction: column;
+    gap: 0;
+    padding: 0;
+    align-items: stretch;
+  }
+  .cc-update-entry__header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--navy-deep);
+    padding: 8px 12px;
+    flex-shrink: 0;
+  }
+  .cc-update-entry__dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--yellow);
+    flex-shrink: 0;
+    animation: cc-pulse-dot 1.5s ease-in-out infinite;
+  }
+  @keyframes cc-pulse-dot { 0%,100%{opacity:1} 50%{opacity:0.2} }
+  .cc-update-entry__date {
+    font-family: var(--font-ui);
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--yellow);
+    flex: 1;
+  }
+  .cc-update-entry__live {
+    font-family: var(--font-ui);
+    font-weight: 700;
+    font-size: 9px;
+    letter-spacing: 1px;
+    background: var(--yellow);
+    color: var(--navy-deep);
+    padding: 2px 7px;
+    flex-shrink: 0;
+    animation: cc-live-pulse 2s steps(2) infinite;
+  }
+  @keyframes cc-live-pulse { 0%,100%{opacity:1} 50%{opacity:0.6} }
+  .cc-update-entry__live.is-offline {
+    background: var(--blue-panel-light);
+    animation: none;
+  }
+  .cc-update-entry__dots { color: var(--blue-panel-light); flex-shrink:0; }
+  .cc-update-entry__list {
+    list-style: none;
+    margin: 0;
+    padding: 8px 12px;
+    overflow: hidden;
+  }
+  .cc-update-entry__list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 7px;
+    padding: 6px 0;
+    border-bottom: 1px dashed rgba(166,232,255,0.3);
+    font-family: var(--font-body);
+    font-weight: 600;
+    font-size: clamp(12px,1vw,14px);
+    color: var(--blue-lightest);
+  }
+  .cc-update-entry__list li:last-child { border-bottom: none; }
+  .cc-update-entry__bullet { color: var(--yellow); flex-shrink:0; margin-top:3px; }
+  .cc-update-entry__signal {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--navy-deep);
+    padding: 6px 12px;
+    flex-shrink: 0;
+    border-top: 1px solid rgba(166,232,255,0.15);
+  }
+  .cc-update-entry__signal-label {
+    font-family: var(--font-ui);
+    font-size: 9px;
+    letter-spacing: 1px;
+    color: var(--blue-lightest);
+    flex-shrink: 0;
+  }
+  .cc-update-entry__bars { display:flex; gap:2px; flex:1; }
+  .cc-update-entry__bar {
+    width: 5px; height: 10px;
+    background: var(--yellow);
+    animation: cc-bar-flicker 2s ease-in-out infinite;
+  }
+  @keyframes cc-bar-flicker { 0%,100%{opacity:1} 50%{opacity:0.3} }
+  /* selected: left accent instead of full yellow (it has internal chrome) */
+  .cc-update-entry.is-selected {
+    background: var(--blue-card);
+    box-shadow:
+      inset 0 0 0 1px var(--blue-panel-light),
+      inset 3px 0 0 var(--yellow);
+  }
+  .cc-update-entry.is-selected .cc-update-entry__date { color: var(--yellow); }
+</style>

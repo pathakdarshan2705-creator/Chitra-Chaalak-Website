@@ -72,9 +72,10 @@ const {
     --notch: 20px;
     position:relative;
     background:var(--blue-card);
-    border:1px solid var(--blue-panel-light);
+    border:1px solid var(--navy-deep);
     box-shadow:
-      inset 1px 1px 0 rgba(255,255,255,0.2),
+      inset 0 0 0 1px var(--blue-panel-light),
+      inset 1px 1px 0 rgba(255,255,255,0.15),
       inset -1px -1px 0 rgba(0,10,40,0.4),
       inset 0 0 24px rgba(166,232,255,0.06);
     clip-path:polygon(
@@ -254,11 +255,18 @@ const {
       if (!group) return;
       const cards = cardsInGroup(group);
       if (cards.length === 0) return;
-
       const current = selectedInGroup(group);
       if (current) {
         const href = current.dataset.href;
-        if (href) window.location.href = href;
+        if (href && href !== '#') {
+          // channel-change effect before navigating
+          const flash = document.createElement('div');
+          flash.style.cssText = 'position:fixed;inset:0;background:#fff;z-index:9999;opacity:0;pointer-events:none;transition:opacity 0.08s steps(2)';
+          document.body.appendChild(flash);
+          requestAnimationFrame(() => { flash.style.opacity = '0.7'; });
+          setTimeout(() => { flash.style.opacity = '0'; }, 120);
+          setTimeout(() => { document.body.removeChild(flash); window.location.href = href; }, 300);
+        }
       } else {
         setSelected(group, cards[0]);
       }

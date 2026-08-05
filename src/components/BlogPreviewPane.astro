@@ -1,110 +1,132 @@
 ---
 // src/components/BlogPreviewPane.astro
-//
-// Sits beside the text-only blog list (see index.astro). Watches for
-// `.is-selected` changing on any `.cc-card[data-group="blog"]` via
-// MutationObserver, and updates its own content to match — works no
-// matter what caused the selection change (click, up/down, Enter),
-// since it just reacts to DOM state rather than duplicating the
-// selection logic itself. Auto-selects the first post on load so the
-// pane isn't empty on first paint, matching the reference.
-
-interface Props {
-  group?: string;
-}
+// Live preview pane — watches blog card selection via MutationObserver.
+// Creative addition: the title types itself out like a teleprinter
+// whenever the selected post changes — thematic for a broadcast UI.
+interface Props { group?: string; }
 const { group = 'blog' } = Astro.props;
 ---
 <div class="cc-blog-preview" data-preview-group={group}>
-  <img class="cc-blog-preview__img" src="" alt="" />
+  <div class="cc-blog-preview__img-wrap">
+    <img class="cc-blog-preview__img" src="" alt="" />
+    <div class="cc-blog-preview__overlay"></div>
+  </div>
   <div class="cc-blog-preview__body">
-    <div class="cc-blog-preview__title">Select a post</div>
+    <div class="cc-blog-preview__title"></div>
     <div class="cc-blog-preview__meta"></div>
   </div>
 </div>
-
 <style>
-  .cc-blog-preview{
-    flex:1;
-    min-width:0;
-    display:flex;
-    flex-direction:column;
-    background:var(--blue-column);
-    border:1px solid var(--blue-panel-light);
+  .cc-blog-preview {
+    flex: 1; min-width: 0;
+    display: flex; flex-direction: column;
+    background: var(--blue-column);
+    border: 1px solid var(--navy-deep);
     box-shadow:
-      inset 1px 1px 0 rgba(255,255,255,0.15),
+      inset 0 0 0 1px var(--blue-panel-light),
+      inset 1px 1px 0 rgba(255,255,255,0.12),
       inset -1px -1px 0 rgba(0,10,40,0.3);
-    overflow:hidden;
+    overflow: hidden;
   }
-
-  .cc-blog-preview__img{
-    width:100%;
-    flex:1;
-    min-height:0;
-    object-fit:cover;
-    display:block;
-    background:var(--blue-panel-light);
+  .cc-blog-preview__img-wrap { flex: 1; min-height: 0; position: relative; }
+  .cc-blog-preview__img {
+    width: 100%; height: 100%;
+    object-fit: cover; display: block;
+    background: var(--blue-panel-light);
+    transition: opacity 0.15s steps(3);
   }
-
-  .cc-blog-preview__body{
-    flex-shrink:0;
-    padding:12px 14px;
-    background:var(--navy-deep);
+  .cc-blog-preview__img.is-loading { opacity: 0.4; }
+  /* Scanline overlay on image — makes it look like a monitor */
+  .cc-blog-preview__overlay {
+    position: absolute; inset: 0; pointer-events: none;
+    background: repeating-linear-gradient(
+      0deg, rgba(0,0,0,0.1) 0px, rgba(0,0,0,0.1) 1px,
+      transparent 1px, transparent 3px
+    );
   }
-
-  .cc-blog-preview__title{
-    font-family:var(--font-ui);
-    font-weight:700;
-    font-size:clamp(13px, 1.1vw, 16px);
-    text-transform:uppercase;
-    letter-spacing:0.5px;
-    color:var(--yellow);
-    margin-bottom:4px;
+  .cc-blog-preview__body {
+    flex-shrink: 0;
+    padding: 10px 14px;
+    background: var(--navy-deep);
+    border-top: 1px solid rgba(166,232,255,0.2);
   }
-
-  .cc-blog-preview__meta{
-    font-family:var(--font-body);
-    font-size:clamp(12px, 1vw, 14px);
-    color:var(--blue-lightest);
-    opacity:0.8;
+  .cc-blog-preview__title {
+    font-family: var(--font-ui);
+    font-weight: 700;
+    font-size: clamp(12px,1.1vw,15px);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--yellow);
+    margin-bottom: 3px;
+    min-height: 1.3em;
+    /* blinking cursor while typing */
+    border-right: 2px solid var(--yellow);
+    padding-right: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+  .cc-blog-preview__title.done { border-right-color: transparent; }
+  .cc-blog-preview__meta {
+    font-family: var(--font-body);
+    font-size: clamp(11px,0.95vw,13px);
+    color: var(--blue-lightest);
+    opacity: 0.8;
   }
 </style>
-
 <script>
   if (!(window as any).__ccBlogPreviewInit) {
     (window as any).__ccBlogPreviewInit = true;
+    let typeTimer: ReturnType<typeof setTimeout> | null = null;
+
+    function typeTitle(el: HTMLElement, text: string) {
+      if (typeTimer) clearTimeout(typeTimer);
+      el.classList.remove('done');
+      el.textContent = '';
+      let i = 0;
+      function step() {
+        if (i <= text.length) {
+          el.textContent = text.slice(0, i);
+          i++;
+          typeTimer = setTimeout(step, 28);
+        } else {
+          el.classList.add('done');
+        }
+      }
+      step();
+    }
 
     function renderPreview(pane: HTMLElement, source: HTMLElement) {
       const img = pane.querySelector('.cc-blog-preview__img') as HTMLImageElement | null;
       const titleEl = pane.querySelector('.cc-blog-preview__title') as HTMLElement | null;
       const metaEl = pane.querySelector('.cc-blog-preview__meta') as HTMLElement | null;
-      if (img) img.src = source.dataset.image ?? '';
-      if (titleEl) titleEl.textContent = source.dataset.title ?? '';
+      if (img) {
+        img.classList.add('is-loading');
+        img.src = source.dataset.image ?? '';
+        img.onload = () => img.classList.remove('is-loading');
+        img.onerror = () => img.classList.remove('is-loading');
+      }
+      if (titleEl) typeTitle(titleEl, source.dataset.title ?? '');
       if (metaEl) metaEl.textContent = source.dataset.meta ?? '';
     }
 
     function initPane(pane: HTMLElement) {
       const group = pane.dataset.previewGroup;
       if (!group) return;
-
-      const cards = Array.from(document.querySelectorAll(`.cc-card[data-group="${group}"]`)) as HTMLElement[];
-      if (cards.length === 0) return;
-
-      // auto-select the first post so the pane isn't empty on load
-      if (!cards.some((c) => c.classList.contains('is-selected'))) {
+      const cards = Array.from(
+        document.querySelectorAll(`.cc-card[data-group="${group}"]`)
+      ) as HTMLElement[];
+      if (!cards.length) return;
+      if (!cards.some(c => c.classList.contains('is-selected'))) {
         cards[0].classList.add('is-selected');
       }
-      const selected = cards.find((c) => c.classList.contains('is-selected')) ?? cards[0];
+      const selected = cards.find(c => c.classList.contains('is-selected')) ?? cards[0];
       renderPreview(pane, selected);
-
       const observer = new MutationObserver(() => {
-        const nowSelected = cards.find((c) => c.classList.contains('is-selected'));
-        if (nowSelected) renderPreview(pane, nowSelected);
+        const now = cards.find(c => c.classList.contains('is-selected'));
+        if (now) renderPreview(pane, now);
       });
-      cards.forEach((card) => {
-        observer.observe(card, { attributes: true, attributeFilter: ['class'] });
-      });
+      cards.forEach(c => observer.observe(c, { attributes: true, attributeFilter: ['class'] }));
     }
-
     document.querySelectorAll<HTMLElement>('[data-preview-group]').forEach(initPane);
   }
 </script>

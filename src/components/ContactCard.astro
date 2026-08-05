@@ -1,9 +1,7 @@
 ---
 // src/components/ContactCard.astro
-// Static — not a page. Swap the `links` array for your real handles.
-
+// Same panel shape as every other section — notched corner, light header.
 import Icon from './Icons.astro';
-
 const links = [
   { label: 'Instagram', href: 'https://instagram.com/yourhandle' },
   { label: 'Email', href: 'mailto:you@example.com' },
@@ -11,65 +9,74 @@ const links = [
   { label: 'Behance', href: 'https://behance.net/yourhandle' },
 ];
 ---
-<div class="cc-contact">
-  <div class="cc-contact__header">
-    <span class="cc-contact__label">Get in Touch</span>
-    <span class="cc-contact__phone"><Icon name="phone" size={18} /></span>
+<div class="cc-contact-panel">
+  <div class="cc-contact-panel__header">
+    <span class="cc-contact-panel__arrow"><Icon name="arrow" size={14} /></span>
+    <span class="cc-contact-panel__title">Get in Touch</span>
+    <span class="cc-contact-panel__phone"><Icon name="phone" size={14} /></span>
   </div>
-  <ul class="cc-contact__list">
-    {links.map((link) => (
+  <ul class="cc-contact-panel__list">
+    {links.map(link => (
       <li>
-        <a href={link.href} target="_blank" rel="noopener noreferrer">{link.label}</a>
+        <a href={link.href} target="_blank" rel="noopener noreferrer">
+          <span class="cc-contact-panel__bullet"><Icon name="triangle" size={10} /></span>
+          {link.label}
+        </a>
       </li>
     ))}
   </ul>
 </div>
-
 <style>
-  .cc-contact{
-    background:var(--blue-column);
-    border:1px solid rgba(166,232,255,0.3);
-    padding:14px;
+  .cc-contact-panel {
+    --notch: 16px;
+    background: var(--blue-card);
+    border: 1px solid var(--navy-deep);
+    box-shadow:
+      inset 0 0 0 1px var(--blue-panel-light),
+      inset 1px 1px 0 rgba(255,255,255,0.15),
+      inset -1px -1px 0 rgba(0,10,40,0.4);
+    clip-path: polygon(0 0, calc(100% - var(--notch)) 0, 100% var(--notch), 100% 100%, 0 100%);
+    flex-shrink: 0;
   }
-
-  .cc-contact__header{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    margin-bottom:10px;
+  .cc-contact-panel__header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--blue-panel-light);
+    color: var(--navy-deep);
+    padding: 6px 12px;
+    padding-right: calc(var(--notch) + 8px);
   }
-
-  .cc-contact__label{
-    font-family:var(--font-ui);
-    font-size:11px;
-    letter-spacing:1.5px;
-    text-transform:uppercase;
-    color:var(--yellow);
+  .cc-contact-panel__arrow, .cc-contact-panel__phone { display:flex; align-items:center; flex-shrink:0; }
+  .cc-contact-panel__title {
+    font-family: var(--font-ui);
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    flex: 1;
   }
-
-  .cc-contact__phone{
-    color:var(--blue-lightest);
-    opacity:0.8;
+  .cc-contact-panel__list {
+    list-style: none;
+    margin: 0;
+    padding: 10px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
   }
-
-  .cc-contact__list{
-    list-style:none;
-    margin:0;
-    padding:0;
-    display:flex;
-    flex-direction:column;
-    gap:6px;
+  .cc-contact-panel__list a {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-body);
+    font-weight: 600;
+    font-size: clamp(13px,1.1vw,15px);
+    color: var(--blue-lightest);
+    padding: 5px 0;
+    border-bottom: 1px solid rgba(166,232,255,0.12);
+    transition: color 0.1s steps(2);
   }
-
-  .cc-contact__list a{
-    font-family:var(--font-body);
-    font-size:clamp(14px, 1.1vw, 16px);
-    font-weight:600;
-    color:var(--blue-lightest);
-    transition:color 0.1s steps(2);
-  }
-
-  .cc-contact__list a:hover{
-    color:var(--yellow);
-  }
+  .cc-contact-panel__list li:last-child a { border-bottom: none; }
+  .cc-contact-panel__list a:hover { color: var(--yellow); }
+  .cc-contact-panel__bullet { color: var(--yellow); flex-shrink:0; }
 </style>

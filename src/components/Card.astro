@@ -44,6 +44,7 @@ const { href, title, meta, imageSrc = '', imageAlt = '', group, variant = 'defau
     <div class="cc-card__title">{title}</div>
     {meta && <div class="cc-card__meta">{meta}</div>}
   </div>
+  <span class="cc-card__corner-br" aria-hidden="true"></span>
 </div>
 
 <style>
@@ -58,13 +59,39 @@ const { href, title, meta, imageSrc = '', imageAlt = '', group, variant = 'defau
     overflow:hidden;
     outline:none;
     width:100%;
-    /* beveled edge instead of a flat single-color line: a light
-       top/left edge and a darker bottom/right edge, like a physical
-       button or an old hardware panel catching light */
-    border:1px solid var(--blue-panel-light);
+    /* double-line bezel: a dark outer line, a lighter inset line one
+       pixel in, plus a highlight/shadow bevel — reads as a hardware
+       panel edge rather than a flat CSS border */
+    border:1px solid var(--navy-deep);
     box-shadow:
-      inset 1px 1px 0 rgba(255,255,255,0.25),
+      inset 0 0 0 1px var(--blue-panel-light),
+      inset 1px 1px 0 rgba(255,255,255,0.2),
       inset -1px -1px 0 rgba(0,10,40,0.35);
+  }
+
+  /* corner brackets — a viewfinder/monitor-framing accent on two
+     opposite corners, static, on-theme */
+  .cc-card::before{
+    content:"";
+    position:absolute;
+    top:3px; left:3px;
+    width:8px; height:8px;
+    border-top:2px solid var(--blue-panel-light);
+    border-left:2px solid var(--blue-panel-light);
+    opacity:0.8;
+    pointer-events:none;
+    z-index:1;
+  }
+
+  .cc-card__corner-br{
+    position:absolute;
+    bottom:3px; right:3px;
+    width:8px; height:8px;
+    border-bottom:2px solid var(--blue-panel-light);
+    border-right:2px solid var(--blue-panel-light);
+    opacity:0.8;
+    pointer-events:none;
+    z-index:1;
   }
 
   .cc-card:focus-visible{
@@ -89,19 +116,23 @@ const { href, title, meta, imageSrc = '', imageAlt = '', group, variant = 'defau
     display:block;
   }
 
-  /* poster: portrait movie-poster proportions, like the reference's
-     "Film Poster" placeholder — capped width so the row's height
-     stays sane regardless of how wide its grid column is */
+  /* poster: portrait movie-poster proportions — sized from the row's
+     available HEIGHT (fixed by flex ratios in index.astro), not from
+     grid column width, so it stays a consistent size regardless of
+     how much content is around it */
   .cc-card--poster{
     flex-direction:column;
     align-items:stretch;
-    max-width:150px;
+    height:100%;
+    width:auto;
     justify-self:start;
   }
 
   .cc-card--poster .cc-card__img{
-    flex:none;
-    width:100%;
+    flex:1;
+    min-height:0;
+    width:auto;
+    height:100%;
     aspect-ratio:2 / 3;
   }
 
