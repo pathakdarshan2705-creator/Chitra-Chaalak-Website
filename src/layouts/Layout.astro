@@ -2,6 +2,7 @@
 // src/layouts/Layout.astro
 import '../styles/global.css';
 import FooterBanner from '../components/FooterBanner.astro';
+import TestCardIntro from '../components/TestCardIntro.astro';
 
 interface Props {
   title: string;
@@ -16,6 +17,7 @@ const { title } = Astro.props;
   <title>{title} — Chitra-Chaalak</title>
 </head>
 <body>
+  <TestCardIntro />
   <div class="cc-scanlines"></div>
   <div class="cc-vignette"></div>
   <div class="cc-flicker"></div>

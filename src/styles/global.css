@@ -43,7 +43,7 @@ html, body{
 }
 
 body{
-  background:var(--navy-deep) url('/assets/bg-texture.png') center center / cover no-repeat fixed;
+  background:var(--navy-deep) url('/assets/bg-texture.png');
   color:var(--blue-lightest);
   font-family:var(--font-body);
   overflow:hidden; /* the app shell below owns internal scrolling per-section, not the page */

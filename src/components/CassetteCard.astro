@@ -1,42 +1,51 @@
 ---
 // src/components/CassetteCard.astro
-// <CassetteCard href="/portfolio/filmmaking" label="Filmmaking" />
-// A direct portfolio entry point — single click opens (no select step).
+// <CassetteCard href="/portfolio/filmmaking" label="Filmmaking" group="portfolio" />
+//
+// Uses the same .cc-card contract as Card.astro (data-href/group/title)
+// so it participates in the shared click-select / dblclick-open /
+// up-down / Enter system unchanged — just a different visual skin.
 
 import Icon from './Icons.astro';
 
 interface Props {
   href: string;
   label: string;
+  group?: string;
 }
-const { href, label } = Astro.props;
+const { href, label, group } = Astro.props;
 ---
-<a class="cc-cassette" href={href} aria-label={`Open ${label} portfolio`}>
-  <span class="cc-cassette__dots" aria-hidden="true"><Icon name="dots" size={16} /></span>
+<div
+  class="cc-card cc-cassette"
+  data-href={href}
+  data-group={group ?? ''}
+  data-title={label}
+  data-meta=""
+  data-image=""
+  tabindex="0"
+  role="button"
+  aria-label={`${label}. Click to select, double-click to open.`}
+>
+  <span class="cc-cassette__dots" aria-hidden="true"><Icon name="dots" size={14} /></span>
   <div class="cc-cassette__body">
     <span class="cc-cassette__reel"></span>
     <span class="cc-cassette__bar"></span>
     <span class="cc-cassette__reel"></span>
   </div>
   <div class="cc-cassette__label">{label}</div>
-</a>
+</div>
 
 <style>
   .cc-cassette{
-    position:relative;
     display:block;
-    background:var(--blue-card);
-    border:1px solid rgba(166,232,255,0.3);
-    padding:14px;
-    overflow:hidden;
-    width:100%;
+    padding:10px;
   }
 
   .cc-cassette__dots{
     display:block;
     color:var(--blue-lightest);
     opacity:0.7;
-    margin-bottom:8px;
+    margin-bottom:6px;
   }
 
   .cc-cassette__body{
@@ -44,21 +53,22 @@ const { href, label } = Astro.props;
     align-items:center;
     justify-content:center;
     background:var(--blue-column);
-    padding:clamp(10px, 1.5vw, 16px) 0;
-    margin-bottom:8px;
+    padding:8px 0;
+    margin-bottom:6px;
+    box-shadow:inset 0 0 0 1px rgba(0,10,40,0.3);
   }
 
   .cc-cassette__reel{
-    width:clamp(18px, 2vw, 26px);
-    height:clamp(18px, 2vw, 26px);
+    width:clamp(14px, 1.4vw, 20px);
+    height:clamp(14px, 1.4vw, 20px);
     border-radius:50%;
-    border:5px solid var(--blue-lightest);
+    border:4px solid var(--blue-lightest);
     background:var(--navy-deep);
   }
 
   .cc-cassette__bar{
-    width:clamp(28px, 3vw, 40px);
-    height:6px;
+    width:clamp(22px, 2.2vw, 32px);
+    height:5px;
     background:var(--blue-lightest);
     margin:0 -2px;
   }
@@ -66,45 +76,13 @@ const { href, label } = Astro.props;
   .cc-cassette__label{
     font-family:var(--font-ui);
     font-weight:600;
-    font-size:clamp(11px, 0.9vw, 13px);
+    font-size:clamp(10px, 0.85vw, 12px);
     letter-spacing:0.5px;
     text-transform:uppercase;
     color:var(--blue-lightest);
   }
 
-  .cc-cassette:hover{
-    background:var(--blue-card-hover);
-    animation:cc-glitch 0.4s steps(4) 1, cc-white-flash 0.4s ease-out 1;
-  }
-
-  .cc-cassette:hover::after{
-    content:"";
-    position:absolute;
-    inset:0;
-    border:2px solid var(--yellow);
-    opacity:0;
-    animation:cc-edge-flash 0.4s steps(4) 1;
-    pointer-events:none;
-  }
-
-  @keyframes cc-glitch{
-    0%{ transform:translate(0,0); filter:none; }
-    15%{ transform:translate(-2px,1px); filter:hue-rotate(15deg); }
-    30%{ transform:translate(2px,-1px); filter:none; }
-    45%{ transform:translate(-1px,0); filter:hue-rotate(-10deg); }
-    60%{ transform:translate(1px,-1px); filter:none; }
-    100%{ transform:translate(0,0); filter:none; }
-  }
-
-  @keyframes cc-white-flash{
-    0%{ box-shadow:inset 0 0 0 999px rgba(255,255,255,0); }
-    10%{ box-shadow:inset 0 0 0 999px rgba(255,255,255,0.22); }
-    25%{ box-shadow:inset 0 0 0 999px rgba(255,255,255,0); }
-  }
-
-  @keyframes cc-edge-flash{
-    0%,100%{ opacity:0; }
-    12%,28%{ opacity:0.7; }
-    20%{ opacity:0; }
+  .cc-cassette.is-selected .cc-cassette__label{
+    color:var(--navy-deep);
   }
 </style>

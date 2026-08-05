@@ -6,6 +6,7 @@ import Card from '../components/Card.astro';
 import CassetteCard from '../components/CassetteCard.astro';
 import ContactCard from '../components/ContactCard.astro';
 import TransmissionCard from '../components/TransmissionCard.astro';
+import BlogPreviewPane from '../components/BlogPreviewPane.astro';
 import { getCollection } from 'astro:content';
 
 // Blog comes from src/content/blog/*.md — drop a new .md file there
@@ -70,7 +71,7 @@ const portfolioSections = [
         <Panel title="Film Recommendations" viewAllHref="/films" showControls group="films">
           <div class="cc-card-row" id="films-list">
             {films.map((f) => (
-              <Card title={f.title} meta={f.meta} imageSrc={f.imageSrc} href={f.href} group="films" />
+              <Card title={f.title} meta={f.meta} imageSrc={f.imageSrc} href={f.href} group="films" variant="poster" />
             ))}
           </div>
         </Panel>
@@ -78,22 +79,25 @@ const portfolioSections = [
 
       <div class="cc-row-flex">
         <Panel title="Blog" viewAllHref="/blog" showControls group="blog">
-          <div class="cc-card-list" id="blog-list">
-            {blogPosts.map((b) => (
-              <Card title={b.title} meta={b.meta} imageSrc={b.imageSrc} href={b.href} group="blog" />
-            ))}
+          <div class="cc-blog-split">
+            <div class="cc-card-list cc-blog-split__list" id="blog-list">
+              {blogPosts.map((b) => (
+                <Card title={b.title} meta={b.meta} imageSrc={b.imageSrc} href={b.href} group="blog" variant="text" />
+              ))}
+            </div>
+            <BlogPreviewPane group="blog" />
           </div>
         </Panel>
       </div>
 
       <div class="cc-row-fixed cc-split-row">
-        <Panel title="Visual Tour" viewAllHref="/tour">
+        <Panel title="Visual Tour" viewAllHref="/tour" showControls group="tour">
           {visualTour.map((v) => (
             <Card title={v.title} meta={v.meta} imageSrc={v.imageSrc} href={v.href} group="tour" />
           ))}
         </Panel>
 
-        <Panel title="Collections" viewAllHref="/collections">
+        <Panel title="Collections" viewAllHref="/collections" showControls group="collections">
           {collections.map((c) => (
             <Card title={c.title} meta={c.meta} imageSrc={c.imageSrc} href={c.href} group="collections" />
           ))}
@@ -104,10 +108,10 @@ const portfolioSections = [
 
     <!-- RIGHT COLUMN: portfolio cassettes + contact -->
     <aside class="cc-col cc-col--portfolio">
-      <Panel title="Portfolio" viewAllHref="/portfolio">
+      <Panel title="Portfolio" viewAllHref="/portfolio" showControls group="portfolio">
         <div class="cc-cassette-stack">
           {portfolioSections.map((p) => (
-            <CassetteCard label={p.label} href={p.href} />
+            <CassetteCard label={p.label} href={p.href} group="portfolio" />
           ))}
         </div>
       </Panel>
@@ -146,7 +150,12 @@ const portfolioSections = [
 
   .cc-col--updates{ grid-column:1; }
   .cc-col--center{ grid-column:3; }
-  .cc-col--portfolio{ grid-column:5; overflow-y:auto; scrollbar-width:none; }
+  .cc-col--portfolio{
+    grid-column:5;
+    gap:10px;
+    overflow-y:auto;
+    scrollbar-width:none;
+  }
   .cc-col--portfolio::-webkit-scrollbar{ display:none; }
   /* grid-columns 2 and 4 are the measured gaps — intentionally empty */
 
@@ -180,6 +189,20 @@ const portfolioSections = [
 
   .cc-card-list::-webkit-scrollbar{ display:none; }
 
+  /* Blog: text list (left) + live preview (right), matching the
+     reference's channel-list layout */
+  .cc-blog-split{
+    display:flex;
+    gap:12px;
+    flex:1 1 auto;
+    min-height:0;
+  }
+
+  .cc-blog-split__list{
+    flex:0 0 34%;
+    gap:2px;
+  }
+
   .cc-split-row{
     display:grid;
     grid-template-columns:1fr 1fr;
@@ -189,6 +212,6 @@ const portfolioSections = [
   .cc-cassette-stack{
     display:flex;
     flex-direction:column;
-    gap:8px;
+    gap:6px;
   }
 </style>

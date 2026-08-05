@@ -1,0 +1,110 @@
+---
+// src/components/BlogPreviewPane.astro
+//
+// Sits beside the text-only blog list (see index.astro). Watches for
+// `.is-selected` changing on any `.cc-card[data-group="blog"]` via
+// MutationObserver, and updates its own content to match — works no
+// matter what caused the selection change (click, up/down, Enter),
+// since it just reacts to DOM state rather than duplicating the
+// selection logic itself. Auto-selects the first post on load so the
+// pane isn't empty on first paint, matching the reference.
+
+interface Props {
+  group?: string;
+}
+const { group = 'blog' } = Astro.props;
+---
+<div class="cc-blog-preview" data-preview-group={group}>
+  <img class="cc-blog-preview__img" src="" alt="" />
+  <div class="cc-blog-preview__body">
+    <div class="cc-blog-preview__title">Select a post</div>
+    <div class="cc-blog-preview__meta"></div>
+  </div>
+</div>
+
+<style>
+  .cc-blog-preview{
+    flex:1;
+    min-width:0;
+    display:flex;
+    flex-direction:column;
+    background:var(--blue-column);
+    border:1px solid var(--blue-panel-light);
+    box-shadow:
+      inset 1px 1px 0 rgba(255,255,255,0.15),
+      inset -1px -1px 0 rgba(0,10,40,0.3);
+    overflow:hidden;
+  }
+
+  .cc-blog-preview__img{
+    width:100%;
+    flex:1;
+    min-height:0;
+    object-fit:cover;
+    display:block;
+    background:var(--blue-panel-light);
+  }
+
+  .cc-blog-preview__body{
+    flex-shrink:0;
+    padding:12px 14px;
+    background:var(--navy-deep);
+  }
+
+  .cc-blog-preview__title{
+    font-family:var(--font-ui);
+    font-weight:700;
+    font-size:clamp(13px, 1.1vw, 16px);
+    text-transform:uppercase;
+    letter-spacing:0.5px;
+    color:var(--yellow);
+    margin-bottom:4px;
+  }
+
+  .cc-blog-preview__meta{
+    font-family:var(--font-body);
+    font-size:clamp(12px, 1vw, 14px);
+    color:var(--blue-lightest);
+    opacity:0.8;
+  }
+</style>
+
+<script>
+  if (!(window as any).__ccBlogPreviewInit) {
+    (window as any).__ccBlogPreviewInit = true;
+
+    function renderPreview(pane: HTMLElement, source: HTMLElement) {
+      const img = pane.querySelector('.cc-blog-preview__img') as HTMLImageElement | null;
+      const titleEl = pane.querySelector('.cc-blog-preview__title') as HTMLElement | null;
+      const metaEl = pane.querySelector('.cc-blog-preview__meta') as HTMLElement | null;
+      if (img) img.src = source.dataset.image ?? '';
+      if (titleEl) titleEl.textContent = source.dataset.title ?? '';
+      if (metaEl) metaEl.textContent = source.dataset.meta ?? '';
+    }
+
+    function initPane(pane: HTMLElement) {
+      const group = pane.dataset.previewGroup;
+      if (!group) return;
+
+      const cards = Array.from(document.querySelectorAll(`.cc-card[data-group="${group}"]`)) as HTMLElement[];
+      if (cards.length === 0) return;
+
+      // auto-select the first post so the pane isn't empty on load
+      if (!cards.some((c) => c.classList.contains('is-selected'))) {
+        cards[0].classList.add('is-selected');
+      }
+      const selected = cards.find((c) => c.classList.contains('is-selected')) ?? cards[0];
+      renderPreview(pane, selected);
+
+      const observer = new MutationObserver(() => {
+        const nowSelected = cards.find((c) => c.classList.contains('is-selected'));
+        if (nowSelected) renderPreview(pane, nowSelected);
+      });
+      cards.forEach((card) => {
+        observer.observe(card, { attributes: true, attributeFilter: ['class'] });
+      });
+    }
+
+    document.querySelectorAll<HTMLElement>('[data-preview-group]').forEach(initPane);
+  }
+</script>

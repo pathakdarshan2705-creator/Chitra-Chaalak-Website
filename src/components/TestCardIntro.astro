@@ -1,0 +1,177 @@
+---
+// src/components/TestCardIntro.astro
+//
+// A broadcast test card — the color bars / alignment grid a channel
+// shows before transmission starts — as the site's entry moment.
+// This is an original geometric pattern (bars + grid + reticle +
+// station ID), not a reproduction of any real broadcaster's actual
+// test card or logo.
+//
+// Plays once per browser session (sessionStorage-gated) so repeat
+// navigation within the same visit isn't interrupted by it.
+---
+<div class="cc-testcard" id="cc-testcard" aria-hidden="true">
+  <div class="cc-testcard__bars">
+    <span></span><span></span><span></span><span></span>
+    <span></span><span></span><span></span>
+  </div>
+
+  <div class="cc-testcard__grid">
+    <div class="cc-testcard__reticle">
+      <span class="cc-testcard__crosshair-v"></span>
+      <span class="cc-testcard__crosshair-h"></span>
+      <span class="cc-testcard__circle"></span>
+    </div>
+  </div>
+
+  <div class="cc-testcard__id">
+    <span class="cc-testcard__id-name">CHITRA-CHAALAK</span>
+    <span class="cc-testcard__id-freq">CH 01 · STANDBY</span>
+  </div>
+
+  <div class="cc-testcard__noise"></div>
+</div>
+
+<style>
+  .cc-testcard{
+    position:fixed;
+    inset:0;
+    z-index:5000;
+    background:#111;
+    display:flex;
+    flex-direction:column;
+    opacity:1;
+    transition:opacity 0.5s steps(6);
+  }
+
+  .cc-testcard.cc-testcard--tuning{
+    animation:cc-tune-flicker 0.4s steps(2) 3;
+  }
+
+  .cc-testcard.cc-testcard--out{
+    opacity:0;
+    pointer-events:none;
+  }
+
+  .cc-testcard.cc-testcard--gone{
+    display:none;
+  }
+
+  @keyframes cc-tune-flicker{
+    0%,100%{ filter:brightness(1); }
+    50%{ filter:brightness(1.4) saturate(1.3); }
+  }
+
+  .cc-testcard__bars{
+    flex:1;
+    display:flex;
+  }
+
+  .cc-testcard__bars span{ flex:1; }
+  .cc-testcard__bars span:nth-child(1){ background:#c0c0c0; }
+  .cc-testcard__bars span:nth-child(2){ background:#c0c000; }
+  .cc-testcard__bars span:nth-child(3){ background:#00c0c0; }
+  .cc-testcard__bars span:nth-child(4){ background:#00c000; }
+  .cc-testcard__bars span:nth-child(5){ background:#c000c0; }
+  .cc-testcard__bars span:nth-child(6){ background:#c00000; }
+  .cc-testcard__bars span:nth-child(7){ background:#0000c0; }
+
+  .cc-testcard__grid{
+    position:absolute;
+    inset:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    pointer-events:none;
+  }
+
+  .cc-testcard__reticle{
+    position:relative;
+    width:120px;
+    height:120px;
+  }
+
+  .cc-testcard__crosshair-v,
+  .cc-testcard__crosshair-h{
+    position:absolute;
+    background:rgba(255,255,255,0.8);
+  }
+
+  .cc-testcard__crosshair-v{
+    left:50%; top:0; bottom:0;
+    width:2px;
+    transform:translateX(-50%);
+  }
+
+  .cc-testcard__crosshair-h{
+    top:50%; left:0; right:0;
+    height:2px;
+    transform:translateY(-50%);
+  }
+
+  .cc-testcard__circle{
+    position:absolute;
+    inset:0;
+    border:2px solid rgba(255,255,255,0.8);
+    border-radius:50%;
+  }
+
+  .cc-testcard__id{
+    position:absolute;
+    bottom:14%;
+    left:50%;
+    transform:translateX(-50%);
+    text-align:center;
+    font-family:var(--font-ui);
+    color:#fff;
+  }
+
+  .cc-testcard__id-name{
+    display:block;
+    font-size:clamp(18px, 2.4vw, 32px);
+    font-weight:700;
+    letter-spacing:4px;
+    margin-bottom:4px;
+  }
+
+  .cc-testcard__id-freq{
+    display:block;
+    font-size:clamp(10px, 0.9vw, 13px);
+    letter-spacing:2px;
+    color:#fff000;
+    animation:cc-pulse-dot 1.2s ease-in-out infinite;
+  }
+
+  @keyframes cc-pulse-dot{
+    0%,100%{ opacity:1; }
+    50%{ opacity:0.4; }
+  }
+
+  .cc-testcard__noise{
+    position:absolute;
+    inset:0;
+    pointer-events:none;
+    background-image:
+      repeating-linear-gradient(0deg, rgba(255,255,255,0.06) 0px, transparent 1px, transparent 3px);
+    mix-blend-mode:overlay;
+  }
+</style>
+
+<script>
+  (function () {
+    const KEY = 'cc-testcard-seen';
+    const el = document.getElementById('cc-testcard');
+    if (!el) return;
+
+    if (sessionStorage.getItem(KEY)) {
+      el.classList.add('cc-testcard--gone');
+      return;
+    }
+    sessionStorage.setItem(KEY, '1');
+
+    // hold on the test card briefly, "tune" (flicker), then wipe out
+    setTimeout(() => el.classList.add('cc-testcard--tuning'), 1100);
+    setTimeout(() => el.classList.add('cc-testcard--out'), 1500);
+    setTimeout(() => el.classList.add('cc-testcard--gone'), 2100);
+  })();
+</script>
