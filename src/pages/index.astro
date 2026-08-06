@@ -70,8 +70,19 @@ const portfolioSections = [
 <Layout title="Home">
   <div class="cc-home">
 
+    <nav class="cc-mobile-tabs" id="cc-mobile-tabs">
+  <button class="cc-mobile-tab is-active" data-target="updates">CH 1 · UPDATES</button>
+  <button class="cc-mobile-tab" data-target="center">CH 2 · WATCH</button>
+  <button class="cc-mobile-tab" data-target="portfolio">CH 3 · WORK</button>
+</nav>
+<div class="cc-mobile-dots" id="cc-mobile-dots">
+  <span class="cc-mobile-dot is-active"></span>
+  <span class="cc-mobile-dot"></span>
+  <span class="cc-mobile-dot"></span>
+</div>
+
     <!-- LEFT: Updates -->
-    <aside class="cc-col cc-col--updates">
+    <aside class="cc-col cc-col--updates" data-screen="updates">
       <Panel title="Daily Transmission" viewAllHref="/updates" showControls group="updates">
         <div class="cc-card-list" id="updates-list">
           {updates.map(u => (
@@ -88,7 +99,7 @@ const portfolioSections = [
     </aside>
 
     <!-- CENTER: Film / Blog / Tour+Collections -->
-    <main class="cc-col cc-col--center">
+    <main class="cc-col cc-col--center" data-screen="center">
 
       <div class="cc-row cc-row--film">
         <Panel title="Film Recommendations" viewAllHref="/films" showControls group="films">
@@ -127,7 +138,7 @@ const portfolioSections = [
     </main>
 
     <!-- RIGHT: Portfolio + Contact -->
-    <aside class="cc-col cc-col--portfolio">
+    <aside class="cc-col cc-col--portfolio" data-screen="portfolio">
       <Panel title="Portfolio" viewAllHref="/portfolio" showControls group="portfolio">
         <div class="cc-cassette-stack">
           {portfolioSections.map(p => (
@@ -260,4 +271,42 @@ const portfolioSections = [
   }
   checkLiveStatus();
   setInterval(checkLiveStatus, POLL_INTERVAL);
+</script>
+
+<script>
+  if (!(window as any).__ccMobileTabsInit) {
+    (window as any).__ccMobileTabsInit = true;
+
+    const SCREENS = ['updates', 'center', 'portfolio'];
+    const tabs = document.querySelectorAll<HTMLElement>('.cc-mobile-tab');
+    const dots = document.querySelectorAll<HTMLElement>('.cc-mobile-dot');
+    const cols = document.querySelectorAll<HTMLElement>('.cc-col');
+    let current = 0;
+
+    function showScreen(index: number) {
+      current = index;
+      cols.forEach(col => {
+        col.classList.toggle('is-active-mobile', col.dataset.screen === SCREENS[index]);
+      });
+      tabs.forEach((tab, i) => tab.classList.toggle('is-active', i === index));
+      dots.forEach((dot, i) => dot.classList.toggle('is-active', i === index));
+    }
+
+    tabs.forEach((tab, i) => tab.addEventListener('click', () => showScreen(i)));
+
+    // Swipe support
+    let touchStartX = 0;
+    const home = document.querySelector('.cc-home');
+    home?.addEventListener('touchstart', (e) => {
+      touchStartX = (e as TouchEvent).touches[0].clientX;
+    });
+    home?.addEventListener('touchend', (e) => {
+      const dx = (e as TouchEvent).changedTouches[0].clientX - touchStartX;
+      if (Math.abs(dx) < 50) return;
+      if (dx < 0 && current < SCREENS.length - 1) showScreen(current + 1);
+      if (dx > 0 && current > 0) showScreen(current - 1);
+    });
+
+    showScreen(0);
+  }
 </script>

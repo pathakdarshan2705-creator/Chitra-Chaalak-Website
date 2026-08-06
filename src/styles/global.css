@@ -220,3 +220,60 @@ button{
 
 .cc-btn:hover{ background:var(--yellow); }
 .cc-btn:active{ transform:translate(1px,1px); }
+
+.cc-mobile-tabs, .cc-mobile-dots { display: none; }
+
+  @media (max-width: 768px) {
+    .cc-home {
+      display: block;
+      height: 100%;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .cc-mobile-tabs {
+      display: flex;
+      gap: 4px;
+      padding: 0 0 8px;
+    }
+    .cc-mobile-tab {
+      flex: 1;
+      background: var(--blue-card);
+      color: var(--blue-lightest);
+      border: 1px solid var(--navy-deep);
+      box-shadow: inset 0 0 0 1px var(--blue-panel-light);
+      font-family: var(--font-ui);
+      font-size: 11px;
+      letter-spacing: 1px;
+      padding: 8px 4px;
+      cursor: pointer;
+    }
+    .cc-mobile-tab.is-active {
+      background: var(--yellow);
+      color: var(--navy-deep);
+    }
+
+    .cc-col {
+      display: none;
+      height: calc(100% - 76px);
+      grid-column: unset !important;
+    }
+    .cc-col.is-active-mobile {
+      display: flex;
+    }
+
+    .cc-mobile-dots {
+      display: flex;
+      justify-content: center;
+      gap: 6px;
+      padding-top: 6px;
+    }
+    .cc-mobile-dot {
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      background: var(--blue-card);
+    }
+    .cc-mobile-dot.is-active {
+      background: var(--yellow);
+    }
+  }
