@@ -9,7 +9,6 @@ const { group = 'blog' } = Astro.props;
 <div class="cc-blog-preview" data-preview-group={group}>
   <div class="cc-blog-preview__img-wrap">
     <img class="cc-blog-preview__img" src="" alt="" />
-    <div class="cc-blog-preview__overlay"></div>
   </div>
   <div class="cc-blog-preview__body">
     <div class="cc-blog-preview__title"></div>
@@ -36,14 +35,6 @@ const { group = 'blog' } = Astro.props;
     transition: opacity 0.15s steps(3);
   }
   .cc-blog-preview__img.is-loading { opacity: 0.4; }
-  /* Scanline overlay on image — makes it look like a monitor */
-  .cc-blog-preview__overlay {
-    position: absolute; inset: 0; pointer-events: none;
-    background: repeating-linear-gradient(
-      0deg, rgba(0,0,0,0.1) 0px, rgba(0,0,0,0.1) 1px,
-      transparent 1px, transparent 3px
-    );
-  }
   .cc-blog-preview__body {
     flex-shrink: 0;
     padding: 10px 14px;

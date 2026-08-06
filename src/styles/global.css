@@ -43,7 +43,7 @@ html, body{
 }
 
 body{
-  background:var(--navy-deep) url('/assets/bg-texture.png');
+  background:var(--navy-deep) url('/assets/bg-texture.png') center center / cover no-repeat fixed;
   color:var(--blue-lightest);
   font-family:var(--font-body);
   overflow:hidden; /* the app shell below owns internal scrolling per-section, not the page */
@@ -98,12 +98,6 @@ button{
   );
   z-index:999;
   opacity:0.3;
-  animation:cc-scanline-drift 14s linear infinite;
-}
-
-@keyframes cc-scanline-drift{
-  0%{ background-position:0 0; }
-  100%{ background-position:0 300px; }
 }
 
 .cc-vignette{

@@ -1,0 +1,130 @@
+---
+// src/components/SlideshowCard.astro
+// A single portrait "poster" frame that auto-cycles through `items`
+// via GSAP crossfade. Reuses the shared selection system by keeping
+// itself permanently `.is-selected` and updating its own data-*
+// attributes each cycle — so Enter/double-click/info-hover all keep
+// working unmodified, they just always read "whichever slide is showing".
+// The panel's own ▲▼ buttons (data-select-group matching `group`)
+// also manually advance/retreat the slideshow.
+interface Item { title: string; meta: string; imageSrc: string; href: string; }
+interface Props { items: Item[]; group: string; intervalMs?: number; }
+const { items, group, intervalMs = 4000 } = Astro.props;
+const first = items[0];
+---
+<div
+  class="cc-card cc-card--poster is-selected cc-slideshow"
+  data-slideshow-group={group}
+  data-href={first.href}
+  data-group={group}
+  data-title={first.title}
+  data-meta={first.meta}
+  data-image={first.imageSrc}
+  data-items={JSON.stringify(items)}
+  data-index="0"
+  tabindex="0"
+  role="button"
+>
+  <div class="cc-card__img">
+    <img src={first.imageSrc} alt={first.title} />
+  </div>
+  <div class="cc-card__body">
+    <div class="cc-card__title">{first.title}</div>
+    <div class="cc-card__meta">{first.meta}</div>
+  </div>
+  <div class="cc-slideshow__dots">
+    {items.map((_, i) => <span class={i === 0 ? 'is-active' : ''}></span>)}
+  </div>
+  <span class="cc-card__corner-br"></span>
+</div>
+<style>
+  .cc-slideshow { position: relative; }
+
+  /* This card is permanently marked is-selected so the shared
+     Enter/info-hover system treats it as "the current item" — but
+     visually it should look like a normal resting card, not a
+     selected list row, so override the yellow selected treatment. */
+  .cc-slideshow.is-selected {
+    background: var(--blue-card);
+  }
+  .cc-slideshow.is-selected .cc-card__title {
+    color: var(--blue-lightest);
+    opacity: 1;
+  }
+  .cc-slideshow.is-selected .cc-card__meta {
+    color: var(--blue-lightest);
+    opacity: 0.7;
+  }
+  .cc-slideshow.is-selected::after {
+    display: none;
+  }
+  .cc-slideshow:hover.is-selected {
+    background: var(--blue-card-hover);
+  }
+
+  .cc-slideshow__dots {
+    position: absolute; bottom: 8px; right: 8px;
+    display: flex; gap: 4px; z-index: 4;
+  }
+  .cc-slideshow__dots span {
+    width: 5px; height: 5px; border-radius: 50%;
+    background: rgba(166,232,255,0.4);
+  }
+  .cc-slideshow__dots span.is-active { background: var(--yellow); }
+</style>
+<script lang="ts">
+  import { gsap } from 'gsap';
+
+  document.querySelectorAll<HTMLElement>('.cc-slideshow').forEach((card) => {
+    const group = card.dataset.slideshowGroup!;
+    const items = JSON.parse(card.dataset.items || '[]') as
+      { title: string; meta: string; imageSrc: string; href: string }[];
+    if (items.length <= 1) return;
+
+    let index = 0;
+    let timer: ReturnType<typeof setInterval> | null = null;
+    const img = card.querySelector('.cc-card__img img') as HTMLImageElement;
+    const titleEl = card.querySelector('.cc-card__title') as HTMLElement;
+    const metaEl = card.querySelector('.cc-card__meta') as HTMLElement;
+    const dots = card.querySelectorAll('.cc-slideshow__dots span');
+
+    function goTo(i: number) {
+      index = ((i % items.length) + items.length) % items.length;
+      const item = items[index];
+      const tl = gsap.timeline();
+      tl.to([img, titleEl, metaEl], { opacity: 0, duration: 0.25, ease: 'power1.in' })
+        .call(() => {
+          img.src = item.imageSrc;
+          titleEl.textContent = item.title;
+          metaEl.textContent = item.meta;
+          card.dataset.title = item.title;
+          card.dataset.meta = item.meta;
+          card.dataset.image = item.imageSrc;
+          card.dataset.href = item.href;
+        })
+        .to([img, titleEl, metaEl], { opacity: 1, duration: 0.35, ease: 'power1.out' });
+      dots.forEach((d, di) => d.classList.toggle('is-active', di === index));
+    }
+
+    function start() {
+      timer = setInterval(() => goTo(index + 1), 4000);
+    }
+    function stop() {
+      if (timer) clearInterval(timer);
+    }
+
+    start();
+    card.addEventListener('mouseenter', stop);
+    card.addEventListener('mouseleave', start);
+
+    // manual prev/next via this group's control buttons
+    document.querySelectorAll(`[data-select-group="${group}"]`).forEach((btn) => {
+      btn.addEventListener('click', () => {
+        stop();
+        const dir = Number((btn as HTMLElement).dataset.dir ?? '1');
+        goTo(index + dir);
+        start();
+      });
+    });
+  });
+</script>
