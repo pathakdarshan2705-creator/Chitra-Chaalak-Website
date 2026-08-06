@@ -71,15 +71,10 @@ const portfolioSections = [
   <div class="cc-home">
 
     <nav class="cc-mobile-tabs" id="cc-mobile-tabs">
-  <button class="cc-mobile-tab is-active" data-target="updates">CH 1 · UPDATES</button>
-  <button class="cc-mobile-tab" data-target="center">CH 2 · WATCH</button>
-  <button class="cc-mobile-tab" data-target="portfolio">CH 3 · WORK</button>
-</nav>
-<div class="cc-mobile-dots" id="cc-mobile-dots">
-  <span class="cc-mobile-dot is-active"></span>
-  <span class="cc-mobile-dot"></span>
-  <span class="cc-mobile-dot"></span>
-</div>
+      <button class="cc-mobile-tab is-active" data-target="updates">CH 1 · UPDATES</button>
+      <button class="cc-mobile-tab" data-target="center">CH 2 · WATCH</button>
+      <button class="cc-mobile-tab" data-target="portfolio">CH 3 · WORK</button>
+    </nav>
 
     <!-- LEFT: Updates -->
     <aside class="cc-col cc-col--updates" data-screen="updates">
@@ -149,6 +144,12 @@ const portfolioSections = [
       <ContactCard />
     </aside>
 
+    <div class="cc-mobile-dots" id="cc-mobile-dots">
+      <span class="cc-mobile-dot is-active"></span>
+      <span class="cc-mobile-dot"></span>
+      <span class="cc-mobile-dot"></span>
+    </div>
+
   </div>
 </Layout>
 
@@ -204,7 +205,6 @@ const portfolioSections = [
   }
   .cc-film-row::-webkit-scrollbar { display: none; }
   .cc-film-row > :global(.cc-card--poster) {
-    flex: 0 0 auto;
     height: 100%;
   }
 
@@ -294,7 +294,6 @@ const portfolioSections = [
 
     tabs.forEach((tab, i) => tab.addEventListener('click', () => showScreen(i)));
 
-    // Swipe support
     let touchStartX = 0;
     const home = document.querySelector('.cc-home');
     home?.addEventListener('touchstart', (e) => {

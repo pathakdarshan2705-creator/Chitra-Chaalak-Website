@@ -1,4 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 26 26">
-  <polygon points="2,1 2,19 7,15 10,23 13.5,21.5 10.5,14 17,14"
-    fill="#fff000" stroke="#003b99" stroke-width="1.6" stroke-linejoin="round"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 28 28">
+  <path d="M2,9 L2,2 L9,2" stroke="#fff000" stroke-width="2.2" fill="none" stroke-linecap="square"/>
+  <path d="M19,2 L26,2 L26,9" stroke="#fff000" stroke-width="2.2" fill="none" stroke-linecap="square"/>
+  <path d="M26,19 L26,26 L19,26" stroke="#fff000" stroke-width="2.2" fill="none" stroke-linecap="square"/>
+  <path d="M9,26 L2,26 L2,19" stroke="#fff000" stroke-width="2.2" fill="none" stroke-linecap="square"/>
+  <circle cx="14" cy="14" r="1.8" fill="#fff000"/>
 </svg>

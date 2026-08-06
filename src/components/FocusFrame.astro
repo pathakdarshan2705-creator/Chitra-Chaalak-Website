@@ -1,0 +1,96 @@
+---
+// src/components/FocusFrame.astro
+//
+// A camera autofocus-lock frame that smoothly snaps to whatever
+// card/button you're hovering — corner brackets that expand/contract
+// like a real camera's AF box acquiring a subject. Ties directly into
+// Darshan's photography background: the whole site behaves like it's
+// looking through a viewfinder at whatever you're paying attention to.
+//
+// Mounts once in Layout.astro. Pure CSS transition, no animation
+// library needed — snappy but calm.
+---
+<div class="cc-focus-frame" id="cc-focus-frame" aria-hidden="true">
+  <span class="cc-focus-frame__corner cc-focus-frame__corner--tl"></span>
+  <span class="cc-focus-frame__corner cc-focus-frame__corner--tr"></span>
+  <span class="cc-focus-frame__corner cc-focus-frame__corner--bl"></span>
+  <span class="cc-focus-frame__corner cc-focus-frame__corner--br"></span>
+</div>
+
+<style>
+  .cc-focus-frame {
+    position: fixed;
+    top: 0; left: 0;
+    width: 40px; height: 40px;
+    pointer-events: none;
+    z-index: 2500;
+    opacity: 0;
+    transition:
+      transform 0.22s cubic-bezier(0.34, 1.4, 0.64, 1),
+      width 0.22s cubic-bezier(0.34, 1.4, 0.64, 1),
+      height 0.22s cubic-bezier(0.34, 1.4, 0.64, 1),
+      opacity 0.15s ease-out;
+  }
+  .cc-focus-frame.is-active { opacity: 1; }
+
+  .cc-focus-frame__corner {
+    position: absolute;
+    width: 14px; height: 14px;
+    border: 2px solid var(--yellow);
+  }
+  .cc-focus-frame__corner--tl { top: -2px; left: -2px; border-right: none; border-bottom: none; }
+  .cc-focus-frame__corner--tr { top: -2px; right: -2px; border-left: none; border-bottom: none; }
+  .cc-focus-frame__corner--bl { bottom: -2px; left: -2px; border-right: none; border-top: none; }
+  .cc-focus-frame__corner--br { bottom: -2px; right: -2px; border-left: none; border-top: none; }
+
+  /* a quick "acquired focus" flash the instant it locks on */
+  .cc-focus-frame.is-locking .cc-focus-frame__corner {
+    animation: cc-focus-lock 0.25s steps(3) 1;
+  }
+  @keyframes cc-focus-lock {
+    0%   { border-color: #ffffff; }
+    100% { border-color: var(--yellow); }
+  }
+</style>
+
+<script>
+  if (!(window as any).__ccFocusFrameInit) {
+    (window as any).__ccFocusFrameInit = true;
+
+    const frame = document.getElementById('cc-focus-frame');
+    if (frame) {
+      const TARGETS = '.cc-card, .cc-btn, .cc-icon-btn, .cc-panel__viewall, .cc-contact-panel__list a';
+      let current: Element | null = null;
+
+      function place(el: HTMLElement) {
+        const r = el.getBoundingClientRect();
+        const pad = 5;
+        frame!.style.width = `${r.width + pad * 2}px`;
+        frame!.style.height = `${r.height + pad * 2}px`;
+        frame!.style.transform = `translate(${r.left - pad}px, ${r.top - pad}px)`;
+        frame!.classList.add('is-active', 'is-locking');
+        setTimeout(() => frame!.classList.remove('is-locking'), 250);
+      }
+
+      document.addEventListener('mouseover', (e) => {
+        const target = (e.target as HTMLElement).closest(TARGETS);
+        if (!target || target === current) return;
+        current = target;
+        place(target as HTMLElement);
+      });
+
+      document.addEventListener('mouseout', (e) => {
+        const related = (e as MouseEvent).relatedTarget as HTMLElement | null;
+        if (related && related.closest(TARGETS)) return;
+        if (!(e.target as HTMLElement).closest(TARGETS)) return;
+        current = null;
+        frame!.classList.remove('is-active');
+      });
+
+      // keep the frame glued to its target while scrolling within a section
+      document.addEventListener('scroll', () => {
+        if (current) place(current as HTMLElement);
+      }, true);
+    }
+  }
+</script>
