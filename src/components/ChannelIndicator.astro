@@ -1,0 +1,109 @@
+---
+// src/components/ChannelIndicator.astro
+//
+// The "TV remote" payoff: press select anywhere on the site (any
+// card, any section) and a channel readout briefly flashes in the
+// corner — like a real remote confirming the button press. Ties
+// every section together as one physical device rather than a
+// pile of independent widgets.
+//
+// Mounts once in Layout.astro. Watches for `is-selected` appearing
+// on any `.cc-card` via a single site-wide MutationObserver — no
+// changes needed to Card.astro, Panel.astro, or SlideshowCard.astro.
+---
+<div class="cc-channel-indicator" id="cc-channel-indicator">
+  <span class="cc-channel-indicator__label">CH</span>
+  <span class="cc-channel-indicator__group" id="cc-channel-group"></span>
+  <span class="cc-channel-indicator__num" id="cc-channel-num"></span>
+</div>
+
+<style>
+  .cc-channel-indicator {
+    position: fixed;
+    top: 16px; right: 16px;
+    z-index: 3000;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(0,10,40,0.9);
+    border: 2px solid var(--yellow);
+    padding: 6px 12px;
+    font-family: var(--font-ui);
+    font-weight: 700;
+    letter-spacing: 1px;
+    pointer-events: none;
+    opacity: 0;
+    transform: translateY(-6px) scale(0.96);
+  }
+  .cc-channel-indicator.is-visible {
+    animation: cc-channel-pop 1.1s steps(8) forwards;
+  }
+  @keyframes cc-channel-pop {
+    0%   { opacity: 0; transform: translateY(-6px) scale(0.96); }
+    12%  { opacity: 1; transform: translateY(0) scale(1); }
+    80%  { opacity: 1; transform: translateY(0) scale(1); }
+    100% { opacity: 0; transform: translateY(-4px) scale(0.98); }
+  }
+  .cc-channel-indicator__label {
+    font-size: 11px;
+    color: var(--blue-lightest);
+    opacity: 0.7;
+  }
+  .cc-channel-indicator__group {
+    font-size: 13px;
+    color: var(--yellow);
+    text-transform: uppercase;
+  }
+  .cc-channel-indicator__num {
+    font-size: 13px;
+    color: var(--blue-lightest);
+  }
+</style>
+
+<script>
+  if (!(window as any).__ccChannelIndicatorInit) {
+    (window as any).__ccChannelIndicatorInit = true;
+
+    const badge = document.getElementById('cc-channel-indicator');
+    const groupEl = document.getElementById('cc-channel-group');
+    const numEl = document.getElementById('cc-channel-num');
+    if (!badge || !groupEl || !numEl) {
+      // guard clause only — nothing to init
+    } else {
+      let lastShown: Element | null = null;
+
+      function flash(card: HTMLElement) {
+        if (card === lastShown) return; // don't re-flash the same card twice in a row
+        lastShown = card;
+
+        const group = card.dataset.group || card.closest('[data-group]')?.getAttribute('data-group') || '';
+        const siblings = Array.from(
+          document.querySelectorAll(`.cc-card[data-group="${group}"]`)
+        );
+        const index = siblings.indexOf(card) + 1;
+
+        groupEl!.textContent = group;
+        numEl!.textContent = String(index).padStart(2, '0');
+
+        badge!.classList.remove('is-visible');
+        void badge!.offsetWidth; // force reflow so the animation restarts
+        badge!.classList.add('is-visible');
+      }
+
+      const observer = new MutationObserver((mutations) => {
+        for (const m of mutations) {
+          const el = m.target as HTMLElement;
+          if (el.classList?.contains('cc-card') && el.classList.contains('is-selected')) {
+            flash(el);
+          }
+        }
+      });
+
+      observer.observe(document.body, {
+        subtree: true,
+        attributes: true,
+        attributeFilter: ['class'],
+      });
+    }
+  }
+</script>

@@ -3,6 +3,8 @@
 import '../styles/global.css';
 import FooterBanner from '../components/FooterBanner.astro';
 import TestCardIntro from '../components/TestCardIntro.astro';
+import ChannelIndicator from '../components/ChannelIndicator.astro';
+import RemoteControl from '../components/RemoteControl.astro';
 
 interface Props {
   title: string;
@@ -18,6 +20,8 @@ const { title } = Astro.props;
 </head>
 <body>
   <TestCardIntro />
+  <ChannelIndicator />
+  <RemoteControl />
   <div class="cc-scanlines"></div>
   <div class="cc-vignette"></div>
   <div class="cc-flicker"></div>

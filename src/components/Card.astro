@@ -254,22 +254,6 @@ const { href, title, meta, imageSrc = '', imageAlt = '', group, variant = 'defau
     color:var(--navy-deep);
     opacity:1;
   }
-
-  .cc-card.is-selected::after{
-    content:"";
-    position:absolute;
-    left:0; right:0;
-    height:6px;
-    background:rgba(255,255,255,0.6);
-    top:-6px;
-    opacity:1;
-    animation:cc-scanline-sweep 1.8s linear infinite;
-  }
-
-  @keyframes cc-scanline-sweep{
-    0%{ top:-6px; }
-    100%{ top:100%; }
-  }
 </style>
 
 <script>

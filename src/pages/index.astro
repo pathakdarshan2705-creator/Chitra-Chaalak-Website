@@ -46,6 +46,8 @@ const films = [
   { title: 'Pyaasa (1957)', meta: 'DRAMA · GURU DUTT', imageSrc: '/images/placeholder.jpg', href: '/films/pyaasa' },
   { title: 'Andhadhun (2018)', meta: 'THRILLER · SRIRAM', imageSrc: '/images/placeholder.jpg', href: '/films/andhadhun' },
   { title: 'Charulata (1964)', meta: 'DRAMA · RAY', imageSrc: '/images/placeholder.jpg', href: '/films/charulata' },
+  { title: 'Sholay (1975)', meta: 'ACTION · SIPPY', imageSrc: '/images/placeholder.jpg', href: '/films/sholay' },
+  { title: 'Mughal-E-Azam (1960)', meta: 'DRAMA · ASIF', imageSrc: '/images/placeholder.jpg', href: '/films/mughal-e-azam' },
 ];
 
 const visualTour = [
@@ -98,9 +100,6 @@ const portfolioSections = [
         </Panel>
       </div>
 
-      <!-- Signal separator — one of the creative additions -->
-      <div class="cc-signal-sep" aria-hidden="true"></div>
-
       <div class="cc-row cc-row--blog">
         <Panel title="Blog" viewAllHref="/blog" showControls group="blog">
           <div class="cc-blog-split">
@@ -113,8 +112,6 @@ const portfolioSections = [
           </div>
         </Panel>
       </div>
-
-      <div class="cc-signal-sep" aria-hidden="true"></div>
 
       <div class="cc-row cc-row--bottom">
         <div class="cc-split-row">
@@ -175,26 +172,14 @@ const portfolioSections = [
   .cc-row--blog  { flex: 1 1 auto; }
   .cc-row--bottom { flex: 0 0 22%; }
 
-  /* Signal separator — a 3px animated scanline strip between panels */
-  .cc-signal-sep {
-    flex-shrink: 0;
-    height: 3px;
-    background: repeating-linear-gradient(
-      90deg,
-      var(--blue-panel-light) 0px, var(--blue-panel-light) 4px,
-      transparent 4px, transparent 8px
-    );
-    opacity: 0.4;
-  }
-
   /* Portfolio column */
   .cc-col--portfolio {
     grid-column: 5;
     gap: 10px;
-    overflow-y: auto; scrollbar-width: none;
+    overflow: hidden;
   }
-  .cc-col--portfolio::-webkit-scrollbar { display: none; }
-  .cc-col--portfolio > :global(.cc-panel) { flex-shrink: 0; }
+  .cc-col--portfolio > :global(.cc-panel) { flex-shrink: 1; min-height: 0; }
+  .cc-col--portfolio > :global(.cc-contact-panel) { flex-shrink: 0; }
 
   /* Film row: poster cards side by side, taking full row height */
   .cc-film-row {
@@ -202,9 +187,13 @@ const portfolioSections = [
     gap: 12px;
     height: 100%;
     align-items: stretch;
+    justify-content: flex-start;
+    overflow-x: auto;
+    scrollbar-width: none;
   }
+  .cc-film-row::-webkit-scrollbar { display: none; }
   .cc-film-row > :global(.cc-card--poster) {
-    flex: 1;
+    flex: 0 0 auto;
     height: 100%;
   }
 
@@ -234,10 +223,14 @@ const portfolioSections = [
   }
   .cc-card-list::-webkit-scrollbar { display: none; }
 
-  /* Cassette stack — tight gap so all 4 fit */
+  /* Cassette stack — tight gap so all 4 fit; scrolls internally if
+     content ever exceeds available height, rather than the page/column */
   .cc-cassette-stack {
     display: flex; flex-direction: column; gap: 6px;
+    min-height: 0;
+    overflow-y: auto; scrollbar-width: none;
   }
+  .cc-cassette-stack::-webkit-scrollbar { display: none; }
 </style>
 
 <!-- Live status polling for the Updates LIVE badge -->

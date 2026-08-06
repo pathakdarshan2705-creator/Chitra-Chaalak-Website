@@ -1,0 +1,45 @@
+---
+// src/components/RemoteControl.astro
+//
+// Turns the keyboard into an actual TV remote: press 1-6 to jump to
+// a section, exactly like punching a channel number. Reuses the
+// existing is-selected mechanics — pressing a number selects that
+// section's first card if nothing's selected there yet, and scrolls
+// it into view. Because ChannelIndicator already watches for
+// is-selected via MutationObserver, the channel-flash fires
+// automatically — no extra wiring needed between the two.
+---
+<script lang="ts">
+  if (!(window as any).__ccRemoteControlInit) {
+    (window as any).__ccRemoteControlInit = true;
+
+    const KEYMAP: Record<string, string> = {
+      '1': 'updates',
+      '2': 'films',
+      '3': 'blog',
+      '4': 'tour',
+      '5': 'collections',
+      '6': 'portfolio',
+    };
+
+    document.addEventListener('keydown', (e) => {
+      const active = document.activeElement;
+      if (active && ['INPUT', 'TEXTAREA'].includes(active.tagName)) return;
+
+      const group = KEYMAP[e.key];
+      if (!group) return;
+
+      const cards = Array.from(
+        document.querySelectorAll(`.cc-card[data-group="${group}"]`)
+      ) as HTMLElement[];
+      if (cards.length === 0) return;
+
+      let current = cards.find((c) => c.classList.contains('is-selected'));
+      if (!current) {
+        current = cards[0];
+        current.classList.add('is-selected');
+      }
+      current.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
+    });
+  }
+</script>

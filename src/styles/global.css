@@ -47,6 +47,11 @@ body{
   color:var(--blue-lightest);
   font-family:var(--font-body);
   overflow:hidden; /* the app shell below owns internal scrolling per-section, not the page */
+  cursor:url('/assets/cursor-default.svg') 2 1, auto;
+}
+
+a, button, [role="button"], .cc-card, .cc-btn, .cc-icon-btn{
+  cursor:url('/assets/cursor-select.svg') 2 1, pointer;
 }
 
 a{ color:inherit; text-decoration:none; }
