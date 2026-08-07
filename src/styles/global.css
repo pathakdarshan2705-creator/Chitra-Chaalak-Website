@@ -274,7 +274,9 @@ button{
      instead of crushing every section into a sliver. */
   .cc-col--center.is-active-mobile {
     overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
+    gap: 14px;
   }
   .cc-col--center.is-active-mobile::-webkit-scrollbar { display: none; }
   .cc-col--center.is-active-mobile .cc-row--film,
@@ -295,11 +297,12 @@ button{
     flex: 0 0 auto !important;
     max-height: 160px;
   }
-  /* Tour + Collections side-by-side also doesn't fit — stack */
+  /* Tour + Collections side-by-side also doesn't fit — stack, with
+     breathing room between them */
   .cc-col--center.is-active-mobile .cc-split-row {
     grid-template-columns: 1fr !important;
     height: auto !important;
-    gap: 12px;
+    gap: 16px;
   }
 
   /* Portfolio screen: allow it to scroll as a whole on mobile
@@ -308,7 +311,9 @@ button{
      is the right tradeoff) */
   .cc-col--portfolio.is-active-mobile {
     overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
+    gap: 12px;
   }
   .cc-col--portfolio.is-active-mobile::-webkit-scrollbar { display: none; }
 

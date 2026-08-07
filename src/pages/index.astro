@@ -215,7 +215,7 @@ const portfolioSections = [
   }
   .cc-blog-split__list {
     flex: 0 0 40%; gap: 2px;
-    overflow-y: auto; scrollbar-width: none;
+    overflow-y: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none;
   }
   .cc-blog-split__list::-webkit-scrollbar { display: none; }
 
@@ -230,7 +230,7 @@ const portfolioSections = [
   .cc-card-list {
     display: flex; flex-direction: column; gap: 8px;
     flex: 1; min-height: 0;
-    overflow-y: auto; scrollbar-width: none;
+    overflow-y: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none;
   }
   .cc-card-list::-webkit-scrollbar { display: none; }
 
@@ -239,7 +239,7 @@ const portfolioSections = [
   .cc-cassette-stack {
     display: flex; flex-direction: column; gap: 6px;
     min-height: 0;
-    overflow-y: auto; scrollbar-width: none;
+    overflow-y: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none;
   }
   .cc-cassette-stack::-webkit-scrollbar { display: none; }
 </style>

@@ -1,0 +1,96 @@
+---
+// src/components/TiltCards.astro
+//
+// Every .cc-card tilts in 3D toward the cursor on hover, with a glare
+// highlight that tracks the mouse across its surface — like glass
+// catching light. Mounted once, applies globally via event delegation
+// so no other component needs to know about it. Uses GSAP quickTo for
+// buttery-smooth interpolation instead of directly setting styles
+// every mousemove frame.
+---
+<style>
+  .cc-card, .cc-cassette, .cc-slideshow, .cc-update-entry {
+    transform-style: preserve-3d;
+    will-change: transform;
+  }
+  .cc-tilt-glare {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: radial-gradient(
+      circle 140px at var(--glare-x, 50%) var(--glare-y, 50%),
+      rgba(255,255,255,0.18),
+      transparent 70%
+    );
+    opacity: 0;
+    transition: opacity 0.2s ease-out;
+    z-index: 5;
+  }
+  .cc-tilt-glare.is-active { opacity: 1; }
+</style>
+
+<script>
+  if (!(window as any).__ccTiltCardsInit) {
+    (window as any).__ccTiltCardsInit = true;
+
+    import('gsap').then(({ gsap }) => {
+      const TARGETS = '.cc-card, .cc-cassette, .cc-slideshow, .cc-update-entry';
+      const MAX_TILT = 6; // degrees — subtle, not cartoonish
+      const registry = new WeakMap<HTMLElement, {
+        rotX: ReturnType<typeof gsap.quickTo>;
+        rotY: ReturnType<typeof gsap.quickTo>;
+        glare: HTMLElement;
+      }>();
+
+      function ensureGlare(el: HTMLElement): HTMLElement {
+        let glare = el.querySelector<HTMLElement>('.cc-tilt-glare');
+        if (!glare) {
+          glare = document.createElement('div');
+          glare.className = 'cc-tilt-glare';
+          el.appendChild(glare);
+        }
+        return glare;
+      }
+
+      function setup(el: HTMLElement) {
+        if (registry.has(el)) return registry.get(el)!;
+        const rotX = gsap.quickTo(el, 'rotationX', { duration: 0.4, ease: 'power2.out' });
+        const rotY = gsap.quickTo(el, 'rotationY', { duration: 0.4, ease: 'power2.out' });
+        gsap.set(el, { transformPerspective: 700, transformOrigin: 'center' });
+        const entry = { rotX, rotY, glare: ensureGlare(el) };
+        registry.set(el, entry);
+        return entry;
+      }
+
+      document.addEventListener('mousemove', (e) => {
+        const target = (e.target as HTMLElement).closest(TARGETS) as HTMLElement | null;
+        if (!target) return;
+        const { rotX, rotY, glare } = setup(target);
+        const r = target.getBoundingClientRect();
+        const px = (e.clientX - r.left) / r.width;  // 0..1
+        const py = (e.clientY - r.top) / r.height;  // 0..1
+
+        rotY(( px - 0.5) * MAX_TILT * 2);
+        rotX(-(py - 0.5) * MAX_TILT * 2);
+
+        glare.style.setProperty('--glare-x', `${px * 100}%`);
+        glare.style.setProperty('--glare-y', `${py * 100}%`);
+        glare.classList.add('is-active');
+      });
+
+      document.addEventListener('mouseout', (e) => {
+        const target = (e.target as HTMLElement).closest(TARGETS) as HTMLElement | null;
+        if (!target) return;
+        const related = (e as MouseEvent).relatedTarget as HTMLElement | null;
+        if (related && related.closest(TARGETS) === target) return;
+
+        const entry = registry.get(target);
+        if (entry) {
+          entry.rotX(0);
+          entry.rotY(0);
+          entry.glare.classList.remove('is-active');
+        }
+      });
+    });
+  }
+</script>

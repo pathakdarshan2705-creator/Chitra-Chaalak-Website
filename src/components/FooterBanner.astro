@@ -1,21 +1,36 @@
 ---
-// Footer banner with date, time, and steps counter. The steps counter is a placeholder for now, until the Phase 4 phone-sync endpoint is wired in. The date and time update every second.
+// src/components/FooterBanner.astro
+// Broadcast ticker — matches the double-border/bevel language used
+// everywhere else, plus a live signal-bar meter (same visual family
+// as UpdateEntryCard) so it reads as part of the same system.
 ---
 <div class="cc-footer">
+  <span class="cc-footer__corner cc-footer__corner--tl"></span>
+  <span class="cc-footer__corner cc-footer__corner--tr"></span>
+
   <div class="cc-footer__segment">
     <span class="cc-footer__dot"></span>
     <span id="cc-footer-date">--</span>
   </div>
+  <div class="cc-footer__divider"></div>
   <div class="cc-footer__segment">
     <span id="cc-footer-time">--:--:--</span>
   </div>
-  <div class="cc-footer__segment">
-    <span id="cc-footer-steps">STEPS: ----</span>
+  <div class="cc-footer__divider"></div>
+  <div class="cc-footer__segment cc-footer__segment--steps">
+    <span>STEPS</span>
+    <span class="cc-footer__bars" aria-hidden="true">
+      {Array.from({ length: 8 }).map((_, i) => (
+        <span class="cc-footer__bar" style={`animation-delay:${i * 0.09}s`}></span>
+      ))}
+    </span>
+    <span id="cc-footer-steps">----</span>
   </div>
 </div>
 
 <style>
   .cc-footer{
+    position: relative;
     flex-shrink:0;
     height:var(--footer-height);
     background:var(--blue-lightest);
@@ -26,27 +41,72 @@
     letter-spacing:1px;
     display:flex;
     align-items:center;
-    justify-content:space-between;
+    gap:18px;
     padding:0 24px;
-    border-top:2px solid var(--yellow);
+    border-top: 2px solid var(--navy-deep);
+    box-shadow:
+      inset 0 2px 0 var(--yellow),
+      inset 0 0 0 1px rgba(0,10,40,0.15);
   }
+
+  .cc-footer__corner{
+    position:absolute;
+    width:9px; height:9px;
+    opacity:0.7;
+    pointer-events:none;
+  }
+  .cc-footer__corner--tl{ top:3px; left:3px; border-top:2px solid var(--navy-deep); border-left:2px solid var(--navy-deep); }
+  .cc-footer__corner--tr{ top:3px; right:3px; border-top:2px solid var(--navy-deep); border-right:2px solid var(--navy-deep); }
 
   .cc-footer__segment{
     display:flex;
     align-items:center;
-    gap:6px;
+    gap:7px;
+  }
+
+  .cc-footer__segment--steps{
+    margin-left:auto;
+  }
+
+  .cc-footer__divider{
+    width:1px;
+    height:16px;
+    background:rgba(0,10,40,0.25);
+    flex-shrink:0;
   }
 
   .cc-footer__dot{
     width:6px; height:6px;
-    background:var(--yellow);
+    background:var(--navy-deep);
     border-radius:50%;
     animation:cc-pulse-dot 1.5s ease-in-out infinite;
   }
 
   @keyframes cc-pulse-dot{
     0%,100%{ opacity:1; }
-    50%{ opacity:0.2; }
+    50%{ opacity:0.25; }
+  }
+
+  .cc-footer__bars{
+    display:flex;
+    gap:2px;
+  }
+
+  .cc-footer__bar{
+    width:3px; height:10px;
+    background:var(--navy-deep);
+    opacity:0.85;
+    animation:cc-footer-bar-flicker 2s ease-in-out infinite;
+  }
+
+  @keyframes cc-footer-bar-flicker{
+    0%,100%{ opacity:0.85; }
+    50%{ opacity:0.3; }
+  }
+
+  @media (max-width: 768px){
+    .cc-footer{ gap:10px; padding:0 14px; font-size:10px; }
+    .cc-footer__bars{ display:none; }
   }
 </style>
 
@@ -59,6 +119,7 @@
     const timeEl = document.getElementById('cc-footer-time');
     if (dateEl) dateEl.textContent = dateStr;
     if (timeEl) timeEl.textContent = timeStr;
+    // steps stays placeholder until the Phase 4 phone-sync endpoint is wired in
   }
   ccUpdateFooter();
   setInterval(ccUpdateFooter, 1000);
