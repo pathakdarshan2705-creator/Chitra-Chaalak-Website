@@ -1,0 +1,63 @@
+---
+// src/components/ChannelWipe.astro
+//
+// Fires only when RemoteControl jumps between sections via number
+// keys — the viewport splits into horizontal bands that slide in
+// from alternating left/right and snap together, like a physical
+// channel dial flipping past static and landing on the new channel.
+// Distinct from a hover effect: this is a full-screen, once-per-jump
+// payoff, dispatched via a custom event so RemoteControl doesn't need
+// to know this component exists.
+---
+<div class="cc-wipe" id="cc-wipe" aria-hidden="true">
+  {Array.from({ length: 7 }).map((_, i) => (
+    <span class="cc-wipe__band" style={`--i:${i}`}></span>
+  ))}
+</div>
+
+<style>
+  .cc-wipe {
+    position: fixed;
+    inset: 0;
+    z-index: 4000;
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+  }
+  .cc-wipe__band {
+    flex: 1;
+    background: var(--navy-deep);
+    border-bottom: 1px solid rgba(166,232,255,0.15);
+    transform: translateX(calc(100% * var(--dir, 1)));
+  }
+  .cc-wipe.is-playing .cc-wipe__band {
+    animation: cc-wipe-band 0.55s cubic-bezier(0.6, 0, 0.2, 1) forwards;
+    animation-delay: calc(var(--i) * 0.03s);
+  }
+  @keyframes cc-wipe-band {
+    0%   { transform: translateX(calc(100% * var(--dir, 1))); }
+    55%  { transform: translateX(0); }
+    100% { transform: translateX(calc(-100% * var(--dir, 1))); }
+  }
+</style>
+
+<script>
+  if (!(window as any).__ccChannelWipeInit) {
+    (window as any).__ccChannelWipeInit = true;
+
+    const wipe = document.getElementById('cc-wipe');
+    if (wipe) {
+      const bands = wipe.querySelectorAll<HTMLElement>('.cc-wipe__band');
+      bands.forEach((b, i) => {
+        b.style.setProperty('--dir', i % 2 === 0 ? '1' : '-1');
+      });
+
+      document.addEventListener('cc:channel-jump', () => {
+        wipe.classList.remove('is-playing');
+        void wipe.offsetWidth; // restart animation
+        wipe.classList.add('is-playing');
+        setTimeout(() => wipe.classList.remove('is-playing'), 700);
+      });
+    }
+  }
+</script>

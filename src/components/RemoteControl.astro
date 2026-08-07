@@ -1,38 +1,85 @@
 ---
-// Tried to add a remote control feature to the site, where pressing 1-6 on the keyboard would scroll to different sections of the site. This is a fun little easter egg for users who want to navigate the site like a TV remote. Although still figuring out how to do
-
+// src/components/RemoteControl.astro
+//
+// Number keys 1-6 jump straight to a section. Arrow keys move the
+// selection within whichever section you were last in. Enter opens
+// whatever's currently selected. A short busy-lock after each move
+// prevents rapid key-repeat from firing overlapping scroll animations,
+// which was the "getting selected but not smooth" issue.
 ---
 <script>
-  console.log("✅ Remote Control Loaded");
-  if (!window.__ccRemoteControlInit) {
-  window.__ccRemoteControlInit = true;
+  if (!(window as any).__ccRemoteControlInit) {
+    (window as any).__ccRemoteControlInit = true;
 
-  const KEYMAP = {
-      '1': 'updates',
-      '2': 'films',
-      '3': 'blog',
-      '4': 'tour',
-      '5': 'collections',
-      '6': 'portfolio',
+    const KEYMAP: Record<string, string> = {
+      '1': 'updates', '2': 'films', '3': 'blog',
+      '4': 'tour', '5': 'collections', '6': 'portfolio',
     };
+
+    let lastGroup: string | null = null;
+    let busy = false;
+
+    function cardsIn(group: string): HTMLElement[] {
+      return Array.from(document.querySelectorAll(`.cc-card[data-group="${group}"]`));
+    }
+
+    function select(group: string, card: HTMLElement) {
+      cardsIn(group).forEach((c) => c.classList.remove('is-selected'));
+      card.classList.add('is-selected');
+      card.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
+      lastGroup = group;
+    }
 
     document.addEventListener('keydown', (e) => {
       const active = document.activeElement;
       if (active && ['INPUT', 'TEXTAREA'].includes(active.tagName)) return;
+      if (e.ctrlKey || e.metaKey || e.altKey) return;
 
-      const group = KEYMAP[e.key];
-      if (!group) return;
-
-      const cards = Array.from(
-  document.querySelectorAll(`.cc-card[data-group="${group}"]`)
-);
-
-      let current = cards.find((c) => c.classList.contains('is-selected'));
-      if (!current) {
-        current = cards[0];
-        current.classList.add('is-selected');
+      // Number keys: jump straight to a section
+      const numberGroup = KEYMAP[e.key];
+      if (numberGroup) {
+        if (busy) return;
+        const cards = cardsIn(numberGroup);
+        if (!cards.length) return;
+        const current = cards.find((c) => c.classList.contains('is-selected'));
+        busy = true;
+        document.dispatchEvent(new CustomEvent('cc:channel-jump'));
+        select(numberGroup, current ?? cards[0]);
+        setTimeout(() => { busy = false; }, 200);
+        return;
       }
-      current.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
+
+      // Enter: open whatever's currently selected in the last-used group
+      if (e.key === 'Enter' && lastGroup) {
+        const cards = cardsIn(lastGroup);
+        const sel = cards.find((c) => c.classList.contains('is-selected'));
+        const href = sel?.dataset.href;
+        if (href && href !== '#') window.location.href = href;
+        return;
+      }
+
+      // Arrow keys: move selection within whichever section was last touched
+      const isNext = e.key === 'ArrowDown' || e.key === 'ArrowRight';
+      const isPrev = e.key === 'ArrowUp' || e.key === 'ArrowLeft';
+      if (!isNext && !isPrev) return;
+      if (busy) return;
+
+      const group = lastGroup ?? Object.values(KEYMAP).find((g) => cardsIn(g).length);
+      if (!group) return;
+      const cards = cardsIn(group);
+      if (!cards.length) return;
+
+      e.preventDefault();
+
+      const current = cards.find((c) => c.classList.contains('is-selected'));
+      const idx = current ? cards.indexOf(current) : -1;
+      let next = idx + (isNext ? 1 : -1);
+      if (next < 0) next = cards.length - 1;
+      if (next >= cards.length) next = 0;
+
+      busy = true;
+      select(group, cards[next]);
+      setTimeout(() => { busy = false; }, 200);
     });
   }
 </script>

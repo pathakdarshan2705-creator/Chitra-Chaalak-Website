@@ -1,5 +1,16 @@
 ---
-//All the cards general elements, like the shape and borders with different type of elements like images, text as we can see
+// src/components/Card.astro
+//
+// <Card href="..." title="..." meta="..." imageSrc="..." group="films" variant="poster" />
+//
+// variant:
+//   "default" — landscape thumbnail + text (tour, collections)
+//   "poster"  — portrait movie-poster shaped thumbnail (film recommendations)
+//   "text"    — no image, full-width text bar (blog channel-list rows)
+//
+// Single click selects. Same `group` on every card in a list makes
+// selection exclusive within that list. Double-click navigates to
+// `href`. Up/down + Enter in the parent Panel drive the same state.
 
 interface Props {
   href: string;
@@ -267,7 +278,11 @@ const { href, title, meta, imageSrc = '', imageAlt = '', group, variant = 'defau
       const card = (e.target as HTMLElement).closest('.cc-card') as HTMLElement | null;
       if (!card) return;
       const href = card.dataset.href;
-      if (href) window.location.href = href;
+      if (!href || href === '#') return;
+      // same channel-wipe used by number-key jumps and Enter, so every
+      // navigation trigger on the site feels identical
+      document.dispatchEvent(new CustomEvent('cc:channel-jump'));
+      setTimeout(() => { window.location.href = href; }, 320);
     });
 
     document.addEventListener('keydown', (e) => {
