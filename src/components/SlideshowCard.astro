@@ -1,13 +1,6 @@
 ---
-// src/components/SlideshowCard.astro
-// A text-first slide that auto-cycles through `items` via GSAP
-// crossfade. No thumbnail image — Visual Tour and Collections read
-// better as attractive typography than a cramped image, since these
-// panels are too small for a photo to breathe. Reuses the shared
-// selection system by staying permanently `.is-selected` and updating
-// its own data-* attributes each cycle, so Enter/double-click/info-hover
-// all keep working unmodified. The panel's ▲▼ buttons also manually
-// advance/retreat.
+// The bottom two cards of visual tour and my collection which contain a slideshow of the items in the collection. The slideshow auto-advances every 7 seconds, and can be manually advanced with the left/right buttons. The slideshow is also linked to the card's href, so clicking on the card will take you to the first item in the slideshow.
+
 interface Item { title: string; meta: string; href: string; }
 interface Props { items: Item[]; group: string; }
 const { items, group } = Astro.props;
