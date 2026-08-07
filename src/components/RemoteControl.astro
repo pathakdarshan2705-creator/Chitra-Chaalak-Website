@@ -1,19 +1,13 @@
 ---
-// src/components/RemoteControl.astro
-//
-// Turns the keyboard into an actual TV remote: press 1-6 to jump to
-// a section, exactly like punching a channel number. Reuses the
-// existing is-selected mechanics — pressing a number selects that
-// section's first card if nothing's selected there yet, and scrolls
-// it into view. Because ChannelIndicator already watches for
-// is-selected via MutationObserver, the channel-flash fires
-// automatically — no extra wiring needed between the two.
----
-<script lang="ts">
-  if (!(window as any).__ccRemoteControlInit) {
-    (window as any).__ccRemoteControlInit = true;
+// Tried to add a remote control feature to the site, where pressing 1-6 on the keyboard would scroll to different sections of the site. This is a fun little easter egg for users who want to navigate the site like a TV remote. Although still figuring out how to do
 
-    const KEYMAP: Record<string, string> = {
+---
+<script>
+  console.log("✅ Remote Control Loaded");
+  if (!window.__ccRemoteControlInit) {
+  window.__ccRemoteControlInit = true;
+
+  const KEYMAP = {
       '1': 'updates',
       '2': 'films',
       '3': 'blog',
@@ -30,9 +24,8 @@
       if (!group) return;
 
       const cards = Array.from(
-        document.querySelectorAll(`.cc-card[data-group="${group}"]`)
-      ) as HTMLElement[];
-      if (cards.length === 0) return;
+  document.querySelectorAll(`.cc-card[data-group="${group}"]`)
+);
 
       let current = cards.find((c) => c.classList.contains('is-selected'));
       if (!current) {

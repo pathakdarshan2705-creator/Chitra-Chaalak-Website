@@ -1,22 +1,5 @@
 ---
-// src/components/Panel.astro
-//
-// The recurring "TV panel" shell — film, blog, tour, collections,
-// and portfolio all wrap their content in this.
-//
-// <Panel title="Film Recommendations" viewAllHref="/films" showControls group="films">
-//   ...cards with group="films"...
-// </Panel>
-//
-// Controls are fully wired to the same selection state as click/dblclick
-// on the cards themselves:
-// - Up/Down move the current selection within `group` (wrapping, and
-//   scrolling it into view if the list scrolls).
-// - Enter: first press selects the first item if nothing's selected yet
-//   (a TV remote convention — highlight, then confirm), pressing it
-//   again while something's selected opens it.
-// - Info: hovering it shows a floating preview of the selected card
-//   (falls back to the first card if nothing's selected yet).
+// Button controls which get used in all the cards are mentioned here and also common panel style parameters so that content wraps in particular way and also the notch size can be changed from the parent component. The notch size is a CSS variable that can be set on the parent component to change the size of the notch on the panel. The default value is 20px.
 
 import Icon from './Icons.astro';
 
@@ -260,18 +243,56 @@ const {
       if (current) {
         const href = current.dataset.href;
         if (href && href !== '#') {
-          // channel-change effect before navigating
-          const flash = document.createElement('div');
-          flash.style.cssText = 'position:fixed;inset:0;background:#fff;z-index:9999;opacity:0;pointer-events:none;transition:opacity 0.08s steps(2)';
-          document.body.appendChild(flash);
-          requestAnimationFrame(() => { flash.style.opacity = '0.7'; });
-          setTimeout(() => { flash.style.opacity = '0'; }, 120);
-          setTimeout(() => { document.body.removeChild(flash); window.location.href = href; }, 300);
+          signalLockAndNavigate(current, href);
         }
       } else {
         setSelected(group, cards[0]);
       }
     });
+
+    // "Signal lock" — the selected card zooms toward the viewer and
+    // brightens like it's pulling into focus/frame, while every other
+    // panel scan-fades out around it, then the page navigates. Reads
+    // as diving into the channel you picked rather than a plain cut.
+    async function signalLockAndNavigate(card: HTMLElement, href: string) {
+      const { gsap } = await import('gsap');
+
+      const clone = card.cloneNode(true) as HTMLElement;
+      const rect = card.getBoundingClientRect();
+      clone.style.cssText = `
+        position:fixed; top:${rect.top}px; left:${rect.left}px;
+        width:${rect.width}px; height:${rect.height}px;
+        margin:0; z-index:5000; pointer-events:none;
+      `;
+      document.body.appendChild(clone);
+
+      const others = Array.from(
+        document.querySelectorAll('.cc-panel, .cc-contact-panel')
+      ).filter((el) => !el.contains(card));
+
+      const tl = gsap.timeline({
+        onComplete: () => {
+          clone.remove();
+          window.location.href = href;
+        },
+      });
+
+      tl.to(others, {
+        opacity: 0,
+        filter: 'brightness(2) blur(2px)',
+        duration: 0.35,
+        stagger: 0.02,
+        ease: 'power1.in',
+      }, 0)
+        .to(clone, {
+          scale: 3.2,
+          opacity: 0,
+          filter: 'brightness(2.5)',
+          duration: 0.45,
+          ease: 'power2.in',
+        }, 0.08)
+        .to({}, { duration: 0.1 }); // brief hold before navigating
+    }
 
     let popover: HTMLElement | null = document.getElementById('cc-preview-popover');
 

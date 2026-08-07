@@ -1,14 +1,5 @@
 ---
-// src/components/FocusFrame.astro
-//
-// A camera autofocus-lock frame that smoothly snaps to whatever
-// card/button you're hovering — corner brackets that expand/contract
-// like a real camera's AF box acquiring a subject. Ties directly into
-// Darshan's photography background: the whole site behaves like it's
-// looking through a viewfinder at whatever you're paying attention to.
-//
-// Mounts once in Layout.astro. Pure CSS transition, no animation
-// library needed — snappy but calm.
+// Camera's AF sort of interaction that whereever we hover the mouse, frame will slightly come into focus as it happens in actual camera viewfinder. This is a purely visual effect, not a functional one.
 ---
 <div class="cc-focus-frame" id="cc-focus-frame" aria-hidden="true">
   <span class="cc-focus-frame__corner cc-focus-frame__corner--tl"></span>
