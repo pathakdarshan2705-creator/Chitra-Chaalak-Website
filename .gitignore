@@ -17,6 +17,9 @@ pnpm-debug.log*
 .env
 .env.production
 
+# live-status heartbeat script — contains SECRET_TOKEN, never commit
+live-status/
+
 # macOS-specific files
 .DS_Store
 
