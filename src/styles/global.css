@@ -372,6 +372,36 @@ button{
     height: auto;
   }
   .cc-sidebar{ flex-direction: column; }
-  .cc-sidebar__grid{ grid-template-columns: repeat(3, 1fr); }
   .cc-sidebar__footer{ display: none; } /* controls live in the content column's own Panel on mobile instead */
+
+  .cc-sidebar__hamburger{
+    display: flex !important;
+    flex-direction: column;
+    justify-content: center;
+    gap: 4px;
+    width: 100%;
+    padding: 12px;
+    background: var(--blue-card);
+    border: 2px solid var(--navy-deep);
+    box-shadow:
+      inset 0 0 0 2px var(--blue-panel-light),
+      inset 0 0 0 3px var(--navy-deep);
+    cursor: pointer;
+  }
+  .cc-sidebar__hamburger span{
+    width: 22px;
+    height: 2px;
+    background: var(--blue-lightest);
+    transition: transform 0.15s ease-out, opacity 0.15s ease-out;
+  }
+  .cc-sidebar__hamburger[aria-expanded="true"] span:nth-child(1){ transform: translateY(6px) rotate(45deg); }
+  .cc-sidebar__hamburger[aria-expanded="true"] span:nth-child(2){ opacity: 0; }
+  .cc-sidebar__hamburger[aria-expanded="true"] span:nth-child(3){ transform: translateY(-6px) rotate(-45deg); }
+
+  .cc-sidebar__grid{
+    grid-template-columns: repeat(2, 1fr) !important;
+    display: none !important;
+    margin-top: 8px;
+  }
+  .cc-sidebar__grid.is-open{ display: grid !important; }
 }

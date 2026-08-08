@@ -42,7 +42,10 @@ const {
 } = Astro.props;
 ---
 <nav class="cc-sidebar">
-  <div class="cc-sidebar__grid">
+  <button class="cc-sidebar__hamburger" id="cc-sidebar-hamburger" aria-label="Toggle navigation" aria-expanded="false">
+    <span></span><span></span><span></span>
+  </button>
+  <div class="cc-sidebar__grid" id="cc-sidebar-grid">
     {NAV_ITEMS.map((item) => (
       <a
         href={item.href}
@@ -172,4 +175,24 @@ const {
     transition: background 0.1s steps(2), color 0.1s steps(2);
   }
   .cc-sidebar__enter:hover{ background: var(--yellow); color: var(--navy-deep); }
+
+  .cc-sidebar__hamburger{ display: none; } /* shown only on mobile — see global.css */
 </style>
+
+<script>
+  if (!(window as any).__ccSidebarHamburgerInit) {
+    (window as any).__ccSidebarHamburgerInit = true;
+    const btn = document.getElementById('cc-sidebar-hamburger');
+    const grid = document.getElementById('cc-sidebar-grid');
+    btn?.addEventListener('click', () => {
+      const isOpen = grid?.classList.toggle('is-open');
+      btn.setAttribute('aria-expanded', String(!!isOpen));
+    });
+    grid?.querySelectorAll('a').forEach((link) => {
+      link.addEventListener('click', () => {
+        grid.classList.remove('is-open');
+        btn?.setAttribute('aria-expanded', 'false');
+      });
+    });
+  }
+</script>
