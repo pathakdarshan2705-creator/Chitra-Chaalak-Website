@@ -19,6 +19,13 @@
     let lastGroup: string | null = null;
     let busy = false;
 
+    // mouse clicks (handled by CardInteractions.astro) also count as
+    // "last touched section" so arrow keys work immediately after a
+    // mouse selection, not just after a keyboard one
+    document.addEventListener('cc:card-selected', ((e: CustomEvent) => {
+      lastGroup = e.detail.group;
+    }) as EventListener);
+
     function cardsIn(group: string): HTMLElement[] {
       return Array.from(document.querySelectorAll(`.cc-card[data-group="${group}"]`));
     }

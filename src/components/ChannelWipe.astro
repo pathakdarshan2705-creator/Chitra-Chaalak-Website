@@ -58,6 +58,20 @@
         wipe.classList.add('is-playing');
         setTimeout(() => wipe.classList.remove('is-playing'), 700);
       });
+
+      // Same wipe, played as the page reveals itself — but only when
+      // navigating IN from another page (a channel-jump just happened
+      // on the previous page), not on the very first visit of a session,
+      // where TestCardIntro already owns that moment.
+      const cameFromChannelJump = sessionStorage.getItem('cc-nav-wipe-pending');
+      if (cameFromChannelJump) {
+        sessionStorage.removeItem('cc-nav-wipe-pending');
+        wipe.classList.add('is-playing');
+        setTimeout(() => wipe.classList.remove('is-playing'), 700);
+      }
+      document.addEventListener('cc:channel-jump', () => {
+        sessionStorage.setItem('cc-nav-wipe-pending', '1');
+      });
     }
   }
 </script>

@@ -27,6 +27,9 @@
           });
       }
       card.classList.toggle('is-selected');
+      if (card.classList.contains('is-selected') && group) {
+        document.dispatchEvent(new CustomEvent('cc:card-selected', { detail: { group, card } }));
+      }
     });
 
     document.addEventListener('dblclick', (e) => {

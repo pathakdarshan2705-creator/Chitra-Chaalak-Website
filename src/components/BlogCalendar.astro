@@ -209,6 +209,7 @@ const { availableDates, initialDate } = Astro.props;
             if (iso === selected) btn.classList.add('is-selected');
             btn.addEventListener('click', () => {
               selected = iso;
+              root.dataset.selected = iso;
               panel.hidden = true;
               render();
               document.dispatchEvent(new CustomEvent('cc:blog-date-select', { detail: { date: iso } }));
