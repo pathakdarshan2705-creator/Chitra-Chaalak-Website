@@ -1,0 +1,175 @@
+---
+// src/components/SidebarNav.astro
+//
+// Left navigation panel for every inner page (blog, portfolio, film,
+// tour, collections, updates — NOT the home page, which keeps its own
+// 3-column layout). Two parts:
+// 1. A grid of links to every section, current page highlighted yellow.
+// 2. The current page's own title/description + control buttons — these
+//    are wired to `controlGroup` using the exact same data-select-group /
+//    data-enter-group / data-info-group mechanism Panel.astro already
+//    uses, so they control whatever list is on screen with zero new
+//    interaction logic.
+//
+// Pairs with .cc-inner-layout / .cc-inner-content (global.css) which
+// handle the "sidebar pinned, content scrolls independently" structure.
+
+import Icon from './Icons.astro';
+
+interface NavItem { label: string; href: string; key: string; }
+
+const NAV_ITEMS: NavItem[] = [
+  { label: 'Updates', href: '/updates', key: 'updates' },
+  { label: 'Blogs', href: '/blog', key: 'blog' },
+  { label: 'Portfolio', href: '/portfolio', key: 'portfolio' },
+  { label: 'Film Section', href: '/films', key: 'films' },
+  { label: 'Visual Tour', href: '/tour', key: 'tour' },
+  { label: 'My Collection', href: '/collections', key: 'collections' },
+];
+
+interface Props {
+  activePage: string;      // must match a NAV_ITEMS[].key
+  pageTitle: string;
+  pageDescription?: string;
+  controlGroup?: string;   // data-group whose selection the buttons control
+}
+
+const {
+  activePage,
+  pageTitle,
+  pageDescription = 'Below mentioned control buttons are for the page which is open',
+  controlGroup,
+} = Astro.props;
+---
+<nav class="cc-sidebar">
+  <div class="cc-sidebar__grid">
+    {NAV_ITEMS.map((item) => (
+      <a
+        href={item.href}
+        class={`cc-sidebar__link ${item.key === activePage ? 'is-active' : ''}`}
+      >
+        {item.label}
+      </a>
+    ))}
+  </div>
+
+  <div class="cc-sidebar__footer">
+    <div class="cc-sidebar__title">{pageTitle}</div>
+    <div class="cc-sidebar__desc">{pageDescription}</div>
+
+    {controlGroup && (
+      <div class="cc-sidebar__controls">
+        <div class="cc-sidebar__scroll-btns">
+          <button class="cc-icon-btn" data-select-group={controlGroup} data-dir="-1" aria-label="Select previous">
+            <Icon name="chevron-up" size={14} />
+          </button>
+          <button class="cc-icon-btn" data-select-group={controlGroup} data-dir="1" aria-label="Select next">
+            <Icon name="chevron-down" size={14} />
+          </button>
+        </div>
+        <button class="cc-sidebar__enter" data-enter-group={controlGroup}>Enter</button>
+        <button class="cc-icon-btn" data-info-group={controlGroup} aria-label="Preview selected">
+          <Icon name="info" size={17} />
+        </button>
+      </div>
+    )}
+  </div>
+</nav>
+
+<style is:global>
+  .cc-sidebar{
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .cc-sidebar__grid{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  .cc-sidebar__link{
+    background: var(--blue-card);
+    color: var(--blue-lightest);
+    border: 2px solid var(--navy-deep);
+    box-shadow:
+      inset 0 0 0 2px var(--blue-panel-light),
+      inset 0 0 0 3px var(--navy-deep),
+      inset 1px 1px 0 rgba(255,255,255,0.2),
+      inset -1px -1px 0 rgba(0,10,40,0.35);
+    font-family: var(--font-ui);
+    font-weight: 700;
+    font-size: clamp(11px, 0.9vw, 13px);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    padding: 16px 10px;
+    text-align: center;
+  }
+
+  .cc-sidebar__link.is-active{
+    background: var(--yellow);
+    color: var(--navy-deep);
+  }
+
+  .cc-sidebar__footer{
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    background: var(--blue-column);
+    border: 2px solid var(--navy-deep);
+    box-shadow:
+      inset 0 0 0 2px var(--blue-panel-light),
+      inset 0 0 0 3px var(--navy-deep);
+    padding: 16px;
+  }
+
+  .cc-sidebar__title{
+    font-family: var(--font-ui);
+    font-weight: 700;
+    font-size: clamp(14px, 1.2vw, 18px);
+    letter-spacing: 0.5px;
+    color: var(--blue-lightest);
+    margin-bottom: 8px;
+  }
+
+  .cc-sidebar__desc{
+    font-family: var(--font-body);
+    font-size: clamp(11px, 0.95vw, 13px);
+    color: var(--blue-lightest);
+    opacity: 0.65;
+    line-height: 1.4;
+    flex: 1;
+  }
+
+  .cc-sidebar__controls{
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+    margin-top: 12px;
+  }
+
+  .cc-sidebar__scroll-btns{ display: flex; gap: 4px; }
+
+  .cc-sidebar__enter{
+    font-family: var(--font-ui);
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    flex: 1;
+    text-align: center;
+    background: var(--navy-deep);
+    border: 1px solid rgba(0,0,0,0.3);
+    color: var(--blue-lightest);
+    padding: 6px 0;
+    cursor: pointer;
+    transition: background 0.1s steps(2), color 0.1s steps(2);
+  }
+  .cc-sidebar__enter:hover{ background: var(--yellow); color: var(--navy-deep); }
+</style>

@@ -1,0 +1,136 @@
+---
+// src/components/BlogFeatured.astro
+// The large featured post card at the top of the blog archive.
+// Static markup for the DEFAULT (today's/latest) post — swapped live
+// by JS when a date is picked in BlogCalendar, using a JSON map of
+// all posts embedded on the page so no page reload is needed.
+interface Props {
+  title: string;
+  date: string;
+  topic: string;
+  excerpt: string;
+  imageSrc: string;
+  imageAlt?: string;
+  href: string;
+}
+const { title, date, topic, excerpt, imageSrc, imageAlt = '', href } = Astro.props;
+---
+<div class="cc-blog-featured" id="cc-blog-featured">
+  <div class="cc-blog-featured__img">
+    <img id="cc-blog-featured-img" src={imageSrc} alt={imageAlt} />
+  </div>
+  <div class="cc-blog-featured__body">
+    <div class="cc-blog-featured__title" id="cc-blog-featured-title">{title}</div>
+    <div class="cc-blog-featured__meta">
+      <span id="cc-blog-featured-date">{date}</span>
+      <span class="cc-blog-featured__dot">•</span>
+      <span id="cc-blog-featured-topic">{topic}</span>
+    </div>
+    <p class="cc-blog-featured__excerpt" id="cc-blog-featured-excerpt">{excerpt}</p>
+  </div>
+  <a class="cc-blog-featured__enter" id="cc-blog-featured-enter" href={href}>Enter</a>
+</div>
+
+<style is:global>
+  .cc-blog-featured{
+    background: var(--blue-card);
+    border: 2px solid var(--navy-deep);
+    box-shadow:
+      inset 0 0 0 2px var(--blue-panel-light),
+      inset 0 0 0 3px var(--navy-deep),
+      inset 1px 1px 0 rgba(255,255,255,0.2),
+      inset -1px -1px 0 rgba(0,10,40,0.35);
+    margin-bottom: 24px;
+  }
+
+  .cc-blog-featured__img{
+    width: 100%;
+    aspect-ratio: 21 / 9;
+    background: var(--blue-panel-light);
+    overflow: hidden;
+  }
+  .cc-blog-featured__img img{
+    width: 100%; height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: opacity 0.2s ease-out;
+  }
+
+  .cc-blog-featured__body{
+    padding: 20px 24px;
+  }
+
+  .cc-blog-featured__title{
+    font-family: var(--font-ui);
+    font-weight: 700;
+    font-size: clamp(20px, 2.2vw, 28px);
+    letter-spacing: 0.5px;
+    color: var(--yellow);
+    margin-bottom: 6px;
+  }
+
+  .cc-blog-featured__meta{
+    font-family: var(--font-ui);
+    font-size: 13px;
+    letter-spacing: 0.5px;
+    color: var(--blue-lightest);
+    opacity: 0.75;
+    margin-bottom: 12px;
+  }
+  .cc-blog-featured__dot{ margin: 0 6px; opacity: 0.5; }
+
+  .cc-blog-featured__excerpt{
+    font-family: var(--font-body);
+    font-size: clamp(14px, 1.1vw, 17px);
+    line-height: 1.5;
+    color: var(--blue-lightest);
+    margin: 0;
+  }
+
+  .cc-blog-featured__enter{
+    display: block;
+    text-align: center;
+    font-family: var(--font-ui);
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    background: var(--navy-deep);
+    color: var(--blue-lightest);
+    padding: 10px 0;
+    border-top: 2px solid rgba(0,10,40,0.3);
+    transition: background 0.1s steps(2), color 0.1s steps(2);
+  }
+  .cc-blog-featured__enter:hover{ background: var(--yellow); color: var(--navy-deep); }
+</style>
+
+<script>
+  if (!(window as any).__ccBlogFeaturedInit) {
+    (window as any).__ccBlogFeaturedInit = true;
+
+    document.addEventListener('cc:blog-date-select', ((e: CustomEvent) => {
+      const date: string = e.detail.date;
+      const posts = (window as any).__ccBlogPosts as Record<string, {
+        title: string; dateDisplay: string; topic: string; excerpt: string; image: string; href: string;
+      }> | undefined;
+      if (!posts || !posts[date]) return;
+      const p = posts[date];
+
+      const img = document.getElementById('cc-blog-featured-img') as HTMLImageElement;
+      img.style.opacity = '0.3';
+      img.onload = () => { img.style.opacity = '1'; };
+      img.src = p.image;
+
+      document.getElementById('cc-blog-featured-title')!.textContent = p.title;
+      document.getElementById('cc-blog-featured-date')!.textContent = p.dateDisplay;
+      document.getElementById('cc-blog-featured-topic')!.textContent = p.topic;
+      document.getElementById('cc-blog-featured-excerpt')!.textContent = p.excerpt;
+      (document.getElementById('cc-blog-featured-enter') as HTMLAnchorElement).href = p.href;
+
+      // also select the matching card in the grid below, if it's rendered
+      document.querySelectorAll('.cc-blog-grid-card').forEach((el) => {
+        el.classList.toggle('is-selected', (el as HTMLElement).dataset.href === p.href);
+      });
+    }) as EventListener);
+  }
+</script>

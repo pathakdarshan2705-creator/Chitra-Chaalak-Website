@@ -1,0 +1,109 @@
+---
+// src/components/BlogGridCard.astro
+// One card in the full blog archive grid. Same .cc-card interaction
+// contract as every other card (click-select/dblclick-open), styled
+// as a folder-tab per the reference — small notch top-left, thumbnail,
+// title/date/topic stack, its own ENTER bar.
+interface Props {
+  href: string;
+  title: string;
+  date: string;   // pre-formatted display string
+  topic: string;
+  imageSrc: string;
+  imageAlt?: string;
+  group?: string;
+}
+const { href, title, date, topic, imageSrc, imageAlt = '', group = 'blog-archive' } = Astro.props;
+---
+<div
+  class="cc-card cc-blog-grid-card"
+  data-href={href}
+  data-group={group}
+  data-title={title}
+  data-meta={`${date} · ${topic}`}
+  data-image={imageSrc}
+  tabindex="0"
+  role="button"
+>
+  <div class="cc-blog-grid-card__img">
+    <img src={imageSrc} alt={imageAlt} loading="lazy" />
+  </div>
+  <div class="cc-blog-grid-card__body">
+    <div class="cc-blog-grid-card__title">{title}</div>
+    <div class="cc-blog-grid-card__date">{date}</div>
+    <div class="cc-blog-grid-card__topic">{topic}</div>
+  </div>
+  <div class="cc-blog-grid-card__enter">Enter</div>
+  <span class="cc-card__corner-br"></span>
+</div>
+
+<style is:global>
+  .cc-blog-grid-card{
+    flex-direction: column;
+    align-items: stretch;
+    padding: 0;
+    gap: 0;
+  }
+
+  .cc-blog-grid-card__img{
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    background: var(--blue-panel-light);
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+  .cc-blog-grid-card__img img{
+    width: 100%; height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .cc-blog-grid-card__body{
+    padding: 12px 14px 10px;
+    flex: 1;
+  }
+
+  .cc-blog-grid-card__title{
+    font-family: var(--font-ui);
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--blue-lightest);
+    margin-bottom: 4px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .cc-blog-grid-card__date,
+  .cc-blog-grid-card__topic{
+    font-family: var(--font-body);
+    font-size: 0.8rem;
+    color: var(--blue-lightest);
+    opacity: 0.7;
+    line-height: 1.4;
+  }
+
+  .cc-blog-grid-card__enter{
+    font-family: var(--font-ui);
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    text-align: center;
+    background: var(--navy-deep);
+    color: var(--blue-lightest);
+    padding: 8px 0;
+    border-top: 1px solid rgba(0,10,40,0.3);
+  }
+
+  .cc-blog-grid-card.is-selected .cc-blog-grid-card__title,
+  .cc-blog-grid-card.is-selected .cc-blog-grid-card__date,
+  .cc-blog-grid-card.is-selected .cc-blog-grid-card__topic{
+    color: var(--navy-deep);
+  }
+  .cc-blog-grid-card.is-selected .cc-blog-grid-card__enter{
+    background: var(--yellow);
+    color: var(--navy-deep);
+  }
+</style>

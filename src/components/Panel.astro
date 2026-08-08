@@ -40,6 +40,7 @@ const {
   <div class="cc-panel__header">
     <span class="cc-panel__arrow"><Icon name="arrow" size={16} /></span>
     <span class="cc-panel__title">{title}</span>
+    <slot name="header-extra" />
     {viewAllHref && (
       <a class="cc-panel__viewall" href={viewAllHref}>View All</a>
     )}
@@ -312,3 +313,15 @@ const {
     }, true);
   }
 </script>
+<style>
+  @media (max-width: 768px){
+    .cc-panel__header{
+      flex-wrap: wrap;
+      row-gap: 8px;
+    }
+    .cc-panel__title{
+      flex: 1 1 100%;
+      white-space: normal;
+    }
+  }
+</style>

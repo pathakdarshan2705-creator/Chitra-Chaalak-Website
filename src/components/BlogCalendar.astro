@@ -1,0 +1,243 @@
+---
+// src/components/BlogCalendar.astro
+//
+// "SELECT DATE" dropdown. Days with no post are disabled/greyed out
+// (per explicit decision — not an empty state). Picking a date fires
+// `cc:blog-date-select` with the ISO date string; the blog index page
+// listens for this and swaps the featured post card, plus re-selects
+// the matching card in the grid below (reusing the standard selection
+// system — same `.is-selected` mechanism as everywhere else).
+import Icon from './Icons.astro';
+
+interface Props {
+  availableDates: string[]; // ISO 'YYYY-MM-DD', one per post
+  initialDate: string;      // ISO — the date shown by default
+}
+const { availableDates, initialDate } = Astro.props;
+---
+<div class="cc-cal" id="cc-cal" data-available={JSON.stringify(availableDates)} data-initial={initialDate}>
+  <button class="cc-cal__trigger" id="cc-cal-trigger">
+    <span class="cc-cal__label">Select Date</span>
+    <span class="cc-cal__value" id="cc-cal-value">—</span>
+    <span class="cc-cal__caret"><Icon name="chevron-down" size={14} /></span>
+  </button>
+
+  <div class="cc-cal__panel" id="cc-cal-panel" hidden>
+    <div class="cc-cal__panel-title">Select Date</div>
+    <div class="cc-cal__nav">
+      <button class="cc-icon-btn" id="cc-cal-prev" aria-label="Previous month"><Icon name="chevron-up" size={12} /></button>
+      <span class="cc-cal__month-year">
+        <span id="cc-cal-month"></span> <span id="cc-cal-year"></span>
+      </span>
+      <button class="cc-icon-btn" id="cc-cal-next" aria-label="Next month"><Icon name="chevron-down" size={12} /></button>
+    </div>
+    <div class="cc-cal__weekdays">
+      <span>MON</span><span>TUE</span><span>WED</span><span>THU</span><span>FRI</span><span>SAT</span><span>SUN</span>
+    </div>
+    <div class="cc-cal__grid" id="cc-cal-grid"></div>
+    <div class="cc-cal__today" id="cc-cal-today"></div>
+  </div>
+</div>
+
+<style is:global>
+  .cc-cal{ position: relative; }
+
+  .cc-cal__trigger{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--navy-deep);
+    border: 2px solid var(--yellow);
+    color: var(--blue-lightest);
+    font-family: var(--font-ui);
+    padding: 8px 12px;
+    cursor: pointer;
+  }
+  .cc-cal__label{ font-size: 11px; letter-spacing: 1px; text-transform: uppercase; opacity: 0.7; }
+  .cc-cal__value{ font-size: 13px; font-weight: 700; letter-spacing: 0.5px; }
+  .cc-cal__caret{ display: flex; opacity: 0.7; }
+
+  .cc-cal__panel{
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    width: 300px;
+    background: var(--blue-column);
+    border: 2px solid var(--navy-deep);
+    box-shadow:
+      inset 0 0 0 2px var(--blue-panel-light),
+      inset 0 0 0 3px var(--navy-deep),
+      0 12px 32px rgba(0,10,40,0.6);
+    padding: 16px;
+    z-index: 500;
+  }
+
+  .cc-cal__panel-title{
+    font-family: var(--font-ui);
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--yellow);
+    margin-bottom: 12px;
+  }
+
+  .cc-cal__nav{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  .cc-cal__month-year{
+    font-family: var(--font-ui);
+    font-weight: 700;
+    font-size: 13px;
+    color: var(--blue-lightest);
+    letter-spacing: 1px;
+  }
+
+  .cc-cal__weekdays{
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    margin-bottom: 4px;
+  }
+  .cc-cal__weekdays span{
+    font-family: var(--font-ui);
+    font-size: 9px;
+    text-align: center;
+    color: var(--blue-lightest);
+    opacity: 0.5;
+    letter-spacing: 0.5px;
+  }
+
+  .cc-cal__grid{
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 3px;
+  }
+
+  .cc-cal__day{
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-ui);
+    font-size: 12px;
+    color: var(--blue-lightest);
+    background: var(--blue-card);
+    cursor: pointer;
+    border: none;
+  }
+  .cc-cal__day:hover{ background: var(--blue-card-hover); }
+  .cc-cal__day.is-empty{ background: transparent; cursor: default; pointer-events: none; }
+  .cc-cal__day.is-disabled{
+    background: transparent;
+    color: var(--blue-lightest);
+    opacity: 0.25;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+  .cc-cal__day.is-selected{ background: var(--yellow); color: var(--navy-deep); font-weight: 700; }
+
+  .cc-cal__today{
+    margin-top: 12px;
+    font-family: var(--font-ui);
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--yellow);
+  }
+</style>
+
+<script>
+  if (!(window as any).__ccBlogCalendarInit) {
+    (window as any).__ccBlogCalendarInit = true;
+
+    const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+    const root = document.getElementById('cc-cal');
+    if (root) {
+      const available: string[] = JSON.parse(root.dataset.available || '[]');
+      const availableSet = new Set(available);
+      let selected = root.dataset.initial!;
+      let [viewYear, viewMonth] = selected.split('-').slice(0, 2).map(Number); // month is 1-indexed here
+      viewMonth -= 1; // convert to 0-indexed for JS Date
+
+      const trigger = document.getElementById('cc-cal-trigger')!;
+      const panel = document.getElementById('cc-cal-panel')!;
+      const valueEl = document.getElementById('cc-cal-value')!;
+      const monthEl = document.getElementById('cc-cal-month')!;
+      const yearEl = document.getElementById('cc-cal-year')!;
+      const gridEl = document.getElementById('cc-cal-grid')!;
+      const todayEl = document.getElementById('cc-cal-today')!;
+      const prevBtn = document.getElementById('cc-cal-prev')!;
+      const nextBtn = document.getElementById('cc-cal-next')!;
+
+      const todayISO = new Date().toISOString().slice(0, 10);
+
+      function formatDisplay(iso: string) {
+        const d = new Date(iso + 'T00:00:00');
+        return `${String(d.getDate()).padStart(2,'0')} ${MONTHS[d.getMonth()].slice(0,3).toUpperCase()} ${d.getFullYear()}`;
+      }
+
+      function render() {
+        valueEl.textContent = formatDisplay(selected);
+        monthEl.textContent = MONTHS[viewMonth].toUpperCase();
+        yearEl.textContent = String(viewYear);
+        todayEl.textContent = `TODAY: ${formatDisplay(todayISO)}`;
+
+        gridEl.innerHTML = '';
+        const firstDay = new Date(viewYear, viewMonth, 1);
+        // JS getDay(): 0=Sun..6=Sat — convert to Mon-first index
+        const startOffset = (firstDay.getDay() + 6) % 7;
+        const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
+
+        for (let i = 0; i < startOffset; i++) {
+          const empty = document.createElement('span');
+          empty.className = 'cc-cal__day is-empty';
+          gridEl.appendChild(empty);
+        }
+
+        for (let day = 1; day <= daysInMonth; day++) {
+          const iso = `${viewYear}-${String(viewMonth + 1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+          const btn = document.createElement('button');
+          btn.className = 'cc-cal__day';
+          btn.textContent = String(day);
+          if (!availableSet.has(iso)) {
+            btn.classList.add('is-disabled');
+          } else {
+            if (iso === selected) btn.classList.add('is-selected');
+            btn.addEventListener('click', () => {
+              selected = iso;
+              panel.hidden = true;
+              render();
+              document.dispatchEvent(new CustomEvent('cc:blog-date-select', { detail: { date: iso } }));
+            });
+          }
+          gridEl.appendChild(btn);
+        }
+      }
+
+      trigger.addEventListener('click', () => {
+        panel.hidden = !panel.hidden;
+      });
+
+      document.addEventListener('click', (e) => {
+        if (!root.contains(e.target as Node)) panel.hidden = true;
+      });
+
+      prevBtn.addEventListener('click', () => {
+        viewMonth -= 1;
+        if (viewMonth < 0) { viewMonth = 11; viewYear -= 1; }
+        render();
+      });
+      nextBtn.addEventListener('click', () => {
+        viewMonth += 1;
+        if (viewMonth > 11) { viewMonth = 0; viewYear += 1; }
+        render();
+      });
+
+      render();
+    }
+  }
+</script>

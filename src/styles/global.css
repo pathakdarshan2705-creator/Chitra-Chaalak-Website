@@ -273,14 +273,11 @@ button{
      content for one fixed-height screen — let it scroll as a whole
      instead of crushing every section into a sliver. */
   .cc-col--center.is-active-mobile {
-  display: flex !important;
-  flex-direction: column !important;
-  overflow-y: scroll !important;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
-  gap: 14px;
-}
-.cc-col--center.is-active-mobile::-webkit-scrollbar { display: none; }
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    gap: 14px;
+  }
   .cc-col--center.is-active-mobile::-webkit-scrollbar { display: none; }
   .cc-col--center.is-active-mobile .cc-row--film,
   .cc-col--center.is-active-mobile .cc-row--blog,
@@ -335,4 +332,46 @@ button{
   .cc-mobile-dot.is-active {
     background: var(--yellow);
   }
+}
+
+/* ==========================================================
+   Inner page shell — sidebar pinned, content scrolls
+   independently. Used by every non-home page.
+   ========================================================== */
+
+.cc-inner-layout{
+  display: flex;
+  gap: var(--col-gap-left);
+  height: 100%;
+  overflow: hidden;
+}
+
+.cc-inner-layout__sidebar{
+  flex: 0 0 260px;
+  height: 100%;
+  overflow: hidden;
+}
+
+.cc-inner-content{
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.cc-inner-content::-webkit-scrollbar{ display: none; }
+
+@media (max-width: 768px){
+  .cc-inner-layout{
+    flex-direction: column;
+    gap: 10px;
+  }
+  .cc-inner-layout__sidebar{
+    flex: 0 0 auto;
+    height: auto;
+  }
+  .cc-sidebar{ flex-direction: column; }
+  .cc-sidebar__grid{ grid-template-columns: repeat(3, 1fr); }
+  .cc-sidebar__footer{ display: none; } /* controls live in the content column's own Panel on mobile instead */
 }

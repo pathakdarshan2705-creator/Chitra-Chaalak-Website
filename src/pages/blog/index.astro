@@ -1,0 +1,116 @@
+---
+// src/pages/blog/index.astro — "Making Sense": the full blog archive.
+import Layout from '../../layouts/Layout.astro';
+import Panel from '../../components/Panel.astro';
+import SidebarNav from '../../components/SidebarNav.astro';
+import BlogCalendar from '../../components/BlogCalendar.astro';
+import BlogFeatured from '../../components/BlogFeatured.astro';
+import BlogGridCard from '../../components/BlogGridCard.astro';
+import { getCollection } from 'astro:content';
+
+const allPosts = await getCollection('blog');
+const sorted = allPosts.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+
+function isoDate(d: Date) {
+  return d.toISOString().slice(0, 10);
+}
+function displayDate(d: Date) {
+  return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).toUpperCase();
+}
+
+const posts = sorted.map((post) => ({
+  iso: isoDate(post.data.date),
+  dateDisplay: displayDate(post.data.date),
+  title: post.data.title,
+  topic: post.data.topic,
+  excerpt: post.data.excerpt ?? '',
+  image: post.data.image,
+  imageAlt: post.data.imageAlt ?? post.data.title,
+  href: `/blog/${post.id}`,
+}));
+
+const availableDates = posts.map((p) => p.iso);
+
+const todayIso = isoDate(new Date());
+const featured =
+  posts.find((p) => p.iso === todayIso) ??
+  posts.find((p) => p.iso < todayIso) ??
+  posts[0];
+
+const postsMap = Object.fromEntries(
+  posts.map((p) => [p.iso, {
+    title: p.title, dateDisplay: p.dateDisplay, topic: p.topic,
+    excerpt: p.excerpt, image: p.image, href: p.href,
+  }])
+);
+---
+<Layout title="Blogs — Making Sense">
+  <div class="cc-inner-layout">
+    <div class="cc-inner-layout__sidebar">
+      <SidebarNav
+        activePage="blog"
+        pageTitle="Making Sense"
+        pageDescription="A running archive of essays, notes, and observations — one entry at a time, most recent first."
+        controlGroup="blog-archive"
+      />
+    </div>
+
+    <div class="cc-inner-content">
+      <Panel title="Making Sense" showControls={false}>
+        <Fragment slot="header-extra">
+          <BlogCalendar availableDates={availableDates} initialDate={featured.iso} />
+        </Fragment>
+
+        <div class="cc-blog-page">
+          <BlogFeatured
+            title={featured.title}
+            date={featured.dateDisplay}
+            topic={featured.topic}
+            excerpt={featured.excerpt}
+            imageSrc={featured.image}
+            imageAlt={featured.imageAlt}
+            href={featured.href}
+          />
+
+          <div class="cc-blog-grid">
+            {posts.map((p) => (
+              <BlogGridCard
+                href={p.href}
+                title={p.title}
+                date={p.dateDisplay}
+                topic={p.topic}
+                imageSrc={p.image}
+                imageAlt={p.imageAlt}
+                group="blog-archive"
+              />
+            ))}
+          </div>
+        </div>
+      </Panel>
+    </div>
+  </div>
+</Layout>
+
+<style>
+  .cc-blog-page{
+    padding: 20px;
+  }
+
+  .cc-blog-grid{
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+
+  @media (max-width: 1100px){
+    .cc-blog-grid{ grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 768px){
+    .cc-blog-grid{ grid-template-columns: 1fr; gap: 12px; }
+    .cc-blog-page{ padding: 12px; }
+  }
+</style>
+
+<script define:vars={{ postsMap }}>
+  window.__ccBlogPosts = postsMap;
+</script>

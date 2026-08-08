@@ -1,0 +1,50 @@
+---
+// src/components/CardInteractions.astro
+//
+// Extracted from Card.astro so this logic is guaranteed present on
+// EVERY page, not just ones that happen to render a <Card> component
+// directly. Astro only bundles a component's script when that exact
+// component is used on the page — CassetteCard, UpdateEntryCard,
+// SlideshowCard, and BlogGridCard all reuse the `.cc-card` class but
+// are separate components, so without this extraction, a page using
+// only e.g. BlogGridCard would silently have no click/dblclick behavior.
+// Mounted once in Layout.astro alongside RemoteControl, FocusFrame, etc.
+---
+<script>
+  if (!(window as any).__ccCardHandlersInit) {
+    (window as any).__ccCardHandlersInit = true;
+
+    document.addEventListener('click', (e) => {
+      const card = (e.target as HTMLElement).closest('.cc-card') as HTMLElement | null;
+      if (!card) return;
+
+      const group = card.dataset.group;
+      if (group) {
+        document
+          .querySelectorAll(`.cc-card[data-group="${group}"].is-selected`)
+          .forEach((el) => {
+            if (el !== card) el.classList.remove('is-selected');
+          });
+      }
+      card.classList.toggle('is-selected');
+    });
+
+    document.addEventListener('dblclick', (e) => {
+      const card = (e.target as HTMLElement).closest('.cc-card') as HTMLElement | null;
+      if (!card) return;
+      const href = card.dataset.href;
+      if (!href || href === '#') return;
+      document.dispatchEvent(new CustomEvent('cc:channel-jump'));
+      setTimeout(() => { window.location.href = href; }, 320);
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key !== 'Enter' && e.key !== ' ') return;
+      const card = (e.target as HTMLElement).closest('.cc-card') as HTMLElement | null;
+      if (!card) return;
+      e.preventDefault();
+      const href = card.dataset.href;
+      if (href) window.location.href = href;
+    });
+  }
+</script>
