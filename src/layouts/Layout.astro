@@ -8,6 +8,7 @@ import RemoteControl from '../components/RemoteControl.astro';
 import FocusFrame from '../components/FocusFrame.astro';
 import TiltCards from '../components/TiltCards.astro';
 import ChannelWipe from '../components/ChannelWipe.astro';
+import CardInteractions from '../components/CardInteractions.astro';
 
 interface Props {
   title: string;
@@ -23,6 +24,7 @@ const { title } = Astro.props;
 </head>
 <body>
   <TestCardIntro />
+  <CardInteractions />
   <ChannelIndicator />
   <RemoteControl />
   <FocusFrame />
