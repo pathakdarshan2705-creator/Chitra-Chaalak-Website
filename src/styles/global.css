@@ -273,7 +273,11 @@ button{
      content for one fixed-height screen — let it scroll as a whole
      instead of crushing every section into a sliver. */
   .cc-col--center.is-active-mobile {
-    overflow-y: auto;
+    display: flex !important;
+    flex-direction: column !important;
+    height: 100% !important;
+    max-height: 100% !important;
+    overflow-y: scroll !important;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
     gap: 14px;
@@ -286,7 +290,10 @@ button{
     min-height: 280px;
   }
   .cc-col--center.is-active-mobile .cc-row--blog {
-    min-height: 380px;
+    min-height: 560px;
+  }
+  .cc-col--center.is-active-mobile .cc-blog-preview__img-wrap {
+    min-height: 220px !important;
   }
   /* Blog's side-by-side list+preview doesn't fit a phone width —
      stack them instead */
