@@ -180,8 +180,26 @@
     const timeEl = document.getElementById('cc-footer-time');
     if (dateEl) dateEl.textContent = dateStr;
     if (timeEl) timeEl.textContent = timeStr;
-    // steps stays placeholder until the Phase 4 phone-sync endpoint is wired in
   }
   ccUpdateFooter();
   setInterval(ccUpdateFooter, 1000);
+
+  async function fetchSteps() {
+    try {
+      const res = await fetch('https://chitra-chaalak-status.pathakdarshan2705.workers.dev/steps');
+      if (res.ok) {
+        const data = await res.json();
+        const stepsEl = document.getElementById('cc-footer-steps');
+        if (stepsEl && data.steps !== undefined) {
+          stepsEl.textContent = data.steps.toLocaleString();
+        }
+      }
+    } catch (err) {
+      console.error('Failed to fetch steps:', err);
+    }
+  }
+  
+  // Fetch steps on load, and then every 5 minutes
+  fetchSteps();
+  setInterval(fetchSteps, 5 * 60 * 1000);
 </script>
