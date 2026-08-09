@@ -1,0 +1,32 @@
+---
+import Layout from '../layouts/Layout.astro';
+import FilterStudio from '../components/FilterStudio.astro';
+---
+
+<Layout title="Filter Studio">
+  <div class="cc-filter-page">
+    <FilterStudio />
+  </div>
+</Layout>
+
+<style>
+  .cc-filter-page {
+    height: 100%;
+    width: 100%;
+    padding: 24px;
+    box-sizing: border-box;
+    overflow-y: auto;
+    
+    /* Hide scrollbar visually */
+    scrollbar-width: none; /* Firefox */
+  }
+  .cc-filter-page::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Edge */
+  }
+  
+  .cc-filter-page > :global(.cc-fs) {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+</style>

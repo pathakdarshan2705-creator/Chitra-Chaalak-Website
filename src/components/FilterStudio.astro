@@ -1,0 +1,539 @@
+---
+// src/components/FilterStudio.astro
+//
+// Standalone image filter tool: upload -> pick a filter -> download.
+// Not part of the site's card/selection/remote-control system (see
+// Layout.astro / RemoteControl.astro) — this is a self-contained
+// widget, so it doesn't use `.cc-card` or `data-group`. Everything is
+// scoped to this component's own markup.
+//
+// Filters are grouped:
+//   1. Classic       — camera/film-emulation looks
+//   2. Black & White  — a dedicated set of B&W variations
+//   3. Chitra-Chaalak Originals — bespoke, tied to the site's own
+//      visual language (duotone navy/yellow, the hover-glitch RGB
+//      split, CRT scanlines, broadcast static)
+//
+// Uses the site's existing design tokens from global.css (--navy-deep,
+// --blue-panel-light, --yellow, --font-ui, etc.) — nothing new is
+// defined here.
+---
+<section class="cc-fs">
+  <div class="cc-fs__panel">
+    <span class="cc-fs__tab" aria-hidden="true"></span>
+
+    <div class="cc-fs__layout">
+      <!-- Stage -->
+      <div class="cc-fs__stage" id="cc-fs-stage">
+        <div class="cc-fs__dropzone" id="cc-fs-dropzone">
+          <div class="cc-fs__dropzone-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 16V4M12 4l-5 5M12 4l5 5" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M4 16v3a2 2 0 002 2h12a2 2 0 002-2v-3" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="cc-fs__dropzone-title">Drop an image, or click to browse</div>
+          <div class="cc-fs__dropzone-sub">JPG · PNG · WEBP</div>
+        </div>
+        <canvas id="cc-fs-main-canvas"></canvas>
+        <span class="cc-fs__corner cc-fs__corner--tl" aria-hidden="true"></span>
+        <span class="cc-fs__corner cc-fs__corner--br" aria-hidden="true"></span>
+      </div>
+      <input type="file" id="cc-fs-file-input" accept="image/*" hidden />
+
+      <!-- Side panel -->
+      <div class="cc-fs__side">
+        <div class="cc-fs__actions">
+          <button class="cc-fs__btn" id="cc-fs-new-btn" disabled>New Image</button>
+          <button class="cc-fs__btn cc-fs__btn--primary" id="cc-fs-download-btn" disabled>Download</button>
+        </div>
+
+        <div id="cc-fs-filter-panels" class="cc-fs__filter-panels" hidden>
+          <div class="cc-fs__group-label">Classic</div>
+          <div class="cc-fs__swatch-grid" id="cc-fs-classic-grid"></div>
+
+          <div class="cc-fs__group-label">Black &amp; White</div>
+          <div class="cc-fs__swatch-grid" id="cc-fs-bw-grid"></div>
+
+          <div class="cc-fs__group-label">
+            Chitra-Chaalak Originals <span class="cc-fs__tag">SIGNATURE</span>
+          </div>
+          <div class="cc-fs__swatch-grid" id="cc-fs-originals-grid"></div>
+        </div>
+
+        <div class="cc-fs__hint" id="cc-fs-hint">Upload an image to see filters</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style is:global>
+  /* is:global is required here, not a style choice: the filter swatches
+     (.cc-fs__swatch, .cc-fs__swatch-label, thumbnail canvases) are built
+     with document.createElement in client-side JS, so they never receive
+     Astro's data-astro-cid scope attribute — scoped CSS silently won't
+     match them. Same root cause already documented for Card.astro. */
+  .cc-fs{
+    font-family: var(--font-body);
+    color: var(--blue-lightest);
+  }
+
+  .cc-fs__panel{
+    background: var(--blue-column);
+    border: 2px solid var(--navy-deep);
+    box-shadow:
+      inset 0 0 0 2px var(--blue-panel-light),
+      inset 0 0 0 3px var(--navy-deep),
+      inset 1px 1px 0 rgba(255,255,255,0.2),
+      inset -1px -1px 0 rgba(0,10,40,0.35);
+    padding: 22px;
+    position: relative;
+  }
+
+  .cc-fs__tab{
+    position: absolute;
+    top: -2px; left: 20px;
+    width: 130px; height: 12px;
+    background: var(--blue-panel-light);
+    border: 2px solid var(--navy-deep);
+    border-bottom: none;
+    clip-path: polygon(0 100%, 0 0, 96% 0, 100% 100%);
+  }
+
+  .cc-fs__layout{
+    display: grid;
+    grid-template-columns: 1fr 360px;
+    gap: 22px;
+    align-items: start;
+  }
+  @media (max-width: 860px){
+    .cc-fs__layout{ grid-template-columns: 1fr; }
+  }
+
+  /* ---- Stage ---- */
+  .cc-fs__stage{
+    background: var(--navy-deep);
+    border: 2px solid var(--blue-panel-light);
+    min-height: 420px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .cc-fs__dropzone{
+    text-align: center;
+    padding: 40px;
+    cursor: pointer;
+    font-family: var(--font-ui);
+  }
+  .cc-fs__dropzone.is-dragover{ background: rgba(103,200,255,0.1); }
+  .cc-fs__dropzone-icon{
+    width: 56px; height: 56px; margin: 0 auto 16px;
+    border: 2px solid var(--blue-panel-light);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--blue-panel-light);
+  }
+  .cc-fs__dropzone-title{
+    font-size: 13px; letter-spacing: 1.5px; text-transform: uppercase;
+    color: var(--blue-lightest); margin-bottom: 6px;
+  }
+  .cc-fs__dropzone-sub{
+    font-size: 10px; letter-spacing: 1px; color: var(--blue-panel-light);
+    text-transform: uppercase;
+  }
+
+  #cc-fs-main-canvas{ max-width: 100%; max-height: 640px; display: none; }
+  #cc-fs-main-canvas.is-visible{ display: block; }
+
+  .cc-fs__corner{ position: absolute; width: 16px; height: 16px; pointer-events: none; }
+  .cc-fs__corner--tl{ top: 8px; left: 8px; border-top: 2px solid var(--yellow); border-left: 2px solid var(--yellow); }
+  .cc-fs__corner--br{ bottom: 8px; right: 8px; border-bottom: 2px solid var(--yellow); border-right: 2px solid var(--yellow); }
+
+  /* ---- Side column ---- */
+  .cc-fs__side{ display: flex; flex-direction: column; gap: 16px; }
+
+  .cc-fs__actions{ display: flex; gap: 10px; }
+  .cc-fs__btn{
+    flex: 1;
+    font-family: var(--font-ui);
+    font-size: 11px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 10px 12px;
+    background: var(--blue-card);
+    color: var(--blue-lightest);
+    border: 2px solid var(--navy-deep);
+    box-shadow: inset 0 0 0 1px var(--blue-panel-light);
+    cursor: pointer;
+    transition: background .1s steps(2), color .1s steps(2);
+  }
+  .cc-fs__btn:hover{ background: var(--blue-card-hover); }
+  .cc-fs__btn:disabled{ opacity: .4; cursor: not-allowed; }
+  .cc-fs__btn--primary{ background: var(--yellow); color: var(--navy-deep); font-weight: 700; }
+  .cc-fs__btn--primary:hover{ background: #fff65c; }
+
+  .cc-fs__group-label{
+    font-family: var(--font-ui);
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--blue-panel-light);
+    border-bottom: 2px solid var(--navy-deep);
+    padding-bottom: 6px;
+    margin: 14px 0 2px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .cc-fs__group-label:first-child{ margin-top: 4px; }
+  .cc-fs__tag{
+    background: var(--yellow); color: var(--navy-deep);
+    padding: 1px 6px; font-size: 9px; font-weight: 700;
+  }
+
+  .cc-fs__swatch-grid{
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+  .cc-fs__swatch{
+    position: relative;
+    border: 2px solid var(--navy-deep);
+    box-shadow: inset 0 0 0 1px var(--blue-panel-light);
+    aspect-ratio: 1;
+    overflow: hidden;
+    cursor: pointer;
+    background: var(--navy-deep);
+  }
+  .cc-fs__swatch canvas{ width: 100%; height: 100%; display: block; }
+  .cc-fs__swatch-label{
+    position: absolute; left: 0; right: 0; bottom: 0;
+    font-family: var(--font-ui);
+    font-size: 8.5px;
+    letter-spacing: .5px;
+    text-transform: uppercase;
+    text-align: center;
+    color: var(--navy-deep);
+    background: var(--blue-panel-light);
+    padding: 2px 2px;
+    line-height: 1.2;
+  }
+  .cc-fs__swatch.is-selected{
+    border-color: var(--yellow);
+    box-shadow: inset 0 0 0 2px var(--yellow);
+  }
+  .cc-fs__swatch.is-selected .cc-fs__swatch-label{ background: var(--yellow); }
+  .cc-fs__swatch:hover:not(.is-selected){ filter: brightness(1.15); }
+  .cc-fs__swatch--original{ box-shadow: inset 0 0 0 1px var(--yellow); }
+
+  .cc-fs__hint{
+    font-family: var(--font-ui);
+    font-size: 10px;
+    color: var(--blue-panel-light);
+    text-align: center;
+    letter-spacing: .5px;
+  }
+</style>
+
+<script>
+  // Guarded the same way as the site's other shared-behavior components
+  // (Panel.astro's __ccPanelControlsInit, RemoteControl.astro, etc.) so
+  // this is safe even if the component is ever mounted more than once.
+  if (!(window as any).__ccFilterStudioInit) {
+    (window as any).__ccFilterStudioInit = true;
+
+    const dropzone = document.getElementById('cc-fs-dropzone')!;
+    const fileInput = document.getElementById('cc-fs-file-input') as HTMLInputElement;
+    const mainCanvas = document.getElementById('cc-fs-main-canvas') as HTMLCanvasElement;
+    const classicGrid = document.getElementById('cc-fs-classic-grid')!;
+    const bwGrid = document.getElementById('cc-fs-bw-grid')!;
+    const originalsGrid = document.getElementById('cc-fs-originals-grid')!;
+    const filterPanels = document.getElementById('cc-fs-filter-panels')!;
+    const hintText = document.getElementById('cc-fs-hint')!;
+    const downloadBtn = document.getElementById('cc-fs-download-btn') as HTMLButtonElement;
+    const newBtn = document.getElementById('cc-fs-new-btn') as HTMLButtonElement;
+
+    let sourceImg: HTMLImageElement | null = null;
+    let activeFilterId = 'original';
+
+    type FilterDef = { id: string; label: string; apply: (c: HTMLCanvasElement) => void };
+
+    // ---------------------------------------------------------------
+    // Every helper takes the target canvas explicitly (rather than
+    // closing over one shared context) so the same filter function
+    // renders both the full-size preview and the small thumbnails.
+    // ---------------------------------------------------------------
+    function withImageData(canvas: HTMLCanvasElement, fn: (d: Uint8ClampedArray) => void) {
+      const ctx = canvas.getContext('2d')!;
+      const data = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      fn(data.data);
+      ctx.putImageData(data, 0, 0);
+    }
+
+    // Center-crop "cover" fit — works identically for the wide main
+    // preview and a 1:1 thumbnail square.
+    function drawBase(canvas: HTMLCanvasElement, cssFilter?: string) {
+      const ctx = canvas.getContext('2d')!;
+      const cw = canvas.width, ch = canvas.height;
+      const iw = sourceImg!.naturalWidth, ih = sourceImg!.naturalHeight;
+      const scale = Math.max(cw / iw, ch / ih);
+      const sw = cw / scale, sh = ch / scale;
+      const sx = (iw - sw) / 2, sy = (ih - sh) / 2;
+      ctx.clearRect(0, 0, cw, ch);
+      ctx.filter = cssFilter || 'none';
+      ctx.drawImage(sourceImg!, sx, sy, sw, sh, 0, 0, cw, ch);
+      ctx.filter = 'none';
+    }
+
+    function vignette(canvas: HTMLCanvasElement, strength: number) {
+      const ctx = canvas.getContext('2d')!;
+      const w = canvas.width, h = canvas.height;
+      const g = ctx.createRadialGradient(w / 2, h / 2, h * 0.35, w / 2, h / 2, h * 0.75);
+      g.addColorStop(0, 'rgba(0,0,0,0)');
+      g.addColorStop(1, `rgba(0,10,30,${strength})`);
+      ctx.fillStyle = g;
+      ctx.fillRect(0, 0, w, h);
+    }
+
+    function grain(canvas: HTMLCanvasElement, amount: number) {
+      withImageData(canvas, (d) => {
+        for (let i = 0; i < d.length; i += 4) {
+          const n = (Math.random() - 0.5) * amount;
+          d[i] += n; d[i + 1] += n; d[i + 2] += n;
+        }
+      });
+    }
+
+    function scanlines(canvas: HTMLCanvasElement, opacity: number, gap: number) {
+      const ctx = canvas.getContext('2d')!;
+      const w = canvas.width, h = canvas.height;
+      ctx.fillStyle = `rgba(0,10,30,${opacity})`;
+      for (let y = 0; y < h; y += gap) ctx.fillRect(0, y, w, 1);
+    }
+
+    function tint(canvas: HTMLCanvasElement, r: number, g: number, b: number, opacity: number) {
+      const ctx = canvas.getContext('2d')!;
+      ctx.fillStyle = `rgba(${r},${g},${b},${opacity})`;
+      ctx.globalCompositeOperation = 'overlay';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.globalCompositeOperation = 'source-over';
+    }
+
+    function duotone(canvas: HTMLCanvasElement, shadow: number[], highlight: number[]) {
+      withImageData(canvas, (d) => {
+        for (let i = 0; i < d.length; i += 4) {
+          const lum = (0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2]) / 255;
+          d[i]     = shadow[0] + (highlight[0] - shadow[0]) * lum;
+          d[i + 1] = shadow[1] + (highlight[1] - shadow[1]) * lum;
+          d[i + 2] = shadow[2] + (highlight[2] - shadow[2]) * lum;
+        }
+      });
+    }
+
+    function thresholdFx(canvas: HTMLCanvasElement, level: number) {
+      withImageData(canvas, (d) => {
+        for (let i = 0; i < d.length; i += 4) {
+          const lum = 0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2];
+          const v = lum > level ? 255 : 0;
+          d[i] = v; d[i + 1] = v; d[i + 2] = v;
+        }
+      });
+    }
+
+    function solarizeFx(canvas: HTMLCanvasElement, level: number) {
+      withImageData(canvas, (d) => {
+        for (let i = 0; i < d.length; i += 4) {
+          if (d[i]   > level) d[i]   = 255 - d[i];
+          if (d[i+1] > level) d[i+1] = 255 - d[i+1];
+          if (d[i+2] > level) d[i+2] = 255 - d[i+2];
+        }
+      });
+    }
+
+    function channelShift(canvas: HTMLCanvasElement, offset: number) {
+      const ctx = canvas.getContext('2d')!;
+      const w = canvas.width, h = canvas.height;
+      const base = ctx.getImageData(0, 0, w, h);
+      const out = ctx.createImageData(w, h);
+      const src = base.data, dst = out.data;
+      for (let y = 0; y < h; y++) {
+        for (let x = 0; x < w; x++) {
+          const di = (y * w + x) * 4;
+          const rx = Math.min(w - 1, x + offset);
+          const bx = Math.max(0, x - offset);
+          const ri = (y * w + rx) * 4;
+          const bi = (y * w + bx) * 4;
+          dst[di]     = src[ri];
+          dst[di + 1] = src[di + 1];
+          dst[di + 2] = src[bi + 2];
+          dst[di + 3] = 255;
+        }
+      }
+      ctx.putImageData(out, 0, 0);
+    }
+
+    function infraredFx(canvas: HTMLCanvasElement) {
+      withImageData(canvas, (d) => {
+        for (let i = 0; i < d.length; i += 4) {
+          const r = d[i], g = d[i + 1], b = d[i + 2];
+          d[i]     = Math.min(255, g * 1.4);
+          d[i + 1] = Math.min(255, r * 0.6);
+          d[i + 2] = Math.min(255, b * 0.8);
+        }
+      });
+    }
+
+    // ---------------------------------------------------------------
+    // Filter registry
+    // ---------------------------------------------------------------
+    const CLASSIC: FilterDef[] = [
+      { id: 'original',      label: 'Original',      apply: (c) => { drawBase(c); } },
+      { id: 'sepia',         label: 'Sepia',          apply: (c) => { drawBase(c, 'sepia(80%) contrast(105%)'); } },
+      { id: 'vintage',       label: 'Vintage',        apply: (c) => { drawBase(c, 'sepia(45%) saturate(80%) contrast(95%) brightness(105%)'); vignette(c, 0.3); grain(c, 14); } },
+      { id: 'oldcamera',     label: 'Old Camera',     apply: (c) => { drawBase(c, 'sepia(25%) saturate(120%) contrast(92%) brightness(108%)'); tint(c, 255, 180, 90, 0.12); vignette(c, 0.4); grain(c, 10); } },
+      { id: 'faded',         label: 'Faded Film',     apply: (c) => { drawBase(c, 'contrast(80%) brightness(112%) saturate(75%)'); tint(c, 255, 240, 210, 0.08); } },
+      { id: 'polaroid',      label: 'Polaroid',       apply: (c) => { drawBase(c, 'contrast(92%) brightness(108%) saturate(90%)'); tint(c, 255, 250, 220, 0.15); vignette(c, 0.22); } },
+      { id: 'kodachrome',    label: 'Kodachrome',     apply: (c) => { drawBase(c, 'saturate(160%) contrast(115%)'); tint(c, 255, 150, 40, 0.06); } },
+      { id: 'crossprocess',  label: 'Cross Process',  apply: (c) => { drawBase(c, 'contrast(118%) saturate(140%)'); tint(c, 60, 255, 120, 0.08); vignette(c, 0.25); } },
+      { id: 'technicolor',   label: 'Technicolor',    apply: (c) => { drawBase(c, 'saturate(180%) contrast(110%)'); } },
+      { id: 'infrared',      label: 'Infrared',       apply: (c) => { drawBase(c, 'contrast(110%)'); infraredFx(c); } },
+      { id: 'solarize',      label: 'Solarize',       apply: (c) => { drawBase(c, 'saturate(120%)'); solarizeFx(c, 150); } },
+      { id: 'cooltone',      label: 'Cool Tone',      apply: (c) => { drawBase(c, 'saturate(90%) contrast(105%)'); tint(c, 40, 90, 255, 0.1); } },
+      { id: 'warmamber',     label: 'Warm Amber',     apply: (c) => { drawBase(c, 'saturate(110%)'); tint(c, 255, 170, 60, 0.14); } },
+      { id: 'invert',        label: 'Invert',         apply: (c) => { drawBase(c, 'invert(100%)'); } },
+      { id: 'softfocus',     label: 'Soft Focus',     apply: (c) => { drawBase(c, 'blur(1.2px) brightness(106%) contrast(95%)'); } },
+      { id: 'graindust',     label: 'Grain & Dust',   apply: (c) => { drawBase(c, 'contrast(102%)'); grain(c, 22); } },
+    ];
+
+    // A dedicated Black & White group with a spread of distinct looks
+    // rather than one flat grayscale toggle.
+    const BLACK_AND_WHITE: FilterDef[] = [
+      { id: 'bw-classic',   label: 'Black & White',  apply: (c) => { drawBase(c, 'grayscale(100%)'); } },
+      { id: 'bw-soft',      label: 'Soft B&W',       apply: (c) => { drawBase(c, 'grayscale(100%) contrast(85%) brightness(110%)'); } },
+      { id: 'bw-deep',      label: 'Deep Contrast',  apply: (c) => { drawBase(c, 'grayscale(100%) contrast(160%)'); } },
+      { id: 'noir',         label: 'Noir',           apply: (c) => { drawBase(c, 'grayscale(100%) contrast(135%) brightness(95%)'); vignette(c, 0.35); } },
+      { id: 'bw-ansel',     label: 'Ansel',          apply: (c) => { drawBase(c, 'grayscale(100%) contrast(175%) brightness(98%)'); vignette(c, 0.45); } },
+      { id: 'bw-cool',      label: 'Cool B&W',       apply: (c) => { drawBase(c, 'grayscale(100%) contrast(110%)'); tint(c, 60, 110, 220, 0.1); } },
+      { id: 'bw-warm',      label: 'Warm B&W',       apply: (c) => { drawBase(c, 'grayscale(100%) contrast(105%)'); tint(c, 230, 180, 120, 0.1); } },
+      { id: 'bw-grain',     label: 'Grainy B&W',     apply: (c) => { drawBase(c, 'grayscale(100%) contrast(115%)'); grain(c, 26); } },
+      { id: 'threshold',    label: 'Threshold',      apply: (c) => { drawBase(c, 'grayscale(100%) contrast(110%)'); thresholdFx(c, 128); } },
+    ];
+
+    const ORIGINALS: FilterDef[] = [
+      { id: 'doordarshan',     label: 'Doordarshan Duotone', apply: (c) => { drawBase(c, 'contrast(105%)'); duotone(c, [0, 20, 80], [255, 240, 0]); } },
+      { id: 'signalloss',      label: 'Signal Loss',         apply: (c) => { drawBase(c, 'contrast(108%) saturate(115%)'); channelShift(c, 4); } },
+      { id: 'crttransmission', label: 'CRT Transmission',    apply: (c) => { drawBase(c, 'contrast(108%) saturate(90%) brightness(102%)'); tint(c, 20, 100, 220, 0.12); scanlines(c, 0.22, 3); vignette(c, 0.4); } },
+      { id: 'broadcaststatic', label: 'Broadcast Static',    apply: (c) => { drawBase(c, 'grayscale(60%) contrast(112%)'); scanlines(c, 0.15, 3); grain(c, 26); vignette(c, 0.3); } },
+      { id: 'testcard',        label: 'Test Card',           apply: (c) => { drawBase(c, 'saturate(130%) contrast(108%)'); tint(c, 255, 0, 100, 0.05); tint(c, 0, 200, 255, 0.05); } },
+    ];
+
+    const ALL: FilterDef[] = [...CLASSIC, ...BLACK_AND_WHITE, ...ORIGINALS];
+
+    function handleFile(file: File | null | undefined) {
+      if (!file || !file.type.startsWith('image/')) return;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          sourceImg = img;
+          setupCanvasSize(img);
+          activeFilterId = 'original';
+          renderMain();
+          buildSwatches();
+          dropzone.style.display = 'none';
+          mainCanvas.classList.add('is-visible');
+          filterPanels.hidden = false;
+          hintText.textContent = 'Click a filter to apply it';
+          downloadBtn.disabled = false;
+          newBtn.disabled = false;
+        };
+        img.src = e.target!.result as string;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function setupCanvasSize(img: HTMLImageElement) {
+      const maxW = 900, maxH = 640;
+      const w = img.naturalWidth, h = img.naturalHeight;
+      const scale = Math.min(1, maxW / w, maxH / h);
+      mainCanvas.width = Math.round(w * scale);
+      mainCanvas.height = Math.round(h * scale);
+    }
+
+    function renderMain() {
+      const filter = ALL.find(f => f.id === activeFilterId) || ALL[0];
+      filter.apply(mainCanvas);
+    }
+
+    function buildSwatches() {
+      classicGrid.innerHTML = '';
+      bwGrid.innerHTML = '';
+      originalsGrid.innerHTML = '';
+
+      ALL.forEach((f) => {
+        const isOriginal = ORIGINALS.includes(f);
+        const swatch = document.createElement('div');
+        swatch.className = 'cc-fs__swatch' + (f.id === activeFilterId ? ' is-selected' : '') + (isOriginal ? ' cc-fs__swatch--original' : '');
+        swatch.dataset.filterId = f.id;
+
+        const thumb = document.createElement('canvas');
+        thumb.width = 120; thumb.height = 120;
+        swatch.appendChild(thumb);
+        f.apply(thumb); // same filter fn, run directly against the thumb canvas
+
+        const label = document.createElement('div');
+        label.className = 'cc-fs__swatch-label';
+        label.textContent = f.label;
+        swatch.appendChild(label);
+
+        swatch.addEventListener('click', () => {
+          activeFilterId = f.id;
+          renderMain();
+          document.querySelectorAll('.cc-fs__swatch').forEach(s => s.classList.remove('is-selected'));
+          swatch.classList.add('is-selected');
+        });
+
+        const target = isOriginal ? originalsGrid : (BLACK_AND_WHITE.includes(f) ? bwGrid : classicGrid);
+        target.appendChild(swatch);
+      });
+    }
+
+    function resetToUpload() {
+      sourceImg = null;
+      activeFilterId = 'original';
+      mainCanvas.classList.remove('is-visible');
+      dropzone.style.display = 'block';
+      filterPanels.hidden = true;
+      hintText.textContent = 'Upload an image to see filters';
+      downloadBtn.disabled = true;
+      newBtn.disabled = true;
+      fileInput.value = '';
+    }
+
+    function downloadImage() {
+      const filter = ALL.find(f => f.id === activeFilterId) || ALL[0];
+      const link = document.createElement('a');
+      link.download = `chitra-chaalak-${filter.id}.png`;
+      link.href = mainCanvas.toDataURL('image/png');
+      link.click();
+    }
+
+    dropzone.addEventListener('click', () => fileInput.click());
+    fileInput.addEventListener('change', (e) => handleFile((e.target as HTMLInputElement).files?.[0]));
+
+    ['dragenter', 'dragover'].forEach(evt =>
+      dropzone.addEventListener(evt, (e) => { e.preventDefault(); dropzone.classList.add('is-dragover'); })
+    );
+    ['dragleave', 'drop'].forEach(evt =>
+      dropzone.addEventListener(evt, (e) => { e.preventDefault(); dropzone.classList.remove('is-dragover'); })
+    );
+    dropzone.addEventListener('drop', (e: DragEvent) => {
+      const file = e.dataTransfer?.files?.[0];
+      handleFile(file);
+    });
+
+    downloadBtn.addEventListener('click', downloadImage);
+    newBtn.addEventListener('click', resetToUpload);
+  }
+</script>

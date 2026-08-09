@@ -1,0 +1,23 @@
+---
+// src/pages/studio.astro
+import Layout from '../layouts/Layout.astro';
+import FilterStudio from '../components/FilterStudio.astro';
+---
+<Layout title="Filter Studio">
+  <div class="cc-studio-page">
+    <FilterStudio />
+  </div>
+</Layout>
+
+<style>
+  .cc-studio-page{
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 28px 0 40px;
+    height: 100%;
+    overflow-y: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  .cc-studio-page::-webkit-scrollbar{ display: none; }
+</style>
