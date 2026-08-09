@@ -1,0 +1,329 @@
+---
+import { getCollection, render } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+import SidebarNav from '../../components/SidebarNav.astro';
+import Panel from '../../components/Panel.astro';
+
+export async function getStaticPaths() {
+  const films = await getCollection('films');
+  const sortedFilms = films.sort((a, b) => b.data.year - a.data.year);
+  
+  return sortedFilms.map((film, index) => ({
+    params: { id: film.id },
+    props: {
+      film,
+      prev: index > 0 ? sortedFilms[index - 1] : null,
+      next: index < sortedFilms.length - 1 ? sortedFilms[index + 1] : null,
+    },
+  }));
+}
+
+const { film, prev, next } = Astro.props;
+const { Content } = await render(film);
+---
+
+<Layout title={`${film.data.title} — Intercept Dossier`}>
+  <div class="cc-inner-layout">
+    
+    <div class="cc-inner-layout__sidebar">
+      <SidebarNav
+        activePage="films"
+        pageTitle={film.data.title}
+        pageDescription={film.data.excerpt || "Classified dossier readout."}
+        controlGroup="film-content"
+        infoTitle="Film Section"
+        infoMeta="A curated list of signal intercepts featuring must-watch films and documentaries."
+      />
+    </div>
+
+    <div class="cc-inner-content">
+      <Panel title={`FILE // ${film.id.toUpperCase()}`} showControls={false}>
+        <div class="cc-dossier" id="film-dossier">
+          
+          <!-- Dossier Header -->
+          <header class="cc-dossier__header">
+            <div class="cc-dossier__poster-wrap">
+              <img src={film.data.image} alt={film.data.title} class="cc-dossier__poster" />
+              <div class="cc-dossier__status-overlay">CLASSIFIED</div>
+            </div>
+            
+            <div class="cc-dossier__meta-grid">
+              <div class="cc-dossier__meta-item">
+                <span class="cc-dossier__meta-label">TARGET / TITLE</span>
+                <span class="cc-dossier__meta-value cc-dossier__meta-value--highlight">{film.data.title}</span>
+              </div>
+              
+              <div class="cc-dossier__meta-row">
+                <div class="cc-dossier__meta-item">
+                  <span class="cc-dossier__meta-label">DIRECTOR(S)</span>
+                  <span class="cc-dossier__meta-value">{film.data.director}</span>
+                </div>
+                <div class="cc-dossier__meta-item">
+                  <span class="cc-dossier__meta-label">YEAR</span>
+                  <span class="cc-dossier__meta-value">{film.data.year}</span>
+                </div>
+              </div>
+              
+              <div class="cc-dossier__meta-item">
+                <span class="cc-dossier__meta-label">CLASSIFICATION (GENRE)</span>
+                <span class="cc-dossier__meta-value">{film.data.genre}</span>
+              </div>
+              
+              {film.data.cast && (
+                <div class="cc-dossier__meta-item">
+                  <span class="cc-dossier__meta-label">KNOWN ASSOCIATES (CAST)</span>
+                  <span class="cc-dossier__meta-value">{film.data.cast}</span>
+                </div>
+              )}
+              
+              <div class="cc-dossier__barcode"></div>
+            </div>
+          </header>
+          
+          <hr class="cc-dossier__divider" />
+          
+          <!-- Transmission Log (Review) -->
+          <div class="cc-dossier__transmission">
+            <div class="cc-dossier__trans-header">
+              <span class="cc-pulse-dot"></span>
+              TRANSMISSION LOG // INTERCEPTED
+            </div>
+            
+            <article class="cc-dossier__body">
+              <Content />
+            </article>
+          </div>
+          
+          <footer class="cc-dossier__footer">
+            {prev ? (
+              <a href={`/films/${prev.id}`} class="cc-dossier__nav">
+                &lt; PREV FILE
+              </a>
+            ) : <span />}
+            {next ? (
+              <a href={`/films/${next.id}`} class="cc-dossier__nav">
+                NEXT FILE &gt;
+              </a>
+            ) : <span />}
+          </footer>
+
+        </div>
+      </Panel>
+    </div>
+    
+  </div>
+</Layout>
+
+<style>
+  .cc-dossier {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow-y: auto;
+    scrollbar-width: none;
+    padding: 32px;
+  }
+  .cc-dossier::-webkit-scrollbar { display: none; }
+
+  /* Header (Poster + Grid) */
+  .cc-dossier__header {
+    display: flex;
+    gap: 32px;
+    margin-bottom: 32px;
+  }
+
+  .cc-dossier__poster-wrap {
+    flex: 0 0 240px;
+    position: relative;
+    border: 2px solid var(--blue-panel-light);
+    box-shadow: 0 10px 30px rgba(0, 10, 40, 0.5);
+    background: var(--navy-deep);
+  }
+
+  .cc-dossier__poster {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 2/3;
+    object-fit: cover;
+    display: block;
+    filter: sepia(0.3) hue-rotate(180deg) saturate(1.5) contrast(1.1); /* Slightly stylized "surveillance" look */
+  }
+
+  .cc-dossier__status-overlay {
+    position: absolute;
+    bottom: 20px;
+    left: -10px;
+    background: var(--yellow);
+    color: var(--navy-deep);
+    font-family: var(--font-ui);
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    padding: 4px 12px;
+    transform: rotate(-5deg);
+    box-shadow: 2px 2px 0 rgba(0,0,0,0.5);
+  }
+
+  /* Meta Grid */
+  .cc-dossier__meta-grid {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    justify-content: center;
+    background: rgba(0, 84, 204, 0.2);
+    padding: 24px;
+    border: 1px dashed var(--blue-panel-light);
+    position: relative;
+  }
+
+  .cc-dossier__meta-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .cc-dossier__meta-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .cc-dossier__meta-label {
+    font-family: var(--font-ui);
+    color: var(--blue-panel-light);
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+  }
+
+  .cc-dossier__meta-value {
+    font-family: var(--font-ui);
+    color: var(--blue-lightest);
+    font-size: 16px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+  
+  .cc-dossier__meta-value--highlight {
+    color: var(--yellow);
+    font-size: 24px;
+    font-weight: 700;
+  }
+
+  .cc-dossier__barcode {
+    margin-top: auto;
+    height: 30px;
+    width: 150px;
+    background: repeating-linear-gradient(
+      90deg,
+      var(--blue-panel-light),
+      var(--blue-panel-light) 2px,
+      transparent 2px,
+      transparent 4px,
+      var(--blue-panel-light) 4px,
+      var(--blue-panel-light) 7px,
+      transparent 7px,
+      transparent 10px
+    );
+    opacity: 0.5;
+  }
+
+  .cc-dossier__divider {
+    border: none;
+    border-top: 2px dashed var(--blue-panel-light);
+    margin: 0 0 32px 0;
+    opacity: 0.5;
+  }
+
+  /* Transmission Log */
+  .cc-dossier__transmission {
+    background: var(--navy-deep);
+    border: 1px solid var(--blue-column);
+    padding: 32px;
+    box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.5);
+  }
+
+  .cc-dossier__trans-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-family: var(--font-ui);
+    color: var(--yellow);
+    font-size: 12px;
+    letter-spacing: 2px;
+    margin-bottom: 24px;
+    border-bottom: 1px solid rgba(255, 240, 0, 0.2);
+    padding-bottom: 12px;
+  }
+
+  .cc-pulse-dot {
+    width: 8px;
+    height: 8px;
+    background: var(--yellow);
+    border-radius: 50%;
+    animation: cc-pulse 1.5s infinite;
+  }
+  @keyframes cc-pulse {
+    0% { box-shadow: 0 0 0 0 rgba(255, 240, 0, 0.7); }
+    70% { box-shadow: 0 0 0 10px rgba(255, 240, 0, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(255, 240, 0, 0); }
+  }
+
+  .cc-dossier__body {
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--blue-lightest);
+  }
+
+  .cc-dossier__body :global(h1), 
+  .cc-dossier__body :global(h2), 
+  .cc-dossier__body :global(h3) {
+    font-family: var(--font-ui);
+    color: var(--yellow);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin: 32px 0 16px;
+  }
+
+  .cc-dossier__body :global(p) {
+    margin-bottom: 16px;
+  }
+
+  .cc-dossier__body :global(blockquote) {
+    border-left: 4px solid var(--yellow);
+    padding-left: 16px;
+    margin: 24px 0;
+    font-style: italic;
+    color: rgba(166, 232, 255, 0.8);
+  }
+
+  .cc-dossier__footer {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 32px;
+    padding-top: 16px;
+    border-top: 1px solid var(--blue-column);
+  }
+
+  .cc-dossier__nav {
+    font-family: var(--font-ui);
+    color: var(--blue-panel-light);
+    font-size: 12px;
+    letter-spacing: 1px;
+    transition: color 0.2s;
+  }
+  .cc-dossier__nav:hover {
+    color: var(--yellow);
+  }
+
+  @media (max-width: 768px) {
+    .cc-dossier { padding: 16px; }
+    .cc-dossier__header { flex-direction: column; align-items: center; }
+    .cc-dossier__poster-wrap { flex: 0 0 auto; width: 200px; }
+    .cc-dossier__meta-grid { width: 100%; }
+    .cc-dossier__meta-row { grid-template-columns: 1fr; }
+    .cc-dossier__transmission { padding: 16px; }
+  }
+</style>

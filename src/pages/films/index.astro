@@ -1,0 +1,61 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import SidebarNav from '../../components/SidebarNav.astro';
+import Panel from '../../components/Panel.astro';
+import VaultCard from '../../components/VaultCard.astro';
+import { getCollection } from 'astro:content';
+
+const films = await getCollection('films');
+const sortedFilms = films.sort((a, b) => b.data.year - a.data.year);
+---
+
+<Layout title="Film Section — The Vault">
+  <div class="cc-inner-layout">
+    <div class="cc-inner-layout__sidebar">
+      <SidebarNav
+        activePage="films"
+        pageTitle="Film Section"
+        pageDescription="A curated list of signal intercepts featuring must-watch films and documentaries."
+        controlGroup="films-archive"
+        infoTitle="Film Section"
+        infoMeta="A curated list of signal intercepts featuring must-watch films and documentaries."
+      />
+    </div>
+
+    <div class="cc-inner-content">
+      <Panel title="The Vault" showControls={false}>
+        <div class="cc-film-vault">
+          {sortedFilms.map((film, i) => (
+            <VaultCard 
+              id={film.id}
+              title={film.data.title}
+              director={film.data.director}
+              year={film.data.year}
+              image={film.data.image}
+              i={i}
+              group="films-archive"
+            />
+          ))}
+        </div>
+      </Panel>
+    </div>
+  </div>
+</Layout>
+
+<style>
+  .cc-film-vault {
+    padding: 40px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 32px;
+    perspective: 1200px;
+  }
+
+  @media (max-width: 768px) {
+    .cc-film-vault {
+      padding: 20px;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 16px;
+    }
+  }
+</style>

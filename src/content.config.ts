@@ -31,4 +31,17 @@ const updates = defineCollection({
   }),
 });
 
-export const collections = { blog, updates };
+const films = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/films' }),
+  schema: z.object({
+    title: z.string(),
+    director: z.string(),
+    year: z.number(),
+    genre: z.string(),
+    cast: z.string().optional(),
+    image: z.string(),
+    excerpt: z.string().optional(),
+  }),
+});
+
+export const collections = { blog, updates, films };

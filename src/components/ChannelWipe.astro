@@ -28,15 +28,29 @@
     flex: 1;
     background: var(--navy-deep);
     border-bottom: 1px solid rgba(166,232,255,0.15);
+    /* Default state: hidden off-screen */
     transform: translateX(calc(100% * var(--dir, 1)));
   }
-  .cc-wipe.is-playing .cc-wipe__band {
-    animation: cc-wipe-band 0.55s cubic-bezier(0.6, 0, 0.2, 1) forwards;
+  
+  /* Leaving the current page (wiping IN to cover the screen) */
+  .cc-wipe.is-leaving .cc-wipe__band {
+    animation: cc-wipe-band-leave 0.3s cubic-bezier(0.6, 0, 0.2, 1) forwards;
     animation-delay: calc(var(--i) * 0.03s);
   }
-  @keyframes cc-wipe-band {
+  
+  /* Entering the new page (wiping OUT to reveal the screen) */
+  .cc-wipe.is-entering .cc-wipe__band {
+    animation: cc-wipe-band-enter 0.3s cubic-bezier(0.6, 0, 0.2, 1) forwards;
+    animation-delay: calc(var(--i) * 0.03s);
+  }
+  
+  @keyframes cc-wipe-band-leave {
     0%   { transform: translateX(calc(100% * var(--dir, 1))); }
-    55%  { transform: translateX(0); }
+    100% { transform: translateX(0); }
+  }
+  
+  @keyframes cc-wipe-band-enter {
+    0%   { transform: translateX(0); }
     100% { transform: translateX(calc(-100% * var(--dir, 1))); }
   }
 </style>
@@ -52,26 +66,27 @@
         b.style.setProperty('--dir', i % 2 === 0 ? '1' : '-1');
       });
 
+      // When a jump is triggered, cover the screen
       document.addEventListener('cc:channel-jump', () => {
-        wipe.classList.remove('is-playing');
+        wipe.classList.remove('is-entering');
+        wipe.classList.remove('is-leaving');
         void wipe.offsetWidth; // restart animation
-        wipe.classList.add('is-playing');
-        setTimeout(() => wipe.classList.remove('is-playing'), 700);
+        wipe.classList.add('is-leaving');
+        sessionStorage.setItem('cc-nav-wipe-pending', '1');
       });
 
-      // Same wipe, played as the page reveals itself — but only when
-      // navigating IN from another page (a channel-jump just happened
-      // on the previous page), not on the very first visit of a session,
-      // where TestCardIntro already owns that moment.
+      // When arriving at a new page after a jump, reveal the screen
       const cameFromChannelJump = sessionStorage.getItem('cc-nav-wipe-pending');
       if (cameFromChannelJump) {
         sessionStorage.removeItem('cc-nav-wipe-pending');
-        wipe.classList.add('is-playing');
-        setTimeout(() => wipe.classList.remove('is-playing'), 700);
+        // Start from covered state instantly
+        bands.forEach(b => b.style.transform = 'translateX(0)'); 
+        wipe.classList.add('is-entering');
+        setTimeout(() => {
+          wipe.classList.remove('is-entering');
+          bands.forEach(b => b.style.transform = ''); // reset to default
+        }, 600);
       }
-      document.addEventListener('cc:channel-jump', () => {
-        sessionStorage.setItem('cc-nav-wipe-pending', '1');
-      });
     }
   }
 </script>
