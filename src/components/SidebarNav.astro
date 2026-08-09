@@ -32,6 +32,8 @@ interface Props {
   pageTitle: string;
   pageDescription?: string;
   controlGroup?: string;   // data-group whose selection the buttons control
+  infoTitle?: string;
+  infoMeta?: string;
 }
 
 const {
@@ -39,6 +41,8 @@ const {
   pageTitle,
   pageDescription = 'Below mentioned control buttons are for the page which is open',
   controlGroup,
+  infoTitle,
+  infoMeta,
 } = Astro.props;
 ---
 <nav class="cc-sidebar">
@@ -71,7 +75,7 @@ const {
           </button>
         </div>
         <button class="cc-sidebar__enter" data-enter-group={controlGroup}>Enter</button>
-        <button class="cc-icon-btn" data-info-group={controlGroup} aria-label="Preview selected">
+        <button class="cc-icon-btn" data-info-group={controlGroup} data-info-title={infoTitle} data-info-meta={infoMeta} aria-label="Preview selected">
           <Icon name="info" size={17} />
         </button>
       </div>
