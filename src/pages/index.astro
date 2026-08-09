@@ -20,27 +20,25 @@ const blogPosts = allBlogPosts
     href: `/blog/${post.id}`,
   }));
 
-// Each item in `updates` is one day's entry: { date, items[], href }
-const updates = [
-  {
-    date: '05 AUG 2026',
-    items: ['Travelling to Kutch', 'Packed film gear', 'Reviewed today\'s shoot'],
-    href: '/updates/05-aug-2026',
-    isLatest: true,
-  },
-  {
-    date: '04 AUG 2026',
-    items: ['Football match in the morning', 'Meeting with BookMyShow team', 'Started editing documentary'],
-    href: '/updates/04-aug-2026',
-    isLatest: false,
-  },
-  {
-    date: '03 AUG 2026',
-    items: ['Found a new stone from Hampi trip', 'Watched Charulata again'],
-    href: '/updates/03-aug-2026',
-    isLatest: false,
-  },
-];
+const allUpdatesCol = await getCollection('updates');
+const sortedUpdates = allUpdatesCol.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+
+// Group by date to match the existing UI of "one card per day with multiple items"
+const groupedUpdates = sortedUpdates.reduce((acc, curr) => {
+  const dateStr = curr.data.date.toLocaleDateString('en-GB', {day:'2-digit',month:'short',year:'numeric'}).toUpperCase();
+  if (!acc[dateStr]) {
+    acc[dateStr] = [];
+  }
+  acc[dateStr].push(curr.data.title);
+  return acc;
+}, {} as Record<string, string[]>);
+
+const updates = Object.entries(groupedUpdates).slice(0, 10).map(([date, items], index) => ({
+  date,
+  items,
+  href: '/updates',
+  isLatest: index === 0
+}));
 
 const films = [
   { title: 'Pyaasa (1957)', meta: 'DRAMA · GURU DUTT', imageSrc: '/images/placeholder.jpg', href: '/films/pyaasa' },
@@ -78,7 +76,14 @@ const portfolioSections = [
 
     <!-- LEFT: Updates -->
     <aside class="cc-col cc-col--updates" data-screen="updates">
-      <Panel title="Daily Transmission" viewAllHref="/updates" showControls group="updates">
+      <Panel 
+        title="Daily Transmission" 
+        viewAllHref="/updates" 
+        showControls 
+        group="updates"
+        infoTitle="Updates Section"
+        infoMeta="A dynamic chronicle of daily thoughts, progress, and location-based logs."
+      >
         <div class="cc-card-list" id="updates-list">
           {updates.map(u => (
             <UpdateEntryCard
@@ -97,7 +102,7 @@ const portfolioSections = [
     <main class="cc-col cc-col--center" data-screen="center">
 
       <div class="cc-row cc-row--film">
-        <Panel title="Film Recommendations" viewAllHref="/films" showControls group="films">
+        <Panel title="Film Recommendations" viewAllHref="/films" showControls group="films" infoTitle="Film Section" infoMeta="A curated list of signal intercepts featuring must-watch films and documentaries.">
           <div class="cc-film-row">
             {films.map(f => (
               <Card title={f.title} meta={f.meta} imageSrc={f.imageSrc} href={f.href} group="films" variant="poster" />
@@ -107,7 +112,7 @@ const portfolioSections = [
       </div>
 
       <div class="cc-row cc-row--blog">
-        <Panel title="Blog" viewAllHref="/blog" showControls group="blog">
+        <Panel title="Blog" viewAllHref="/blog" showControls group="blog" infoTitle="Blog Database" infoMeta="In-depth thoughts, tutorials, and articles on design, code, and philosophy.">
           <div class="cc-blog-split">
             <div class="cc-card-list cc-blog-split__list" id="blog-list">
               {blogPosts.map(b => (
@@ -121,10 +126,10 @@ const portfolioSections = [
 
       <div class="cc-row cc-row--bottom">
         <div class="cc-split-row">
-          <Panel title="Visual Tour" viewAllHref="/tour" showControls group="tour">
+          <Panel title="Visual Tour" viewAllHref="/tour" showControls group="tour" infoTitle="Visual Tour" infoMeta="A visual journey through the concepts and design language of this universe.">
             <SlideshowCard group="tour" items={visualTour} />
           </Panel>
-          <Panel title="Collections" viewAllHref="/collections" showControls group="collections">
+          <Panel title="Collections" viewAllHref="/collections" showControls group="collections" infoTitle="My Collections" infoMeta="A curated inventory of personal items, resources, and inspirations.">
             <SlideshowCard group="collections" items={collections} />
           </Panel>
         </div>
@@ -134,7 +139,7 @@ const portfolioSections = [
 
     <!-- RIGHT: Portfolio + Contact -->
     <aside class="cc-col cc-col--portfolio" data-screen="portfolio">
-      <Panel title="Portfolio" viewAllHref="/portfolio" showControls group="portfolio">
+      <Panel title="Portfolio" viewAllHref="/portfolio" showControls group="portfolio" infoTitle="Portfolio Archive" infoMeta="A structured repository of past projects, creations, and design work.">
         <div class="cc-cassette-stack">
           {portfolioSections.map(p => (
             <CassetteCard label={p.label} href={p.href} group="portfolio" />
@@ -265,8 +270,11 @@ const portfolioSections = [
         badge.textContent = 'SOON';
         badge.classList.add('is-offline');
       }
-    } catch {
-      // Worker not deployed yet — badge stays at its rendered state
+    } catch (e) {
+      // If fetch fails (CORS, offline, worker down), default to SOON
+      console.error("Live status check failed:", e);
+      badge.textContent = 'SOON';
+      badge.classList.add('is-offline');
     }
   }
   checkLiveStatus();

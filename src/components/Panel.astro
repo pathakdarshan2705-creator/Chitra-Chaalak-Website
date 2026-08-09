@@ -26,6 +26,8 @@ interface Props {
   showControls?: boolean;
   group?: string;
   notchSize?: number;
+  infoTitle?: string;
+  infoMeta?: string;
 }
 
 const {
@@ -34,6 +36,8 @@ const {
   showControls = false,
   group,
   notchSize = 20,
+  infoTitle,
+  infoMeta,
 } = Astro.props;
 ---
 <div class="cc-panel" style={`--notch: ${notchSize}px`}>
@@ -61,7 +65,7 @@ const {
         </button>
       </div>
       <button class="cc-panel__enter" data-enter-group={group}>Enter</button>
-      <button class="cc-icon-btn cc-panel__info" data-info-group={group} aria-label="Preview selected">
+      <button class="cc-icon-btn cc-panel__info" data-info-group={group} data-info-title={infoTitle} data-info-meta={infoMeta} aria-label="Preview selected">
         <Icon name="info" size={17} />
       </button>
     </div>
@@ -275,19 +279,58 @@ const {
 
     function showPreview(anchor: HTMLElement, group: string) {
       if (!popover) return;
-      const cards = cardsInGroup(group);
-      if (cards.length === 0) return;
-      const source = selectedInGroup(group) ?? cards[0];
+      
+      const customTitle = anchor.dataset.infoTitle;
+      const customMeta = anchor.dataset.infoMeta;
+      
+      let title = '';
+      let meta = '';
+      let image = '';
+
+      if (customTitle || customMeta) {
+        title = customTitle ?? '';
+        meta = customMeta ?? '';
+      } else {
+        const cards = cardsInGroup(group);
+        if (cards.length === 0) return;
+        const source = selectedInGroup(group) ?? cards[0];
+        title = source.dataset.title ?? '';
+        meta = source.dataset.meta ?? '';
+        image = source.dataset.image ?? '';
+      }
 
       const img = popover.querySelector('.cc-preview-popover__img') as HTMLImageElement | null;
       const titleEl = popover.querySelector('.cc-preview-popover__title') as HTMLElement | null;
       const metaEl = popover.querySelector('.cc-preview-popover__meta') as HTMLElement | null;
-      if (img) img.src = source.dataset.image ?? '';
-      if (titleEl) titleEl.textContent = source.dataset.title ?? '';
-      if (metaEl) metaEl.textContent = source.dataset.meta ?? '';
+      
+      if (img) {
+        if (image) {
+          img.src = image;
+          img.style.display = 'block';
+        } else {
+          img.style.display = 'none';
+        }
+      }
+      if (titleEl) titleEl.textContent = title;
+      if (metaEl) metaEl.textContent = meta;
 
       const rect = anchor.getBoundingClientRect();
-      popover.style.left = `${rect.left + rect.width / 2}px`;
+      let left = rect.left + rect.width / 2;
+      const popoverWidth = 220; // Matches CSS width
+      
+      // Prevent bleeding off the right edge
+      const rightEdge = left + popoverWidth / 2;
+      if (rightEdge > window.innerWidth - 20) {
+        left -= (rightEdge - (window.innerWidth - 20));
+      }
+      
+      // Prevent bleeding off the left edge
+      const leftEdge = left - popoverWidth / 2;
+      if (leftEdge < 20) {
+        left += (20 - leftEdge);
+      }
+      
+      popover.style.left = `${left}px`;
       popover.style.top = `${rect.top - 8}px`;
       popover.hidden = false;
       popover.classList.add('is-visible');

@@ -1,0 +1,28 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Panel from '../components/Panel.astro';
+import SidebarNav from '../components/SidebarNav.astro';
+import UpdateTimeline from '../components/UpdateTimeline.astro';
+import HolographicCanvas from '../components/HolographicCanvas.astro';
+---
+
+<Layout title="Updates — Daily Log">
+  <div class="cc-inner-layout">
+    <div class="cc-inner-layout__sidebar">
+      <SidebarNav
+        activePage="updates"
+        pageTitle="Updates"
+        pageDescription="A dynamic chronicle of daily thoughts, progress, and location-based logs."
+        controlGroup="updates-archive"
+      />
+    </div>
+
+    <div class="cc-inner-content">
+      <Panel title="Updates Timeline" showControls={false}>
+        <UpdateTimeline />
+      </Panel>
+    </div>
+  </div>
+  
+  <HolographicCanvas />
+</Layout>

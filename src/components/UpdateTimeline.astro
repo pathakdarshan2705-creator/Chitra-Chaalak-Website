@@ -1,0 +1,310 @@
+---
+import { getCollection, render } from 'astro:content';
+
+const allUpdates = await getCollection('updates');
+const sortedUpdates = allUpdates.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+
+const renderedUpdates = await Promise.all(
+  sortedUpdates.map(async (update) => {
+    const { Content } = await render(update);
+    return {
+      ...update,
+      Content
+    };
+  })
+);
+
+function displayDate(d: Date) {
+  return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).toUpperCase();
+}
+---
+<div class="cc-timeline">
+  <div class="cc-timeline__pulse-line"></div>
+  
+  {renderedUpdates.map((update, index) => (
+    <div class="cc-timeline__node-container" style={`--animation-order: ${index};`}>
+      <div class="cc-timeline__node"></div>
+      
+      <div class="cc-timeline__card" 
+           data-update-id={update.id}
+           data-title={update.data.title}
+           data-date={displayDate(update.data.date)}
+           data-location={update.data.location || ''}>
+           
+        <div class="cc-timeline__card-meta">
+          <span class="cc-timeline__card-date">{displayDate(update.data.date)}</span>
+          {update.data.location && <span class="cc-timeline__card-location">{update.data.location}</span>}
+        </div>
+        <h3 class="cc-timeline__card-title">{update.data.title}</h3>
+        {update.data.excerpt && <p class="cc-timeline__card-excerpt">{update.data.excerpt}</p>}
+        
+        <div class="cc-timeline__card-footer">
+          <span class="cc-timeline__card-readmore">READ MORE →</span>
+        </div>
+        
+        <div class="cc-timeline__card-glare"></div>
+      </div>
+      
+      <!-- Hidden content template -->
+      <template id={`content-${update.id}`}>
+        <update.Content />
+      </template>
+    </div>
+  ))}
+</div>
+
+<style>
+  .cc-timeline {
+    position: relative;
+    padding: 40px 0;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  
+  .cc-timeline__pulse-line {
+    position: absolute;
+    left: 20px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: linear-gradient(to bottom, transparent, var(--blue-panel-light) 10%, var(--blue-panel-light) 90%, transparent);
+    z-index: 1;
+  }
+  
+  .cc-timeline__pulse-line::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -1px;
+    width: 4px;
+    height: 100px;
+    background: var(--yellow);
+    box-shadow: 0 0 10px var(--yellow);
+    border-radius: 2px;
+    animation: pulse-stream 4s infinite linear;
+  }
+  
+  @keyframes pulse-stream {
+    0% { top: -100px; opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { top: 100%; opacity: 0; }
+  }
+
+  .cc-timeline__node-container {
+    position: relative;
+    padding-left: 60px;
+    margin-bottom: 40px;
+    opacity: 0;
+    transform: translateX(-20px);
+    animation: fade-in-slide 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    animation-delay: calc(var(--animation-order) * 0.1s);
+  }
+  
+  @keyframes fade-in-slide {
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  .cc-timeline__node {
+    position: absolute;
+    left: 17px;
+    top: 24px;
+    width: 8px;
+    height: 8px;
+    background: var(--yellow);
+    border-radius: 50%;
+    z-index: 2;
+    box-shadow: 0 0 0 4px var(--blue-card), 0 0 10px rgba(255, 240, 0, 0.5);
+    transition: transform 0.3s, box-shadow 0.3s;
+  }
+
+  .cc-timeline__node-container:hover .cc-timeline__node {
+    transform: scale(1.5);
+    box-shadow: 0 0 0 4px var(--blue-card), 0 0 15px var(--yellow);
+  }
+
+  .cc-timeline__card {
+    position: relative;
+    background: var(--navy-deep);
+    border: 1px solid var(--blue-panel-light);
+    padding: 24px;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    transform-style: preserve-3d;
+    transform: perspective(1000px) rotateX(0) rotateY(0);
+    overflow: hidden;
+  }
+  
+  .cc-timeline__card:hover {
+    background: var(--navy-deep);
+    border-color: var(--yellow);
+    box-shadow: inset 0 0 0 1px var(--yellow), 0 10px 30px rgba(0, 10, 40, 0.5);
+  }
+  
+  .cc-timeline__card-glare {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at 50% 50%, rgba(166, 232, 255, 0.1), transparent 60%);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+    mix-blend-mode: overlay;
+  }
+  
+  .cc-timeline__card:hover .cc-timeline__card-glare {
+    opacity: 1;
+  }
+
+  .cc-timeline__card-meta {
+    display: flex;
+    gap: 12px;
+    font-size: 0.85rem;
+    font-family: var(--font-ui);
+    color: var(--blue-panel-light);
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 1px;
+  }
+  
+  .cc-timeline__card-location {
+    color: var(--blue-panel-light);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .cc-timeline__card-location::before {
+    content: '•';
+    color: var(--blue-panel-light);
+  }
+
+  .cc-timeline__card-title {
+    font-size: 1.4rem;
+    margin: 0 0 12px 0;
+    color: var(--yellow);
+    font-family: var(--font-ui);
+    text-transform: uppercase;
+    font-weight: 700;
+  }
+  
+  .cc-timeline__card-excerpt {
+    font-size: 1.05rem;
+    color: var(--blue-lightest);
+    font-family: var(--font-body);
+    margin: 0;
+    line-height: 1.5;
+  }
+  
+  .cc-timeline__card-footer {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 16px;
+  }
+  
+  .cc-timeline__card-readmore {
+    font-family: var(--font-ui);
+    font-size: 0.75rem;
+    color: var(--blue-panel-light);
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 1px;
+    opacity: 0;
+    transform: translateX(-10px);
+    transition: all 0.3s ease;
+  }
+  
+  .cc-timeline__card:hover .cc-timeline__card-readmore {
+    opacity: 1;
+    transform: translateX(0);
+    color: var(--yellow);
+  }
+  
+  @media (max-width: 600px) {
+    .cc-timeline__pulse-line { left: 10px; }
+    .cc-timeline__node { left: 7px; }
+    .cc-timeline__node-container { padding-left: 30px; }
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const cards = document.querySelectorAll('.cc-timeline__card');
+    const modal = document.getElementById('holographic-canvas');
+    const backdrop = document.getElementById('holographic-backdrop');
+    const closeBtn = document.getElementById('holographic-close');
+    
+    const mTitle = document.getElementById('holographic-title');
+    const mDate = document.getElementById('holographic-date');
+    const mLocation = document.getElementById('holographic-location');
+    const mBody = document.getElementById('holographic-body');
+    
+    cards.forEach(card => {
+      // @ts-ignore
+      card.addEventListener('mousemove', (e: MouseEvent) => {
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+        
+        const rotateX = ((y - centerY) / centerY) * -5;
+        const rotateY = ((x - centerX) / centerX) * 5;
+        
+        // @ts-ignore
+        card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+        
+        const glare = card.querySelector('.cc-timeline__card-glare');
+        if (glare) {
+          // @ts-ignore
+          glare.style.background = `radial-gradient(circle at ${x}px ${y}px, rgba(255,255,255,0.15), transparent 50%)`;
+        }
+      });
+      
+      card.addEventListener('mouseleave', () => {
+        // @ts-ignore
+        card.style.transform = `perspective(1000px) rotateX(0) rotateY(0)`;
+      });
+      
+      card.addEventListener('click', () => {
+        const id = card.getAttribute('data-update-id');
+        const title = card.getAttribute('data-title');
+        const date = card.getAttribute('data-date');
+        const location = card.getAttribute('data-location');
+        
+        const template = document.getElementById(`content-${id}`) as HTMLTemplateElement;
+        
+        if (template && modal && mTitle && mDate && mLocation && mBody) {
+          mTitle.textContent = title;
+          mDate.textContent = date;
+          mLocation.textContent = location;
+          
+          mLocation.style.display = location ? 'block' : 'none';
+          
+          mBody.innerHTML = '';
+          mBody.appendChild(template.content.cloneNode(true));
+          
+          modal.classList.add('is-active');
+          document.body.style.overflow = 'hidden';
+        }
+      });
+    });
+    
+    const closeModal = () => {
+      if(modal) {
+        modal.classList.remove('is-active');
+        document.body.style.overflow = '';
+      }
+    };
+    
+    if (closeBtn) closeBtn.addEventListener('click', closeModal);
+    if (backdrop) backdrop.addEventListener('click', closeModal);
+    
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeModal();
+    });
+  });
+</script>
