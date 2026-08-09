@@ -1,0 +1,506 @@
+---
+import { getCollection, render } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+import SidebarNav from '../../components/SidebarNav.astro';
+import BlogCalendar from '../../components/BlogCalendar.astro';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog');
+  
+  const sortedPosts = posts.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+  const availableDates = sortedPosts.map(p => p.data.date.toISOString().slice(0, 10));
+  
+  const postMap = sortedPosts.reduce((acc, p) => {
+    acc[p.data.date.toISOString().slice(0, 10)] = p.id;
+    return acc;
+  }, {});
+  
+  return sortedPosts.map((post, index) => {
+    return {
+      params: { id: post.id },
+      props: { 
+        post,
+        availableDates,
+        postMap,
+        prevPost: index > 0 ? sortedPosts[index - 1] : null,
+        nextPost: index < sortedPosts.length - 1 ? sortedPosts[index + 1] : null,
+      },
+    };
+  });
+}
+
+const { post, availableDates, postMap, prevPost, nextPost } = Astro.props;
+const { Content } = await render(post);
+
+const wordCount = post.body ? post.body.split(/\s+/).length : 200;
+const readingTime = Math.ceil(wordCount / 200) || 1;
+
+const dateStr = post.data.date.toLocaleDateString('en-GB', {day:'2-digit',month:'short',year:'numeric'}).toUpperCase();
+const timeStr = post.data.time || '09:15 AM';
+---
+
+<Layout title={post.data.title}>
+  <div class="cc-blog-layout">
+    
+    <!-- LEFT: Sidebar Nav -->
+    <aside class="cc-col cc-col--nav">
+      <SidebarNav 
+        activePage="blog" 
+        pageTitle={post.data.title} 
+        pageDescription={post.data.excerpt || "Control buttons for this page"}
+        controlGroup="blog-content"
+      />
+    </aside>
+
+    <!-- CENTER: Main Content -->
+    <main class="cc-col cc-col--content">
+      <div class="cc-panel cc-blog-main">
+        
+        <!-- Panel Header (Now fixed via flexbox, not sticky) -->
+        <div class="cc-panel__header">
+          <span class="cc-panel__arrow">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M4 12h14M12 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+          <span class="cc-panel__title" style="flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{post.data.title}</span>
+          
+          <BlogCalendar 
+            availableDates={availableDates} 
+            initialDate={post.data.date.toISOString().slice(0, 10)} 
+          />
+        </div>
+
+        <!-- Scrollable Content Area -->
+        <div class="cc-blog-main__scroll-area">
+          <header class="cc-blog-main__header">
+
+            <div class="cc-blog-main__meta-line">
+              {dateStr} &bull; {post.data.topic}
+            </div>
+            <h1 class="cc-blog-main__title">{post.data.title}</h1>
+
+            {post.data.tags && post.data.tags.length > 0 && (
+              <div class="cc-blog-main__tags">
+                {post.data.tags.map(tag => (
+                  <span class="cc-blog-tag">{tag}</span>
+                ))}
+              </div>
+            )}
+
+            {post.data.excerpt && (
+              <div class="cc-blog-main__excerpt">
+                {post.data.excerpt}
+              </div>
+            )}
+          </header>
+
+          <article class="cc-blog-main__body">
+            <Content />
+          </article>
+          
+          <footer class="cc-blog-main__footer">
+            {prevPost ? (
+              <a href={`/blog/${prevPost.id}`} class="cc-blog-nav-btn">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                PREV BLOG
+              </a>
+            ) : <div class="cc-blog-nav-placeholder"></div>}
+            
+            {nextPost ? (
+              <a href={`/blog/${nextPost.id}`} class="cc-blog-nav-btn">
+                NEXT BLOG 
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+              </a>
+            ) : <div class="cc-blog-nav-placeholder"></div>}
+          </footer>
+        </div>
+      </div>
+    </main>
+
+    <!-- RIGHT: Sidebar Info -->
+    <aside class="cc-col cc-col--info">
+      <!-- About panel -->
+      <div class="cc-panel cc-panel--info">
+        <div class="cc-panel__header">ABOUT THIS BLOG</div>
+        <div class="cc-panel__body cc-info-body">
+          <div class="cc-info-excerpt">{post.data.excerpt}</div>
+          
+          <div class="cc-info-stat">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <span>{String(readingTime).padStart(2, '0')}:42 MIN READ</span>
+          </div>
+          
+          <div class="cc-info-stat">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+            <span>{wordCount.toLocaleString()} WORDS</span>
+          </div>
+
+          <div class="cc-info-stat cc-info-stat--tall">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            <div>
+              <div class="cc-info-stat__label">PUBLISHED ON</div>
+              <div class="cc-info-stat__val">{dateStr} &bull; {timeStr}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- References panel -->
+      {post.data.references && post.data.references.length > 0 && (
+        <div class="cc-panel cc-panel--info cc-panel--refs">
+          <div class="cc-panel__header">REFERENCES &amp; NOTES</div>
+          <div class="cc-panel__body cc-refs-list">
+            {post.data.references.map(ref => (
+              <div class="cc-ref-item">
+                <div class="cc-ref-item__term"><span class="cc-ref-dot"></span> {ref.term}</div>
+                <div class="cc-ref-item__desc">{ref.description}</div>
+              </div>
+            ))}
+            
+            <a href="#" class="cc-refs-more">More notes &nearr;</a>
+          </div>
+        </div>
+      )}
+    </aside>
+
+  </div>
+</Layout>
+
+<style>
+  .cc-blog-layout {
+    height: 100%;
+    display: grid;
+    grid-template-columns: 240px var(--col-gap-left) minmax(500px, 900px) var(--col-gap-right) 260px;
+    overflow: hidden;
+  }
+
+  .cc-col {
+    min-width: 0; 
+    height: 100%;
+    display: flex; 
+    flex-direction: column;
+    gap: 12px;
+    overflow: hidden;
+  }
+
+  .cc-col--nav { grid-column: 1; }
+  
+  .cc-col--content { 
+    grid-column: 3; 
+    overflow: hidden; /* No longer scrolling here */
+  }
+  
+  .cc-col--info { grid-column: 5; }
+  
+  /* ---- Panel Shared ---- */
+  .cc-panel {
+    --notch: 20px;
+    background: var(--blue-column);
+    border: 2px solid var(--navy-deep);
+    box-shadow:
+      inset 0 0 0 2px var(--blue-panel-light),
+      inset 0 0 0 3px var(--navy-deep),
+      inset 1px 1px 0 rgba(255,255,255,0.15),
+      inset -1px -1px 0 rgba(0,10,40,0.4),
+      inset 0 0 24px rgba(166,232,255,0.06);
+    clip-path: polygon(
+      0 0,
+      calc(100% - var(--notch)) 0,
+      100% var(--notch),
+      100% 100%,
+      0 100%
+    );
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .cc-panel__header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--blue-panel-light);
+    color: var(--navy-deep);
+    padding: 6px 12px;
+    font-family: var(--font-ui);
+    font-weight: 700;
+    font-size: 13px;
+    border-bottom: 2px solid var(--navy-deep);
+    flex-shrink: 0;
+  }
+
+  .cc-panel__arrow {
+    display: flex;
+  }
+
+  .cc-panel__title {
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-right: auto;
+  }
+  
+  /* ---- Center Column ---- */
+  .cc-blog-main {
+    flex: 1 0 auto;
+    height: 100%;
+  }
+  
+  .cc-blog-main__scroll-area {
+    flex: 1;
+    overflow-y: auto;
+    scrollbar-width: none;
+    display: flex;
+    flex-direction: column;
+  }
+  .cc-blog-main__scroll-area::-webkit-scrollbar { display: none; }
+
+  .cc-blog-main__header {
+    padding: 16px 24px 24px;
+    border-bottom: 1px dashed rgba(166, 232, 255, 0.3);
+  }
+
+  .cc-blog-main__topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--blue-panel-light);
+    color: var(--navy-deep);
+    padding: 6px 12px;
+    margin: -16px -24px 20px;
+    font-family: var(--font-ui);
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  .cc-blog-main__back {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .cc-blog-main__date-dropdown {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: rgba(0,0,0,0.1);
+    padding: 2px 8px;
+  }
+  
+  .cc-blog-main__cal-icon {
+    border-left: 1px solid var(--navy-deep);
+    padding-left: 8px;
+    display: flex;
+  }
+
+  .cc-blog-main__meta-line {
+    font-family: var(--font-ui);
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    margin-bottom: 8px;
+  }
+
+  .cc-blog-main__title {
+    font-family: var(--font-ui);
+    color: var(--yellow);
+    font-size: 28px;
+    margin: 0 0 16px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .cc-blog-main__tags {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .cc-blog-tag {
+    border: 1px solid var(--blue-panel-light);
+    padding: 4px 12px;
+    font-family: var(--font-ui);
+    font-size: 11px;
+    letter-spacing: 1px;
+  }
+
+  .cc-blog-main__excerpt {
+    font-family: var(--font-ui);
+    font-size: 12px;
+    line-height: 1.6;
+    padding-left: 16px;
+    border-left: 1px dashed rgba(166, 232, 255, 0.5);
+    white-space: pre-wrap;
+    opacity: 0.9;
+  }
+
+  .cc-blog-main__body {
+    padding: 32px 24px;
+    font-size: 15px;
+    line-height: 1.5;
+  }
+
+  .cc-blog-main__body :global(h2) {
+    font-family: var(--font-ui);
+    color: var(--blue-panel-light);
+    font-size: 18px;
+    margin: 40px 0 16px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .cc-blog-main__body :global(p) {
+    margin-bottom: 16px;
+  }
+
+  .cc-blog-main__footer {
+    display: flex;
+    justify-content: space-between;
+    padding: 24px;
+    border-top: 1px dashed rgba(166, 232, 255, 0.3);
+    margin-top: auto;
+  }
+
+  .cc-blog-nav-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid var(--blue-panel-light);
+    padding: 6px 16px;
+    font-family: var(--font-ui);
+    font-size: 11px;
+    letter-spacing: 1px;
+    transition: all 0.2s;
+  }
+  
+  .cc-blog-nav-btn:hover {
+    background: var(--blue-panel-light);
+    color: var(--navy-deep);
+  }
+
+  /* ---- Right Column Info Panels ---- */
+  .cc-panel--info {
+    flex-shrink: 0;
+  }
+  
+  .cc-panel--refs {
+    flex: 1;
+    overflow: hidden;
+  }
+
+
+
+  .cc-panel__body {
+    padding: 16px;
+  }
+
+  .cc-info-body {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .cc-info-excerpt {
+    font-family: var(--font-ui);
+    font-size: 11px;
+    line-height: 1.6;
+    padding-bottom: 16px;
+    border-bottom: 1px dashed rgba(166, 232, 255, 0.3);
+  }
+
+  .cc-info-stat {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-family: var(--font-ui);
+    font-size: 11px;
+    letter-spacing: 1px;
+    padding-bottom: 16px;
+    border-bottom: 1px dashed rgba(166, 232, 255, 0.3);
+  }
+
+  .cc-info-stat--tall {
+    align-items: flex-start;
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+  
+  .cc-info-stat__label {
+    opacity: 0.6;
+    margin-bottom: 4px;
+  }
+  
+  .cc-info-stat__val {
+    color: var(--blue-lightest);
+  }
+
+  /* References */
+  .cc-refs-list {
+    overflow-y: auto;
+    scrollbar-width: none;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    height: 100%;
+  }
+  .cc-refs-list::-webkit-scrollbar { display: none; }
+
+  .cc-ref-item {
+    font-size: 12px;
+    line-height: 1.5;
+  }
+
+  .cc-ref-item__term {
+    font-family: var(--font-ui);
+    font-weight: 700;
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--yellow);
+  }
+  
+  .cc-ref-dot {
+    width: 6px; height: 6px;
+    background: var(--yellow);
+    border-radius: 50%;
+  }
+
+  .cc-refs-more {
+    font-family: var(--font-ui);
+    font-size: 11px;
+    color: var(--blue-panel-light);
+    margin-top: auto;
+    display: inline-block;
+  }
+  .cc-refs-more:hover { text-decoration: underline; }
+  
+  @media (max-width: 1100px) {
+    .cc-blog-layout {
+      grid-template-columns: 1fr;
+      overflow-y: auto;
+    }
+    .cc-col { min-height: fit-content; overflow: visible; }
+  }
+</style>
+
+<script define:vars={{ postMap }}>
+  document.addEventListener('cc:blog-date-select', (e) => {
+    const isoDate = e.detail.date;
+    const slug = postMap[isoDate];
+    if (slug) {
+      window.location.href = `/blog/${slug}`;
+    }
+  });
+
+  // Handle up/down arrows in the left sidebar for scrolling the blog post
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('button[data-select-group="blog-content"]');
+    if (btn) {
+      const dir = parseInt(btn.dataset.dir);
+      const scrollArea = document.querySelector('.cc-blog-main__scroll-area');
+      if (scrollArea && !isNaN(dir)) {
+        scrollArea.scrollBy({ top: dir * 300, behavior: 'smooth' });
+      }
+    }
+  });
+</script>

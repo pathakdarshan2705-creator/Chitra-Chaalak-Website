@@ -1,5 +1,5 @@
 ---
-title: Leo Messi
+title: Leo
 date: 2026-08-05
 topic: ESSAY
 image: /images/cassette-shop.jpg

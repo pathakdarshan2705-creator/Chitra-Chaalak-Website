@@ -12,6 +12,12 @@ const blog = defineCollection({
     image: z.string(),           // path under /public, e.g. "/images/cassette-shop.jpg"
     imageAlt: z.string().optional(),
     excerpt: z.string().optional(),
+    time: z.string().optional(),
+    tags: z.array(z.string()).optional(),
+    references: z.array(z.object({
+      term: z.string(),
+      description: z.string()
+    })).optional(),
   }),
 });
 

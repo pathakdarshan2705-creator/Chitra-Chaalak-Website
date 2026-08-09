@@ -1,12 +1,17 @@
 ---
-title: "The Cassette Shop"
-date: 2026-08-08
-topic: "TRAVEL"
-image: "/uploads/cassette-shop.jpg"
-imageAlt: "An old cassette shop outside a Mumbai railway station"
-excerpt: "Kal Mumbai gaya tha shoot ke liye station ke bahar ek purani cassette shop mili — poori dukaan dhool mein dabi thi, magar har cassette abhi bhi bajti thi."
+title: Chitra Chaalak - The Idea
+date: 2026-08-01
+topic: CONCEPT
+time: 10:00 AM
+image: /images/placeholder.jpg
+imageAlt: Project concept
+excerpt: Where it all started. The idea behind Chitra Chaalak.
+tags:
+  - IDEA
+  - CONCEPT
+references:
+  - term: CHITRA CHAALAK
+    description: "Chitra = Picture/Film, Chaalak = Driver/Operator. The one who drives the pictures."
 ---
 
-Kal Mumbai gaya tha shoot ke liye station ke bahar ek purani cassette shop mili — poori dukaan dhool mein dabi thi, magar har cassette abhi bhi bajti thi.
-
-Write the rest of the post here in plain markdown.
+Where it all started. The idea behind Chitra Chaalak.
