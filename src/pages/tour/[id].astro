@@ -1,0 +1,162 @@
+---
+// src/pages/tour/[id].astro
+import Layout from '../../layouts/Layout.astro';
+import Panel from '../../components/Panel.astro';
+import SidebarNav from '../../components/SidebarNav.astro';
+import { getCollection, render } from 'astro:content';
+
+export async function getStaticPaths() {
+  const tours = await getCollection('tour');
+  return tours.map(tour => ({
+    params: { id: tour.id },
+    props: { tour },
+  }));
+}
+
+const { tour } = Astro.props;
+const { Content } = await render(tour);
+
+function displayDate(d: Date | string) {
+  const dateObj = new Date(d);
+  if (isNaN(dateObj.getTime())) return "INVALID DATE";
+  return dateObj.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).toUpperCase();
+}
+---
+<Layout title={`${tour.data.title} — Visual Tour`}>
+  <div class="cc-inner-layout">
+    <div class="cc-inner-layout__sidebar">
+      <SidebarNav
+        activePage="tour"
+        pageTitle="Visual Tour"
+        pageDescription="Explore cities and locations from my perspective. A visual journey through photography and stories."
+      />
+    </div>
+
+    <div class="cc-inner-content">
+      <Panel title={tour.data.title} showControls={false}>
+        <div class="cc-tour-detail">
+          
+          <header class="cc-tour-detail__header">
+            <h1 class="cc-tour-detail__title">{tour.data.title}</h1>
+            <div class="cc-tour-detail__meta">
+              <span>PHOTO ESSAY</span>
+              <span class="cc-dot">·</span>
+              <span>{displayDate(tour.data.date)}</span>
+            </div>
+          </header>
+
+          <div class="cc-tour-detail__cover">
+            <img src={tour.data.cover} alt={`Cover for ${tour.data.title}`} />
+          </div>
+
+          <div class="cc-tour-detail__story cc-markdown">
+            <Content />
+          </div>
+
+          {tour.data.gallery && tour.data.gallery.length > 0 && (
+            <div class="cc-tour-detail__masonry">
+              {tour.data.gallery.map((imgSrc: string) => (
+                <div class="cc-masonry-item">
+                  <img src={imgSrc} alt={`Gallery image from ${tour.data.title}`} loading="lazy" />
+                </div>
+              ))}
+            </div>
+          )}
+
+        </div>
+      </Panel>
+    </div>
+  </div>
+</Layout>
+
+<style>
+  .cc-tour-detail {
+    padding: 30px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .cc-tour-detail__header {
+    margin-bottom: 24px;
+    text-align: center;
+  }
+
+  .cc-tour-detail__title {
+    font-family: var(--font-ui);
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--blue-lightest);
+    margin: 0 0 8px 0;
+  }
+
+  .cc-tour-detail__meta {
+    font-family: var(--font-ui);
+    font-size: 0.85rem;
+    color: var(--blue-panel-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    letter-spacing: 1px;
+  }
+  .cc-dot {
+    opacity: 0.5;
+  }
+
+  .cc-tour-detail__cover {
+    width: 100%;
+    border: 1px solid var(--blue-panel-light);
+    margin-bottom: 30px;
+  }
+
+  .cc-tour-detail__cover img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  .cc-tour-detail__story {
+    font-family: var(--font-body);
+    color: var(--blue-lightest);
+    font-size: 1.05rem;
+    line-height: 1.7;
+    margin-bottom: 40px;
+    opacity: 0.9;
+  }
+
+  /* CSS-Only Masonry Grid */
+  .cc-tour-detail__masonry {
+    column-count: 2;
+    column-gap: 16px;
+  }
+
+  .cc-masonry-item {
+    break-inside: avoid;
+    margin-bottom: 16px;
+    border: 1px solid var(--blue-panel-light);
+    transition: transform 0.3s ease, border-color 0.3s ease;
+  }
+
+  .cc-masonry-item:hover {
+    transform: translateY(-2px);
+    border-color: var(--blue-lightest);
+  }
+
+  .cc-masonry-item img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  @media (max-width: 768px) {
+    .cc-tour-detail {
+      padding: 16px;
+    }
+    .cc-tour-detail__masonry {
+      column-count: 1;
+    }
+    .cc-tour-detail__title {
+      font-size: 1.5rem;
+    }
+  }
+</style>

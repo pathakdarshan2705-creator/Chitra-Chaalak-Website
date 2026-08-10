@@ -53,10 +53,16 @@ const films = allFilmsCol
     image: f.data.image
   }));
 
-const visualTour = [
-  { title: 'Mumbai', meta: 'VISUAL TOUR', imageSrc: '/images/placeholder.jpg', href: '/tour/mumbai' },
-  { title: 'Kutch', meta: 'VISUAL TOUR', imageSrc: '/images/placeholder.jpg', href: '/tour/kutch' },
-];
+const allToursCol = await getCollection('tour');
+const visualTour = allToursCol
+  .sort((a, b) => new Date(b.data.date).valueOf() - new Date(a.data.date).valueOf())
+  .slice(0, 3)
+  .map(t => ({
+    title: t.data.title,
+    meta: 'VISUAL TOUR',
+    imageSrc: t.data.cover || '/images/placeholder.jpg',
+    href: `/tour/${t.id}`
+  }));
 
 const collections = [
   { title: 'Camera Collection', meta: 'CAMERAS', imageSrc: '/images/placeholder.jpg', href: '/collections/cameras' },

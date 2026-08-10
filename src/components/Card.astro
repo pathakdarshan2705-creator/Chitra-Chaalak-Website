@@ -151,11 +151,14 @@ const { href, title, meta, imageSrc = '', imageAlt = '', group, variant = 'defau
     letter-spacing:0.5px;
     color:var(--blue-lightest);
     margin-bottom:4px;
+    line-height:1.25;
+    padding-bottom:2px;
     white-space:nowrap;
     overflow:hidden;
     text-overflow:ellipsis;
   }
 
+  /* if text-only, bump font size slightly */
   .cc-card--text .cc-card__title{
     margin-bottom:0;
     font-size:clamp(12px, 0.95vw, 14px);
@@ -166,6 +169,8 @@ const { href, title, meta, imageSrc = '', imageAlt = '', group, variant = 'defau
     font-size:clamp(11px, 0.85vw, 13px);
     color:var(--blue-lightest);
     opacity:0.7;
+    line-height:1.25;
+    padding-bottom:2px;
   }
 
   /* ---------- hover: glitch ---------- */

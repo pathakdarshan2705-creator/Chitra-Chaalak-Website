@@ -1,0 +1,78 @@
+---
+// src/pages/tour/index.astro
+import Layout from '../../layouts/Layout.astro';
+import Panel from '../../components/Panel.astro';
+import SidebarNav from '../../components/SidebarNav.astro';
+import BlogGridCard from '../../components/BlogGridCard.astro';
+import { getCollection } from 'astro:content';
+
+const allTours = await getCollection('tour');
+const sorted = allTours.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+
+function displayDate(d: Date) {
+  return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).toUpperCase();
+}
+
+const tours = sorted.map((tour) => ({
+  id: tour.id,
+  dateDisplay: displayDate(tour.data.date),
+  title: tour.data.title,
+  excerpt: tour.data.excerpt ?? '',
+  image: tour.data.cover,
+  href: `/tour/${tour.id}`,
+}));
+
+---
+<Layout title="Visual Tour — Chitra Chaalak">
+  <div class="cc-inner-layout">
+    <div class="cc-inner-layout__sidebar">
+      <SidebarNav
+        activePage="tour"
+        pageTitle="Visual Tour"
+        pageDescription="Explore cities and locations from my perspective. A visual journey through photography and stories."
+        controlGroup="tour-archive"
+        infoTitle="Visual Tours"
+        infoMeta="Discover new places through photography."
+      />
+    </div>
+
+    <div class="cc-inner-content">
+      <Panel title="All Destinations" showControls={false}>
+        <div class="cc-tour-page">
+          <div class="cc-tour-grid">
+            {tours.map((t) => (
+              <BlogGridCard
+                href={t.href}
+                title={t.title}
+                date={t.dateDisplay}
+                topic="PHOTO ESSAY"
+                imageSrc={t.image}
+                group="tour-archive"
+              />
+            ))}
+          </div>
+        </div>
+      </Panel>
+    </div>
+  </div>
+</Layout>
+
+<style>
+  .cc-tour-page {
+    padding: 20px;
+  }
+
+  .cc-tour-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+
+  @media (max-width: 1100px) {
+    .cc-tour-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 768px) {
+    .cc-tour-grid { grid-template-columns: 1fr; gap: 12px; }
+    .cc-tour-page { padding: 12px; }
+  }
+</style>

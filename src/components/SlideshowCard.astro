@@ -4,7 +4,7 @@
 interface Item { title: string; meta: string; href: string; }
 interface Props { items: Item[]; group: string; }
 const { items, group } = Astro.props;
-const first = items[0];
+const first = items[0] || { title: 'No items', meta: 'EMPTY', href: '#' };
 ---
 <div
   class="cc-card is-selected cc-slideshow"
@@ -62,7 +62,8 @@ const first = items[0];
   text-transform: uppercase;
   color: var(--blue-lightest);
   margin-bottom: 4px;
-  line-height: 1.25;
+  line-height: 1.15;
+  padding-bottom: 2px;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;

@@ -69,6 +69,8 @@ const { href, title, date, topic, imageSrc, imageAlt = '', group = 'blog-archive
     font-size: 0.95rem;
     color: var(--blue-lightest);
     margin-bottom: 4px;
+    line-height: 1.25;
+    padding-bottom: 2px;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
@@ -97,6 +99,9 @@ const { href, title, date, topic, imageSrc, imageAlt = '', group = 'blog-archive
     border-top: 1px solid rgba(0,10,40,0.3);
   }
 
+  .cc-blog-grid-card.is-selected .cc-blog-grid-card__body {
+    background: var(--yellow);
+  }
   .cc-blog-grid-card.is-selected .cc-blog-grid-card__title,
   .cc-blog-grid-card.is-selected .cc-blog-grid-card__date,
   .cc-blog-grid-card.is-selected .cc-blog-grid-card__topic{

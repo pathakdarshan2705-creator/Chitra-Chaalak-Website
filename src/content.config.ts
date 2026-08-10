@@ -56,4 +56,15 @@ const portfolio = defineCollection({
   }),
 });
 
-export const collections = { blog, updates, films, portfolio };
+const tour = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/tour' }),
+  schema: z.object({
+    title: z.string(),
+    date: z.coerce.date(),
+    cover: z.string().optional(),
+    gallery: z.array(z.string()).optional(),
+    excerpt: z.string().optional(),
+  }),
+});
+
+export const collections = { blog, updates, films, portfolio, tour };
