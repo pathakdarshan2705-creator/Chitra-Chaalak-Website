@@ -15,20 +15,28 @@ export default {
   async fetch(request, env) {
     const url = new URL(request.url);
     const method = request.method;
-    
+
     // Hardcoded secret for simplicity. Change this to a secure password!
     const SECRET_KEY = "CHITRA_SECRET_KEY_123";
 
-    // CORS Headers for Astro frontend
+    // CORS and Cache Headers for Astro frontend
     const corsHeaders = {
       "Access-Control-Allow-Origin": "*",
       "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-      "Access-Control-Allow-Headers": "Content-Type",
+      "Access-Control-Allow-Headers": "Content-Type, x-secret-token",
+      "Cache-Control": "no-store, max-age=0",
     };
 
     // Handle OPTIONS request for CORS
     if (method === "OPTIONS") {
       return new Response(null, { headers: corsHeaders });
+    }
+
+    if (!env.STATUS_KV) {
+      return new Response(JSON.stringify({ error: "STATUS_KV binding missing" }), {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" }
+      });
     }
 
     /* --------------------------------------------------------
@@ -37,7 +45,18 @@ export default {
      * -------------------------------------------------------- */
     if (url.pathname === "/status") {
       if (method === "GET") {
-        const status = await env.STATUS_KV.get("laptop_status") || "SOON";
+        const lastPingStr = await env.STATUS_KV.get("last_ping");
+        let status = "SOON";
+
+        if (lastPingStr) {
+          const lastPing = new Date(lastPingStr).getTime();
+          const now = Date.now();
+          // If pinged within the last 5 minutes (300,000 ms), we're LIVE
+          if (now - lastPing < 300000) {
+            status = "LIVE";
+          }
+        }
+
         return new Response(JSON.stringify({ status }), {
           headers: { ...corsHeaders, "Content-Type": "application/json" }
         });
@@ -58,50 +77,29 @@ export default {
     }
 
     /* --------------------------------------------------------
-     * ENDPOINT: /steps
-     * Handles the Footer Step Counter
+     * ENDPOINT: /ping
+     * Receives heartbeat from heartbeat-windows.ps1
      * -------------------------------------------------------- */
-    if (url.pathname === "/steps") {
-      if (method === "GET") {
-        const stepsData = await env.STATUS_KV.get("daily_steps");
-        let steps = 0;
-        let lastUpdated = null;
-        
-        if (stepsData) {
-          const parsed = JSON.parse(stepsData);
-          steps = parsed.steps;
-          lastUpdated = parsed.lastUpdated;
-        }
-
-        return new Response(JSON.stringify({ steps, lastUpdated }), {
-          headers: { ...corsHeaders, "Content-Type": "application/json" }
-        });
+    if (url.pathname === "/ping" && method === "POST") {
+      const secretToken = request.headers.get("x-secret-token");
+      if (secretToken !== "AboxNRpIvjYt2z634WkDeZhrcyPB7n8XsmalJ5Ku") {
+        return new Response("Unauthorized", { status: 401, headers: corsHeaders });
       }
 
-      if (method === "POST") {
-        try {
-          const body = await request.json();
-          if (body.secret !== SECRET_KEY) {
-            return new Response("Unauthorized", { status: 401, headers: corsHeaders });
-          }
-          
-          const payload = {
-            steps: body.steps,
-            lastUpdated: new Date().toISOString()
-          };
-          
-          await env.STATUS_KV.put("daily_steps", JSON.stringify(payload));
-          return new Response("Steps updated", { status: 200, headers: corsHeaders });
-        } catch (e) {
-          return new Response("Bad Request", { status: 400, headers: corsHeaders });
-        }
-      }
+      // Update last ping time
+      await env.STATUS_KV.put("last_ping", new Date().toISOString());
+      // Optionally also force status to LIVE
+      await env.STATUS_KV.put("laptop_status", "LIVE");
+
+      return new Response("Ping received", { status: 200, headers: corsHeaders });
     }
 
+
+
     // Default route
-    return new Response("Chitra-Chaalak API Running", { 
-      status: 200, 
-      headers: corsHeaders 
+    return new Response("Chitra-Chaalak API Running", {
+      status: 200,
+      headers: corsHeaders
     });
   }
 };

@@ -26,22 +26,12 @@
     <span id="cc-footer-time">--:--:--</span>
   </div>
   
-  <a href="/filter" class="cc-footer__link cc-footer__link--center">
+  <a href="/filter" class="cc-footer__link cc-footer__link--right">
     <span>FILTER STUDIO</span>
     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="cc-footer__link-icon">
       <path d="M5 12h14M12 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>
   </a>
-
-  <div class="cc-footer__segment cc-footer__segment--steps">
-    <span>STEPS</span>
-    <span class="cc-footer__bars" aria-hidden="true">
-      {Array.from({ length: 8 }).map((_, i) => (
-        <span class="cc-footer__bar" style={`animation-delay:${i * 0.09}s`}></span>
-      ))}
-    </span>
-    <span id="cc-footer-steps">----</span>
-  </div>
 </div>
 
 <style>
@@ -80,9 +70,7 @@
     gap:7px;
   }
 
-  .cc-footer__segment--steps{
-    margin-left:auto;
-  }
+
 
   .cc-footer__link{
     text-decoration: none;
@@ -95,10 +83,8 @@
     color: var(--yellow);
   }
   
-  .cc-footer__link--center {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
+  .cc-footer__link--right {
+    margin-left: auto;
     background: var(--blue-card);
     color: var(--yellow);
     padding: 6px 18px;
@@ -113,19 +99,19 @@
     box-shadow: 0 4px 10px rgba(0,0,0,0.3);
   }
   
-  .cc-footer__link--center:hover{
+  .cc-footer__link--right:hover{
     background: var(--yellow);
     color: var(--navy-deep);
     border-color: var(--yellow);
     box-shadow: 0 0 15px rgba(255, 240, 0, 0.4);
-    transform: translateX(-50%) translateY(-2px);
+    transform: translateY(-2px);
   }
   
   .cc-footer__link-icon {
     transition: transform 0.2s ease;
   }
   
-  .cc-footer__link--center:hover .cc-footer__link-icon {
+  .cc-footer__link--right:hover .cc-footer__link-icon {
     transform: translateX(3px);
   }
 
@@ -167,7 +153,6 @@
 
   @media (max-width: 768px){
     .cc-footer{ gap:10px; padding:0 14px; font-size:10px; }
-    .cc-footer__bars{ display:none; }
   }
 </style>
 
@@ -183,23 +168,4 @@
   }
   ccUpdateFooter();
   setInterval(ccUpdateFooter, 1000);
-
-  async function fetchSteps() {
-    try {
-      const res = await fetch('https://chitra-chaalak-status.pathakdarshan2705.workers.dev/steps');
-      if (res.ok) {
-        const data = await res.json();
-        const stepsEl = document.getElementById('cc-footer-steps');
-        if (stepsEl && data.steps !== undefined) {
-          stepsEl.textContent = data.steps.toLocaleString();
-        }
-      }
-    } catch (err) {
-      console.error('Failed to fetch steps:', err);
-    }
-  }
-  
-  // Fetch steps on load, and then every 5 minutes
-  fetchSteps();
-  setInterval(fetchSteps, 5 * 60 * 1000);
 </script>

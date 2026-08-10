@@ -274,10 +274,10 @@ const portfolioSections = [
     const badge = document.getElementById('cc-live-badge');
     if (!badge) return;
     try {
-      const res = await fetch(WORKER_URL, { cache: 'no-store' });
+      const res = await fetch(`${WORKER_URL}?t=${Date.now()}`, { cache: 'no-store' });
       if (!res.ok) throw new Error();
-      const { online } = await res.json();
-      if (online) {
+      const { status } = await res.json();
+      if (status === "LIVE") {
         badge.textContent = 'LIVE';
         badge.classList.remove('is-offline');
       } else {

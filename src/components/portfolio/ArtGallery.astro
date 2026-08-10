@@ -1,0 +1,122 @@
+---
+const { projects } = Astro.props;
+---
+<div class="cc-art-gallery">
+  <div class="cc-art-canvas">
+    {projects.map((project, i) => (
+      <a href={`/portfolio/art/${project.slug}`} class={`cc-art-piece cc-art-piece--${i % 4}`}>
+        <div class="cc-art-img-wrapper">
+          <img src={project.data.image} alt={project.data.title} class="cc-art-img" />
+        </div>
+        <div class="cc-art-label">
+          <h2 class="cc-art-title">{project.data.title}</h2>
+          <p class="cc-art-desc">{project.data.description}</p>
+        </div>
+      </a>
+    ))}
+  </div>
+</div>
+
+<style>
+  .cc-art-gallery {
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    position: relative;
+  }
+
+  .cc-art-canvas {
+    padding: 60px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 40px;
+    justify-content: center;
+    align-items: center;
+    min-height: 100%;
+  }
+
+  .cc-art-piece {
+    position: relative;
+    display: block;
+    text-decoration: none;
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  /* Scattering effects */
+  .cc-art-piece--0 { transform: rotate(-3deg) translateY(20px); width: 350px; }
+  .cc-art-piece--1 { transform: rotate(2deg) translateY(-30px); width: 400px; margin-top: 50px; }
+  .cc-art-piece--2 { transform: rotate(4deg) translateY(10px); width: 280px; }
+  .cc-art-piece--3 { transform: rotate(-1deg) translateY(-10px); width: 450px; }
+
+  .cc-art-img-wrapper {
+    position: relative;
+    padding: 20px;
+    background: #fff; /* Polaroid/Gallery wrap feel */
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    border: 1px solid var(--blue-panel-light);
+  }
+
+  .cc-art-img {
+    width: 100%;
+    height: auto;
+    display: block;
+    filter: sepia(0.3) hue-rotate(-10deg) saturate(1.2);
+    transition: filter 0.4s ease;
+  }
+
+  .cc-art-label {
+    position: absolute;
+    bottom: -20px;
+    right: -20px;
+    background: var(--yellow);
+    padding: 10px 15px;
+    color: var(--navy-deep);
+    border: 2px solid var(--navy-deep);
+    box-shadow: 4px 4px 0 var(--blue-column);
+    opacity: 0;
+    transform: translateY(10px) rotate(-2deg);
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    z-index: 10;
+  }
+
+  .cc-art-title {
+    font-family: var(--font-ui);
+    font-size: 14px;
+    margin: 0;
+    text-transform: uppercase;
+    font-weight: 700;
+  }
+
+  .cc-art-desc {
+    font-family: var(--font-body);
+    font-size: 12px;
+    margin: 4px 0 0 0;
+  }
+
+  .cc-art-piece:hover {
+    transform: scale(1.05) rotate(0deg) !important;
+    z-index: 20;
+  }
+
+  .cc-art-piece:hover .cc-art-img {
+    filter: sepia(0) hue-rotate(0) saturate(1);
+  }
+
+  .cc-art-piece:hover .cc-art-label {
+    opacity: 1;
+    transform: translateY(0) rotate(2deg);
+  }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+  
+  gsap.from('.cc-art-piece', {
+    scale: 0.8,
+    rotation: () => gsap.utils.random(-15, 15),
+    opacity: 0,
+    duration: 1.2,
+    stagger: 0.15,
+    ease: "back.out(1.5)"
+  });
+</script>
