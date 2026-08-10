@@ -20,9 +20,9 @@ const { project } = Astro.props;
 const { Content } = await project.render();
 ---
 <Layout title={`${project.data.title} — ${project.data.section.toUpperCase()}`}>
-  <div class="cc-project-page">
-    <div class="cc-project-hero">
-      <img src={project.data.image} alt={project.data.title} class="cc-hero-img" />
+  <div class="cc-project-page" id="project-page">
+    <div class="cc-project-hero" id="project-hero">
+      <img src={project.data.image} alt={project.data.title} class="cc-hero-img" id="hero-img" />
       <div class="cc-hero-overlay"></div>
       
       <div class="cc-hero-text">
@@ -32,8 +32,8 @@ const { Content } = await project.render();
           </svg>
           BACK TO {project.data.section.toUpperCase()}
         </a>
-        <h1 class="cc-hero-title">{project.data.title}</h1>
-        <div class="cc-hero-meta">
+        <h1 class="cc-hero-title js-split-text">{project.data.title}</h1>
+        <div class="cc-hero-meta js-fade-up">
           <span>{project.data.date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
           <span class="cc-meta-divider">/</span>
           <span class="cc-meta-section">{project.data.section.toUpperCase()}</span>
@@ -42,8 +42,20 @@ const { Content } = await project.render();
     </div>
 
     <div class="cc-project-content">
-      <div class="cc-project-desc">{project.data.description}</div>
-      <div class="cc-project-markdown">
+      {project.data.youtubeId && (
+        <div class="cc-youtube-embed js-fade-up">
+          <iframe 
+            src={`https://www.youtube.com/embed/${project.data.youtubeId}?autoplay=0&showinfo=0&controls=1&rel=0`} 
+            title={project.data.title} 
+            frameborder="0" 
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+            allowfullscreen>
+          </iframe>
+        </div>
+      )}
+
+      <div class="cc-project-desc js-fade-up">{project.data.description}</div>
+      <div class="cc-project-markdown js-fade-up">
         <Content />
       </div>
     </div>
@@ -51,6 +63,21 @@ const { Content } = await project.render();
 </Layout>
 
 <style>
+  .cc-youtube-embed {
+    position: relative;
+    padding-bottom: 56.25%; /* 16:9 aspect ratio */
+    height: 0;
+    overflow: hidden;
+    margin-bottom: 60px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: #000;
+  }
+  .cc-youtube-embed iframe {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
+  }
   .cc-project-page {
     height: 100%;
     overflow-y: auto;
@@ -58,36 +85,37 @@ const { Content } = await project.render();
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
     position: relative;
-    padding-bottom: 60px;
+    padding-bottom: 120px;
   }
   .cc-project-page::-webkit-scrollbar { display: none; }
 
   .cc-project-hero {
     position: relative;
     width: 100%;
-    height: 60vh;
+    height: 80vh;
     border-bottom: 2px solid var(--yellow);
     overflow: hidden;
   }
 
   .cc-hero-img {
     width: 100%;
-    height: 100%;
+    height: 120%; /* extra height for intense parallax */
     object-fit: cover;
-    transform: scale(1.1); /* for gsap scroll effect */
+    transform-origin: center bottom;
   }
 
   .cc-hero-overlay {
     position: absolute;
     inset: 0;
-    background: linear-gradient(0deg, var(--navy-deep) 0%, transparent 100%);
+    background: linear-gradient(0deg, var(--navy-deep) 0%, rgba(0,20,50,0.2) 60%, transparent 100%);
   }
 
   .cc-hero-text {
     position: absolute;
-    bottom: 40px;
-    left: 40px;
-    right: 40px;
+    bottom: 60px;
+    left: 60px;
+    right: 60px;
+    z-index: 10;
   }
 
   .cc-hero-back {
@@ -100,61 +128,104 @@ const { Content } = await project.render();
     font-weight: 700;
     letter-spacing: 1px;
     text-transform: uppercase;
-    margin-bottom: 16px;
-    transition: opacity 0.2s;
+    margin-bottom: 24px;
+    transition: opacity 0.2s, transform 0.2s;
   }
-  .cc-hero-back:hover { opacity: 0.8; }
+  .cc-hero-back:hover { 
+    opacity: 0.8; 
+    transform: translateX(-4px);
+  }
 
   .cc-hero-title {
     font-family: var(--font-ui);
-    font-size: clamp(32px, 4vw, 56px);
+    font-size: clamp(40px, 6vw, 80px);
     color: var(--blue-lightest);
-    margin: 0 0 10px 0;
-    line-height: 1.1;
+    margin: 0 0 16px 0;
+    line-height: 1;
     text-transform: uppercase;
+    letter-spacing: -1px;
+    overflow: hidden; /* for split text animation */
   }
 
   .cc-hero-meta {
     font-family: var(--font-ui);
-    font-size: 12px;
+    font-size: 14px;
     color: var(--blue-panel-light);
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 16px;
+    letter-spacing: 2px;
   }
 
-  .cc-meta-divider { opacity: 0.5; }
+  .cc-meta-divider { opacity: 0.5; color: var(--yellow); }
   .cc-meta-section { color: var(--yellow); font-weight: 700; }
 
   .cc-project-content {
-    max-width: 800px;
-    margin: 40px auto;
-    padding: 0 24px;
+    max-width: 900px;
+    margin: 80px auto 0 auto;
+    padding: 0 40px;
     color: var(--blue-lightest);
     font-family: var(--font-body);
   }
 
   .cc-project-desc {
-    font-size: 22px;
+    font-size: 28px;
     font-weight: 600;
     color: var(--yellow);
-    margin-bottom: 40px;
-    line-height: 1.5;
+    margin-bottom: 60px;
+    line-height: 1.4;
+    font-style: italic;
+    border-left: 4px solid var(--yellow);
+    padding-left: 24px;
   }
 
   .cc-project-markdown {
-    font-size: 18px;
-    line-height: 1.7;
-    opacity: 0.9;
+    font-size: 20px;
+    line-height: 1.8;
+    color: rgba(255, 255, 255, 0.85);
   }
 
+  /* Editorial Markdown Styles */
   .cc-project-markdown :global(h2) {
     font-family: var(--font-ui);
-    color: var(--blue-panel-light);
-    margin-top: 40px;
-    font-size: 20px;
+    color: var(--yellow);
+    margin-top: 60px;
+    margin-bottom: 20px;
+    font-size: 24px;
     text-transform: uppercase;
-    letter-spacing: 1px;
+    letter-spacing: 2px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 10px;
+  }
+  
+  .cc-project-markdown :global(p) {
+    margin-bottom: 24px;
+  }
+
+  .cc-project-markdown :global(blockquote) {
+    font-size: 32px;
+    line-height: 1.3;
+    font-style: italic;
+    color: #fff;
+    margin: 60px -40px;
+    padding: 40px;
+    background: rgba(103, 200, 255, 0.05);
+    border-left: 4px solid var(--yellow);
+  }
+  
+  .cc-project-markdown :global(ul) {
+    margin-bottom: 30px;
+    padding-left: 20px;
+  }
+  .cc-project-markdown :global(li) {
+    margin-bottom: 10px;
+  }
+  
+  @media (max-width: 768px) {
+    .cc-hero-text { left: 20px; right: 20px; bottom: 40px; }
+    .cc-project-content { padding: 0 20px; margin-top: 40px; }
+    .cc-project-desc { font-size: 22px; margin-bottom: 40px; }
+    .cc-project-markdown :global(blockquote) { margin: 40px -20px; padding: 20px; font-size: 24px; }
   }
 </style>
 
@@ -163,18 +234,46 @@ const { Content } = await project.render();
   import { ScrollTrigger } from 'gsap/ScrollTrigger';
   gsap.registerPlugin(ScrollTrigger);
 
-  // Parallax the hero image
-  const img = document.querySelector('.cc-hero-img');
-  if (img) {
-    gsap.to(img, {
-      yPercent: 20,
+  // Parallax the hero image and fade it out
+  const scroller = document.getElementById('project-page');
+  const heroImg = document.getElementById('hero-img');
+  const heroText = document.querySelector('.cc-hero-text');
+  
+  if (scroller && heroImg && heroText) {
+    gsap.to(heroImg, {
+      yPercent: 30, // move down as we scroll down
+      scale: 1.1,
+      opacity: 0.3,
       ease: "none",
       scrollTrigger: {
         trigger: ".cc-project-hero",
+        scroller: scroller,
         start: "top top",
         end: "bottom top",
         scrub: true
       }
     });
+
+    gsap.to(heroText, {
+      y: 50,
+      opacity: 0,
+      ease: "none",
+      scrollTrigger: {
+        trigger: ".cc-project-hero",
+        scroller: scroller,
+        start: "top top",
+        end: "center top",
+        scrub: true
+      }
+    });
   }
+
+  // Entrance animations
+  gsap.from('.cc-hero-title', {
+    y: 50, opacity: 0, duration: 1, ease: "power4.out", delay: 0.2
+  });
+  
+  gsap.from('.js-fade-up', {
+    y: 40, opacity: 0, duration: 1, stagger: 0.2, ease: "power3.out", delay: 0.4
+  });
 </script>

@@ -1,17 +1,59 @@
 ---
 const { projects } = Astro.props;
+
+// Split projects into 3 columns for parallax
+const col1 = projects.filter((_, i) => i % 3 === 0);
+const col2 = projects.filter((_, i) => i % 3 === 1);
+const col3 = projects.filter((_, i) => i % 3 === 2);
 ---
-<div class="cc-photo-gallery">
-  <div class="cc-masonry-grid">
-    {projects.map((project, i) => (
-      <a href={`/portfolio/photography/${project.slug}`} class={`cc-photo-card cc-photo-card--${i % 3}`}>
-        <img src={project.data.image} alt={project.data.title} class="cc-photo-img" />
-        <div class="cc-photo-details">
-          <h2 class="cc-photo-title">{project.data.title}</h2>
-          <div class="cc-photo-date">{project.data.date.toLocaleDateString()}</div>
-        </div>
-      </a>
-    ))}
+<div class="cc-photo-gallery" id="photo-gallery">
+  <div class="cc-parallax-grid">
+    
+    <!-- Column 1 -->
+    <div class="cc-parallax-col cc-parallax-up">
+      {col1.map((project) => (
+        <a href={`/portfolio/photography/${project.slug}`} class="cc-photo-card">
+          <div class="cc-photo-img-wrap">
+            <img src={project.data.image} alt={project.data.title} class="cc-photo-img" />
+          </div>
+          <div class="cc-photo-details">
+            <h3 class="cc-photo-title">{project.data.title}</h3>
+            <span class="cc-photo-date">{project.data.date.getFullYear()}</span>
+          </div>
+        </a>
+      ))}
+    </div>
+
+    <!-- Column 2 -->
+    <div class="cc-parallax-col cc-parallax-down">
+      {col2.map((project) => (
+        <a href={`/portfolio/photography/${project.slug}`} class="cc-photo-card">
+          <div class="cc-photo-img-wrap">
+            <img src={project.data.image} alt={project.data.title} class="cc-photo-img" />
+          </div>
+          <div class="cc-photo-details">
+            <h3 class="cc-photo-title">{project.data.title}</h3>
+            <span class="cc-photo-date">{project.data.date.getFullYear()}</span>
+          </div>
+        </a>
+      ))}
+    </div>
+
+    <!-- Column 3 -->
+    <div class="cc-parallax-col cc-parallax-up">
+      {col3.map((project) => (
+        <a href={`/portfolio/photography/${project.slug}`} class="cc-photo-card">
+          <div class="cc-photo-img-wrap">
+            <img src={project.data.image} alt={project.data.title} class="cc-photo-img" />
+          </div>
+          <div class="cc-photo-details">
+            <h3 class="cc-photo-title">{project.data.title}</h3>
+            <span class="cc-photo-date">{project.data.date.getFullYear()}</span>
+          </div>
+        </a>
+      ))}
+    </div>
+
   </div>
 </div>
 
@@ -20,55 +62,70 @@ const { projects } = Astro.props;
     width: 100%;
     height: 100%;
     overflow-y: auto;
-    padding: 20px;
-    scrollbar-width: none;
-  }
-  .cc-photo-gallery::-webkit-scrollbar { display: none; }
-
-  .cc-masonry-grid {
-    column-count: 3;
-    column-gap: 20px;
+    overflow-x: hidden;
+    padding: 100px 40px;
+    background: var(--navy-deep);
   }
 
-  @media (max-width: 1024px) { .cc-masonry-grid { column-count: 2; } }
-  @media (max-width: 768px) { .cc-masonry-grid { column-count: 1; } }
+  .cc-parallax-grid {
+    display: flex;
+    gap: 40px;
+    max-width: 1400px;
+    margin: 0 auto;
+    /* Extra height to allow scrolling for the parallax effect */
+    min-height: 150vh;
+  }
+
+  .cc-parallax-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+  }
+
+  /* Offset the middle column visually to start */
+  .cc-parallax-down {
+    margin-top: -100px;
+  }
 
   .cc-photo-card {
-    display: inline-block;
-    width: 100%;
-    margin-bottom: 20px;
+    display: block;
     position: relative;
+    text-decoration: none;
     overflow: hidden;
-    break-inside: avoid;
-    border-radius: 2px;
-    border: 1px solid var(--blue-panel-light);
+    border-radius: 4px;
+    transition: transform 0.4s ease;
   }
 
-  /* Randomize aspect ratios for masonry effect if all placeholders are same size */
-  .cc-photo-card--0 .cc-photo-img { aspect-ratio: 4/5; }
-  .cc-photo-card--1 .cc-photo-img { aspect-ratio: 16/9; }
-  .cc-photo-card--2 .cc-photo-img { aspect-ratio: 1/1; }
+  .cc-photo-img-wrap {
+    width: 100%;
+    /* Randomize aspect ratio slightly based on flex box filling */
+    min-height: 300px;
+    overflow: hidden;
+  }
 
   .cc-photo-img {
     width: 100%;
-    display: block;
+    height: 100%;
     object-fit: cover;
-    transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+    display: block;
+    transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1);
   }
 
   .cc-photo-details {
     position: absolute;
     inset: auto 0 0 0;
-    padding: 20px;
-    background: linear-gradient(0deg, rgba(0, 59, 153, 0.9) 0%, transparent 100%);
+    padding: 30px;
+    background: linear-gradient(0deg, rgba(0, 20, 50, 0.9) 0%, transparent 100%);
     color: var(--blue-lightest);
-    transform: translateY(100%);
-    transition: transform 0.4s ease;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.4s ease;
   }
 
   .cc-photo-title {
     font-family: var(--font-ui);
-    font-size: 16px;
+    font-size: 20px;
     text-transform: uppercase;
     margin: 0 0 5px 0;
     color: var(--yellow);
@@ -76,21 +133,64 @@ const { projects } = Astro.props;
 
   .cc-photo-date {
     font-family: var(--font-ui);
-    font-size: 11px;
+    font-size: 12px;
     opacity: 0.8;
   }
 
+  /* Hover Effects */
+  .cc-photo-card:hover {
+    transform: scale(0.98);
+  }
   .cc-photo-card:hover .cc-photo-img {
-    transform: scale(1.08);
+    transform: scale(1.1);
   }
   .cc-photo-card:hover .cc-photo-details {
+    opacity: 1;
     transform: translateY(0);
+  }
+  
+  @media (max-width: 768px) {
+    .cc-parallax-grid { flex-direction: column; }
+    .cc-parallax-down { margin-top: 0; }
   }
 </style>
 
 <script>
   import { gsap } from 'gsap';
+  import { ScrollTrigger } from 'gsap/ScrollTrigger';
+  gsap.registerPlugin(ScrollTrigger);
   
+  const gallery = document.getElementById('photo-gallery');
+
+  if (gallery && window.innerWidth > 768) {
+    // Column 1 & 3 Parallax (Move slower/up relative to scroll)
+    gsap.to('.cc-parallax-up', {
+      yPercent: -15,
+      ease: "none",
+      scrollTrigger: {
+        trigger: gallery,
+        scroller: gallery,
+        start: "top top",
+        end: "bottom bottom",
+        scrub: true
+      }
+    });
+
+    // Column 2 Parallax (Move faster/down relative to scroll)
+    gsap.to('.cc-parallax-down', {
+      yPercent: 15,
+      ease: "none",
+      scrollTrigger: {
+        trigger: gallery,
+        scroller: gallery,
+        start: "top top",
+        end: "bottom bottom",
+        scrub: true
+      }
+    });
+  }
+
+  // Entrance
   gsap.from('.cc-photo-card', {
     y: 50,
     opacity: 0,
@@ -98,4 +198,33 @@ const { projects } = Astro.props;
     stagger: 0.1,
     ease: "power2.out"
   });
+
+  // 3D Tilt Logic
+  const grid = document.querySelector('.cc-parallax-grid') as HTMLElement;
+  if (gallery && grid) {
+    gallery.addEventListener('mousemove', (e: any) => {
+      const rect = gallery.getBoundingClientRect();
+      const x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+      const y = ((e.clientY - rect.top) / rect.height) * 2 - 1;
+      const limit = 8;
+      
+      gsap.to(grid, {
+        rotationY: x * limit,
+        rotationX: -y * limit,
+        duration: 0.5,
+        ease: "power2.out",
+        transformPerspective: 1200,
+        transformOrigin: "center center"
+      });
+    });
+
+    gallery.addEventListener('mouseleave', () => {
+      gsap.to(grid, {
+        rotationY: 0,
+        rotationX: 0,
+        duration: 1,
+        ease: "elastic.out(1, 0.3)"
+      });
+    });
+  }
 </script>

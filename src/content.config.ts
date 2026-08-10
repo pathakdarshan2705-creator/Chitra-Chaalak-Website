@@ -44,4 +44,16 @@ const films = defineCollection({
   }),
 });
 
-export const collections = { blog, updates, films };
+const portfolio = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/portfolio' }),
+  schema: z.object({
+    title: z.string(),
+    section: z.string(),
+    date: z.date(),
+    image: z.string(),
+    description: z.string(),
+    youtubeId: z.string().optional(),
+  }),
+});
+
+export const collections = { blog, updates, films, portfolio };

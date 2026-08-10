@@ -1,18 +1,17 @@
 ---
 const { projects } = Astro.props;
 ---
-<div class="cc-film-gallery">
+<div class="cc-film-gallery" id="film-gallery">
+  <!-- Custom Cursor -->
+  <div class="cc-film-cursor">PLAY</div>
+
   <div class="cc-film-track">
     {projects.map((project, i) => (
       <a href={`/portfolio/filmmaking/${project.slug}`} class="cc-film-card">
         <div class="cc-film-number">SCENE {String(i + 1).padStart(2, '0')}</div>
         <div class="cc-film-image-wrapper">
           <img src={project.data.image} alt={project.data.title} class="cc-film-image" />
-          <div class="cc-film-overlay">
-            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-              <polygon points="5 3 19 12 5 21 5 3"></polygon>
-            </svg>
-          </div>
+          <div class="cc-film-overlay"></div>
         </div>
         <div class="cc-film-info">
           <h2 class="cc-film-title">{project.data.title}</h2>
@@ -29,30 +28,60 @@ const { projects } = Astro.props;
     height: 100%;
     overflow-x: auto;
     overflow-y: hidden;
-    scroll-snap-type: x mandatory;
     scrollbar-width: none;
     -webkit-overflow-scrolling: touch;
     display: flex;
     align-items: center;
+    position: relative;
+    cursor: none; /* Hide default cursor to use custom one */
   }
   .cc-film-gallery::-webkit-scrollbar { display: none; }
 
+  /* Custom Cursor */
+  .cc-film-cursor {
+    position: fixed;
+    top: 0; left: 0;
+    width: 80px; height: 80px;
+    background: var(--yellow);
+    color: var(--navy-deep);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-ui);
+    font-size: 14px;
+    font-weight: 700;
+    pointer-events: none;
+    z-index: 100;
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.5);
+    transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.3s ease;
+  }
+
+  .cc-film-gallery:hover .cc-film-cursor {
+    opacity: 1;
+  }
+  
+  .cc-film-gallery.is-hovering-card .cc-film-cursor {
+    transform: translate(-50%, -50%) scale(1);
+    background: #fff;
+  }
+
   .cc-film-track {
     display: flex;
-    gap: 40px;
+    gap: 80px;
     padding: 0 40px;
     height: 70vh;
   }
 
   .cc-film-card {
-    scroll-snap-align: center;
     flex: 0 0 70vw; /* Cinematic widescreen ratio */
     max-width: 900px;
     height: 100%;
     display: flex;
     flex-direction: column;
     text-decoration: none;
-    group: film-card;
+    cursor: none;
   }
 
   .cc-film-number {
@@ -69,30 +98,32 @@ const { projects } = Astro.props;
     overflow: hidden;
     border: 1px solid var(--blue-panel-light);
     border-radius: 4px;
+    background: #000;
   }
 
   .cc-film-image {
-    width: 100%;
+    width: 120%; /* Extra width for parallax */
     height: 100%;
     object-fit: cover;
-    filter: grayscale(80%);
-    transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1), filter 0.5s ease;
+    filter: grayscale(80%) sepia(20%);
+    transition: filter 0.5s ease;
+    /* initial offset for parallax */
+    transform: translateX(-10%); 
   }
 
   .cc-film-overlay {
     position: absolute;
     inset: 0;
-    background: rgba(0, 59, 153, 0.6);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--yellow);
-    opacity: 0;
+    background: linear-gradient(180deg, transparent 50%, rgba(0,20,50,0.8) 100%);
+    opacity: 0.5;
     transition: opacity 0.4s ease;
   }
 
   .cc-film-info {
     margin-top: 20px;
+    transform: translateY(20px);
+    opacity: 0;
+    transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
   }
 
   .cc-film-title {
@@ -113,10 +144,69 @@ const { projects } = Astro.props;
 
   /* HOVER EFFECTS */
   .cc-film-card:hover .cc-film-image {
-    transform: scale(1.05);
-    filter: grayscale(0%);
+    filter: grayscale(0%) sepia(0%);
   }
   .cc-film-card:hover .cc-film-overlay {
+    opacity: 0;
+  }
+  .cc-film-card:hover .cc-film-info {
+    transform: translateY(0);
     opacity: 1;
   }
 </style>
+
+<script>
+  import { gsap } from 'gsap';
+  import { ScrollTrigger } from 'gsap/ScrollTrigger';
+  gsap.registerPlugin(ScrollTrigger);
+
+  // Custom Cursor Logic
+  const gallery = document.querySelector('.cc-film-gallery') as HTMLElement;
+  const cursor = document.querySelector('.cc-film-cursor') as HTMLElement;
+  const cards = document.querySelectorAll('.cc-film-card');
+
+  if (gallery && cursor) {
+    // Map vertical scroll wheel to horizontal scroll
+    gallery.addEventListener('wheel', (e) => {
+      // If we are scrolling vertically (deltaY), convert it to horizontal (scrollLeft)
+      if (e.deltaY !== 0) {
+        e.preventDefault();
+        gallery.scrollLeft += e.deltaY;
+      }
+    }, { passive: false });
+
+    gallery.addEventListener('mousemove', (e: any) => {
+      // Use clientX/Y for fixed positioning
+      gsap.to(cursor, {
+        x: e.clientX,
+        y: e.clientY,
+        duration: 0.1,
+        ease: "power2.out"
+      });
+    });
+
+    cards.forEach(card => {
+      card.addEventListener('mouseenter', () => gallery.classList.add('is-hovering-card'));
+      card.addEventListener('mouseleave', () => gallery.classList.remove('is-hovering-card'));
+    });
+
+    // Parallax effect on horizontal scroll
+    cards.forEach((card) => {
+      const img = card.querySelector('.cc-film-image');
+      if (img) {
+        gsap.to(img, {
+          xPercent: 20, // moves the image rightward as you scroll
+          ease: "none",
+          scrollTrigger: {
+            trigger: card,
+            scroller: gallery, // watch the horizontal scroll of the gallery container
+            horizontal: true,
+            start: "left right", // when left of card hits right of scroller
+            end: "right left",
+            scrub: true
+          }
+        });
+      }
+    });
+  }
+</script>

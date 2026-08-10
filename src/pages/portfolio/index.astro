@@ -166,39 +166,46 @@ import Panel from '../../components/Panel.astro';
     transition: opacity 0.4s ease;
   }
 
-  /* HOVER STATES */
-  .cc-accordion-panel:hover {
+  /* HOVER & EXPANDED STATES */
+  .cc-accordion-panel:hover,
+  .cc-accordion-panel.is-expanded {
     flex: 3;
     border-color: var(--yellow);
     box-shadow: inset 0 0 0 2px var(--yellow);
   }
 
-  .cc-accordion-panel:hover .cc-accordion-bg {
+  .cc-accordion-panel:hover .cc-accordion-bg,
+  .cc-accordion-panel.is-expanded .cc-accordion-bg {
     filter: grayscale(0%) contrast(1.1);
     transform: scale(1.05);
   }
 
-  .cc-accordion-panel:hover .cc-accordion-overlay {
+  .cc-accordion-panel:hover .cc-accordion-overlay,
+  .cc-accordion-panel.is-expanded .cc-accordion-overlay {
     opacity: 0.4;
   }
 
-  .cc-accordion-panel:hover .cc-accordion-content {
+  .cc-accordion-panel:hover .cc-accordion-content,
+  .cc-accordion-panel.is-expanded .cc-accordion-content {
     transform: translateY(0);
   }
 
-  .cc-accordion-panel:hover .cc-accordion-title {
+  .cc-accordion-panel:hover .cc-accordion-title,
+  .cc-accordion-panel.is-expanded .cc-accordion-title {
     writing-mode: horizontal-tb;
     transform: rotate(0deg);
     font-size: 3vw;
     color: var(--yellow);
   }
 
-  .cc-accordion-panel:hover .cc-accordion-num {
+  .cc-accordion-panel:hover .cc-accordion-num,
+  .cc-accordion-panel.is-expanded .cc-accordion-num {
     opacity: 1;
     transform: translateY(0);
   }
 
-  .cc-accordion-panel:hover .cc-accordion-desc {
+  .cc-accordion-panel:hover .cc-accordion-desc,
+  .cc-accordion-panel.is-expanded .cc-accordion-desc {
     opacity: 1;
     transition-delay: 0.2s;
   }
@@ -226,5 +233,23 @@ import Panel from '../../components/Panel.astro';
     stagger: 0.15,
     ease: "power3.out",
     delay: 0.2
+  });
+
+  // Single click to expand, double click (or second click) to navigate
+  const panels = document.querySelectorAll('.cc-accordion-panel');
+  panels.forEach(panel => {
+    panel.addEventListener('click', (e) => {
+      if (!panel.classList.contains('is-expanded')) {
+        // Prevent navigation on first click
+        e.preventDefault();
+        
+        // Remove expanded class from all
+        panels.forEach(p => p.classList.remove('is-expanded'));
+        
+        // Add expanded to this one
+        panel.classList.add('is-expanded');
+      }
+      // If it IS expanded, let the default <a> behavior happen (navigate)
+    });
   });
 </script>

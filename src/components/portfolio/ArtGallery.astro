@@ -94,8 +94,12 @@ const { projects } = Astro.props;
   }
 
   .cc-art-piece:hover {
-    transform: scale(1.05) rotate(0deg) !important;
     z-index: 20;
+    cursor: grab;
+  }
+  .cc-art-piece:active {
+    cursor: grabbing;
+    z-index: 30;
   }
 
   .cc-art-piece:hover .cc-art-img {
@@ -110,7 +114,10 @@ const { projects } = Astro.props;
 
 <script>
   import { gsap } from 'gsap';
+  import { Draggable } from 'gsap/Draggable';
+  gsap.registerPlugin(Draggable);
   
+  // Entrance animation
   gsap.from('.cc-art-piece', {
     scale: 0.8,
     rotation: () => gsap.utils.random(-15, 15),
@@ -118,5 +125,38 @@ const { projects } = Astro.props;
     duration: 1.2,
     stagger: 0.15,
     ease: "back.out(1.5)"
+  });
+
+  // Official GSAP Draggable Logic
+  Draggable.create('.cc-art-piece', {
+    type: 'x,y',
+    edgeResistance: 0.85,
+    bounds: '.cc-art-gallery', // Prevents going out of the screen
+    onPress: function() {
+      // Bring to front
+      gsap.to(this.target, { scale: 1.1, zIndex: 50, duration: 0.2 });
+    },
+    onRelease: function() {
+      gsap.to(this.target, { scale: 1.05, zIndex: 20, duration: 0.2 });
+    },
+    onClick: function(e) {
+      // If they just clicked (no drag), let them navigate
+      if (this.pointerEvent && this.pointerEvent.defaultPrevented) return;
+      const href = this.target.getAttribute('href');
+      if (href) window.location.href = href;
+    }
+  });
+
+  // Prevent default <a> behavior so Draggable controls it
+  document.querySelectorAll('.cc-art-piece').forEach(el => {
+    el.addEventListener('click', e => e.preventDefault());
+    
+    // Add custom hover scale using GSAP instead of CSS !important
+    el.addEventListener('mouseenter', () => {
+      if (!Draggable.get(el)?.isDragging) gsap.to(el, { scale: 1.05, duration: 0.2 });
+    });
+    el.addEventListener('mouseleave', () => {
+      if (!Draggable.get(el)?.isDragging) gsap.to(el, { scale: 1, duration: 0.2 });
+    });
   });
 </script>
