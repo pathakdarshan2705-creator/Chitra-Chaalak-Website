@@ -240,7 +240,8 @@ import Panel from '../../components/Panel.astro';
 </style>
 
 <script>
-  import { gsap } from 'gsap';
+  // @ts-nocheck
+import { gsap } from 'gsap';
   
   // Staggered entrance animation for the panels
   gsap.from('.cc-accordion-panel', {

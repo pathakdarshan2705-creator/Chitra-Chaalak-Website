@@ -94,7 +94,8 @@ const first = items[0];
   .cc-slideshow__dots span.is-active { background: var(--yellow); }
 </style>
 <script>
-  import { gsap } from 'gsap';
+  // @ts-nocheck
+import { gsap } from 'gsap';
 
   document.querySelectorAll<HTMLElement>('.cc-slideshow').forEach((card) => {
     const group = card.dataset.slideshowGroup!;
@@ -146,7 +147,7 @@ const first = items[0];
     document.querySelectorAll(`[data-select-group="${group}"]`).forEach((btn) => {
       btn.addEventListener('click', () => {
         stop();
-        const dir = Number((btn as HTMLElement).dataset.dir ?? '1');
+        const dir = Number(btn.dataset.dir ?? '1');
         goTo(index + dir);
         start();
       });

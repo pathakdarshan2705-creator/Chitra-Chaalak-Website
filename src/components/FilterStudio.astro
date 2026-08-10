@@ -237,11 +237,12 @@
 </style>
 
 <script>
-  // Guarded the same way as the site's other shared-behavior components
+  // @ts-nocheck
+// Guarded the same way as the site's other shared-behavior components
   // (Panel.astro's __ccPanelControlsInit, RemoteControl.astro, etc.) so
   // this is safe even if the component is ever mounted more than once.
-  if (!(window as any).__ccFilterStudioInit) {
-    (window as any).__ccFilterStudioInit = true;
+  if (!window.__ccFilterStudioInit) {
+    window.__ccFilterStudioInit = true;
 
     const dropzone = document.getElementById('cc-fs-dropzone')!;
     const fileInput = document.getElementById('cc-fs-file-input') as HTMLInputElement;

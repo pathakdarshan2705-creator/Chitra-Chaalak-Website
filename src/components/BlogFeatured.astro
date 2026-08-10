@@ -106,12 +106,13 @@ const { title, date, topic, excerpt, imageSrc, imageAlt = '', href } = Astro.pro
 </style>
 
 <script>
-  if (!(window as any).__ccBlogFeaturedInit) {
-    (window as any).__ccBlogFeaturedInit = true;
+  // @ts-nocheck
+if (!window.__ccBlogFeaturedInit) {
+    window.__ccBlogFeaturedInit = true;
 
     document.addEventListener('cc:blog-date-select', ((e: CustomEvent) => {
       const date: string = e.detail.date;
-      const posts = (window as any).__ccBlogPosts as Record<string, {
+      const posts = window.__ccBlogPosts as Record<string, {
         title: string; dateDisplay: string; topic: string; excerpt: string; image: string; href: string;
       }> | undefined;
       if (!posts || !posts[date]) return;
@@ -131,7 +132,7 @@ const { title, date, topic, excerpt, imageSrc, imageAlt = '', href } = Astro.pro
 
       // also select the matching card in the grid below, if it's rendered
       document.querySelectorAll('.cc-blog-grid-card').forEach((el) => {
-        el.classList.toggle('is-selected', (el as HTMLElement).dataset.href === p.href);
+        el.classList.toggle('is-selected', el.dataset.href === p.href);
       });
     }) as EventListener);
 

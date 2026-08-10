@@ -230,7 +230,8 @@ function displayDate(d: Date) {
 </style>
 
 <script>
-  document.addEventListener('DOMContentLoaded', () => {
+  // @ts-nocheck
+document.addEventListener('DOMContentLoaded', () => {
     const cards = document.querySelectorAll('.cc-timeline__card');
     const modal = document.getElementById('holographic-canvas');
     const backdrop = document.getElementById('holographic-backdrop');

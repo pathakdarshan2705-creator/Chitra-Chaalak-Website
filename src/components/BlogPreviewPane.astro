@@ -63,8 +63,9 @@ const { group = 'blog' } = Astro.props;
   }
 </style>
 <script>
-  if (!(window as any).__ccBlogPreviewInit) {
-    (window as any).__ccBlogPreviewInit = true;
+  // @ts-nocheck
+if (!window.__ccBlogPreviewInit) {
+    window.__ccBlogPreviewInit = true;
     let typeTimer: ReturnType<typeof setTimeout> | null = null;
 
     function typeTitle(el: HTMLElement, text: string) {

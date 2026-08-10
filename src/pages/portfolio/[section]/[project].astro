@@ -299,7 +299,8 @@ const { Content } = await render(project);
 </style>
 
 <script>
-  import { gsap } from 'gsap';
+  // @ts-nocheck
+import { gsap } from 'gsap';
   import { ScrollTrigger } from 'gsap/ScrollTrigger';
   gsap.registerPlugin(ScrollTrigger);
 

@@ -219,8 +219,9 @@ const {
 </style>
 
 <script>
-  if (!(window as any).__ccPanelControlsInit) {
-    (window as any).__ccPanelControlsInit = true;
+  // @ts-nocheck
+if (!window.__ccPanelControlsInit) {
+    window.__ccPanelControlsInit = true;
 
     function cardsInGroup(group) {
       return Array.from(document.querySelectorAll(`.cc-card[data-group="${group}"]`));

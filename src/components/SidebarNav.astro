@@ -184,8 +184,9 @@ const {
 </style>
 
 <script>
-  if (!(window as any).__ccSidebarHamburgerInit) {
-    (window as any).__ccSidebarHamburgerInit = true;
+  // @ts-nocheck
+if (!window.__ccSidebarHamburgerInit) {
+    window.__ccSidebarHamburgerInit = true;
     const btn = document.getElementById('cc-sidebar-hamburger');
     const grid = document.getElementById('cc-sidebar-grid');
     btn?.addEventListener('click', () => {

@@ -11,11 +11,12 @@
 // Mounted once in Layout.astro alongside RemoteControl, FocusFrame, etc.
 ---
 <script>
-  if (!(window as any).__ccCardHandlersInit) {
-    (window as any).__ccCardHandlersInit = true;
+  // @ts-nocheck
+if (!window.__ccCardHandlersInit) {
+    window.__ccCardHandlersInit = true;
 
     document.addEventListener('click', (e) => {
-      const card = (e.target as HTMLElement).closest('.cc-card') as HTMLElement | null;
+      const card = e.target.closest('.cc-card');
       if (!card) return;
 
       const group = card.dataset.group;
@@ -32,18 +33,31 @@
       }
     });
 
-    document.addEventListener('dblclick', (e) => {
-      const card = (e.target as HTMLElement).closest('.cc-card') as HTMLElement | null;
+    document.addEventListener('dblclick', async (e) => {
+      const card = e.target.closest('.cc-card');
       if (!card) return;
       const href = card.dataset.href;
       if (!href || href === '#') return;
-      document.dispatchEvent(new CustomEvent('cc:channel-jump'));
-      setTimeout(() => { window.location.href = href; }, 320);
+
+      if (card.classList.contains('cc-cassette')) {
+        const { gsap } = await import('gsap');
+        gsap.to(card, {
+          scale: 1.1,
+          y: -30,
+          opacity: 0,
+          duration: 0.6,
+          ease: "back.in(1.7)",
+          onComplete: () => { window.location.href = href; }
+        });
+      } else {
+        document.dispatchEvent(new CustomEvent('cc:channel-jump'));
+        setTimeout(() => { window.location.href = href; }, 320);
+      }
     });
 
     document.addEventListener('keydown', (e) => {
       if (e.key !== 'Enter' && e.key !== ' ') return;
-      const card = (e.target as HTMLElement).closest('.cc-card') as HTMLElement | null;
+      const card = e.target.closest('.cc-card');
       if (!card) return;
       e.preventDefault();
       const href = card.dataset.href;

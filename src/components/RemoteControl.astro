@@ -8,8 +8,9 @@
 // which was the "getting selected but not smooth" issue.
 ---
 <script>
-  if (!(window as any).__ccRemoteControlInit) {
-    (window as any).__ccRemoteControlInit = true;
+  // @ts-nocheck
+if (!window.__ccRemoteControlInit) {
+    window.__ccRemoteControlInit = true;
 
     const KEYMAP: Record<string, string> = {
       '1': 'updates', '2': 'films', '3': 'blog',

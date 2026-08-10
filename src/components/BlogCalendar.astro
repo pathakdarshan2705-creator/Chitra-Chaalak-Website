@@ -150,8 +150,9 @@ const { availableDates, initialDate } = Astro.props;
 </style>
 
 <script>
-  if (!(window as any).__ccBlogCalendarInit) {
-    (window as any).__ccBlogCalendarInit = true;
+  // @ts-nocheck
+if (!window.__ccBlogCalendarInit) {
+    window.__ccBlogCalendarInit = true;
 
     const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 

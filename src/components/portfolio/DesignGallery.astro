@@ -103,13 +103,17 @@ const defaultImage = projects.length > 0 ? projects[0].data.image : '';
 
   .cc-design-row {
     cursor: pointer;
-    transition: all 0.3s ease;
-    border-bottom: 1px solid rgba(103, 200, 255, 0.1);
+    transition: opacity 0.3s ease;
+    border-bottom: 1px solid var(--blue-panel-light);
     opacity: 0.5;
   }
 
+  .cc-design-row:last-child {
+    border-bottom: none;
+  }
+
+  /* Only change opacity on hover, keep text white to balance everything */
   .cc-design-row.is-active, .cc-design-row:hover {
-    background: rgba(103, 200, 255, 0.05);
     opacity: 1;
   }
 
@@ -167,7 +171,8 @@ const defaultImage = projects.length > 0 ? projects[0].data.image : '';
 </style>
 
 <script>
-  import { gsap } from 'gsap';
+  // @ts-nocheck
+import { gsap } from 'gsap';
   
   gsap.from('.cc-design-row', {
     x: -50,

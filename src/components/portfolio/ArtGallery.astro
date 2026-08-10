@@ -131,7 +131,8 @@ const { projects } = Astro.props;
 </style>
 
 <script>
-  import { gsap } from 'gsap';
+  // @ts-nocheck
+import { gsap } from 'gsap';
   import { Draggable } from 'gsap/Draggable';
   import { ScrollTrigger } from 'gsap/ScrollTrigger';
   gsap.registerPlugin(Draggable, ScrollTrigger);

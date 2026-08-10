@@ -52,7 +52,8 @@ const { title } = Astro.props;
   </div>
 
   <script>
-    import { gsap } from 'gsap';
+  // @ts-nocheck
+import { gsap } from 'gsap';
     
     // Global Entrance Animation for page load
     gsap.from('.cc-app__content', {

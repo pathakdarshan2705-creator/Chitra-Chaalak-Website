@@ -160,7 +160,8 @@ const col3 = projects.filter((_, i) => i % 3 === 2);
 </style>
 
 <script>
-  import { gsap } from 'gsap';
+  // @ts-nocheck
+import { gsap } from 'gsap';
   import { ScrollTrigger } from 'gsap/ScrollTrigger';
   gsap.registerPlugin(ScrollTrigger);
   

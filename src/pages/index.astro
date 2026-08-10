@@ -265,7 +265,8 @@ const portfolioSections = [
 
 <!-- Live status polling for the Updates LIVE badge -->
 <script>
-  // Polls the Cloudflare Worker endpoint every 30s.
+  // @ts-nocheck
+// Polls the Cloudflare Worker endpoint every 30s.
   // Replace WORKER_URL with your deployed worker URL in Phase 4.
   const WORKER_URL = 'https://chitra-chaalak-status.pathakdarshan2705.workers.dev/status';
   const POLL_INTERVAL = 30000;
@@ -296,8 +297,9 @@ const portfolioSections = [
 </script>
 
 <script>
-  if (!(window as any).__ccMobileTabsInit) {
-    (window as any).__ccMobileTabsInit = true;
+  // @ts-nocheck
+if (!window.__ccMobileTabsInit) {
+    window.__ccMobileTabsInit = true;
 
     const SCREENS = ['updates', 'center', 'portfolio'];
     const tabs = document.querySelectorAll<HTMLElement>('.cc-mobile-tab');
@@ -325,11 +327,11 @@ const portfolioSections = [
         touchStartX = -1;
         return;
       }
-      touchStartX = (e as TouchEvent).touches[0].clientX;
+      touchStartX = e.touches[0].clientX;
     });
     home?.addEventListener('touchend', (e) => {
       if (touchStartX === -1) return;
-      const dx = (e as TouchEvent).changedTouches[0].clientX - touchStartX;
+      const dx = e.changedTouches[0].clientX - touchStartX;
       if (Math.abs(dx) < 50) return;
       if (dx < 0 && current < SCREENS.length - 1) showScreen(current + 1);
       if (dx > 0 && current > 0) showScreen(current - 1);

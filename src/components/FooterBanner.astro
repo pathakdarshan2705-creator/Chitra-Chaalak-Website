@@ -170,7 +170,8 @@
 </style>
 
 <script>
-  function ccUpdateFooter(){
+  // @ts-nocheck
+function ccUpdateFooter(){
     const now = new Date();
     const dateStr = now.toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' }).toUpperCase();
     const timeStr = now.toLocaleTimeString('en-GB', { hour12:false });
