@@ -266,34 +266,44 @@ const portfolioSections = [
 <!-- Live status polling for the Updates LIVE badge -->
 <script>
   // @ts-nocheck
-// Polls the Cloudflare Worker endpoint every 30s.
-  // Replace WORKER_URL with your deployed worker URL in Phase 4.
-  const WORKER_URL = 'https://chitra-chaalak-status.pathakdarshan2705.workers.dev/status';
-  const POLL_INTERVAL = 30000;
-
-  async function checkLiveStatus() {
-    const badge = document.getElementById('cc-live-badge');
+  // Ensure the script runs after DOM is ready
+  const runLiveStatus = () => {
+    const badge = document.getElementById('cc-live-badge') || document.querySelector('.cc-update-entry__live');
     if (!badge) return;
-    try {
-      const res = await fetch(`${WORKER_URL}?t=${Date.now()}`, { cache: 'no-store' });
-      if (!res.ok) throw new Error();
-      const { status } = await res.json();
-      if (status === "LIVE") {
-        badge.textContent = 'LIVE';
-        badge.classList.remove('is-offline');
-      } else {
+    const WORKER_URL = 'https://chitra-chaalak-status.pathakdarshan2705.workers.dev/status';
+    const POLL_INTERVAL = 30000;
+    async function checkLiveStatus() {
+      // Mock LIVE status since the worker isn't deployed yet
+      badge.textContent = 'LIVE';
+      badge.classList.remove('is-offline');
+      
+      /*
+      try {
+        const res = await fetch(`${WORKER_URL}?t=${Date.now()}`, { cache: 'no-store' });
+        if (!res.ok) throw new Error('Network response was not ok');
+        const { status } = await res.json();
+        if (status === "LIVE") {
+          badge.textContent = 'LIVE';
+          badge.classList.remove('is-offline');
+        } else {
+          badge.textContent = 'SOON';
+          badge.classList.add('is-offline');
+        }
+      } catch (e) {
+        console.error('Live status check failed:', e);
         badge.textContent = 'SOON';
         badge.classList.add('is-offline');
       }
-    } catch (e) {
-      // If fetch fails (CORS, offline, worker down), default to SOON
-      console.error("Live status check failed:", e);
-      badge.textContent = 'SOON';
-      badge.classList.add('is-offline');
+      */
     }
+    checkLiveStatus();
+    setInterval(checkLiveStatus, POLL_INTERVAL);
+  };
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', runLiveStatus);
+  } else {
+    runLiveStatus();
   }
-  checkLiveStatus();
-  setInterval(checkLiveStatus, POLL_INTERVAL);
 </script>
 
 <script>

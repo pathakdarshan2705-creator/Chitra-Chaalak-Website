@@ -103,18 +103,12 @@ const defaultImage = projects.length > 0 ? projects[0].data.image : '';
 
   .cc-design-row {
     cursor: pointer;
-    transition: opacity 0.3s ease;
     border-bottom: 1px solid var(--blue-panel-light);
-    opacity: 0.5;
+    opacity: 1;
   }
 
   .cc-design-row:last-child {
     border-bottom: none;
-  }
-
-  /* Only change opacity on hover, keep text white to balance everything */
-  .cc-design-row.is-active, .cc-design-row:hover {
-    opacity: 1;
   }
 
   .cc-design-row td {
@@ -133,6 +127,10 @@ const defaultImage = projects.length > 0 ? projects[0].data.image : '';
     gap: 12px;
   }
 
+  .cc-design-row.is-active .cc-col-title, .cc-design-row:hover .cc-col-title {
+    color: var(--yellow);
+  }
+
   .cc-design-number {
     font-size: 14px;
     color: var(--yellow);
@@ -142,10 +140,6 @@ const defaultImage = projects.length > 0 ? projects[0].data.image : '';
   .cc-col-cat, .cc-col-date {
     font-size: 14px;
     color: var(--blue-panel-light);
-  }
-
-  .cc-design-row.is-active .cc-col-title, .cc-design-row:hover .cc-col-title {
-    color: var(--yellow);
   }
   
   @media (max-width: 900px) {
@@ -179,7 +173,8 @@ import { gsap } from 'gsap';
     opacity: 0,
     duration: 0.8,
     stagger: 0.1,
-    ease: "power2.out"
+    ease: "power2.out",
+    clearProps: "all"
   });
 
   const rows = document.querySelectorAll('.cc-design-row');
