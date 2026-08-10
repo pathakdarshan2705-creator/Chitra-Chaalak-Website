@@ -177,6 +177,24 @@ const timeStr = post.data.time || '09:15 AM';
     overflow: hidden;
   }
 
+  @media (max-width: 900px) {
+    .cc-blog-layout {
+      grid-template-columns: 1fr;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      padding-bottom: 60px;
+      display: flex;
+      flex-direction: column;
+    }
+    .cc-blog-layout > .cc-col {
+      height: auto;
+      overflow: visible;
+    }
+    .cc-blog-main__scroll-area {
+      overflow: visible;
+    }
+  }
+
   .cc-col {
     min-width: 0; 
     height: 100%;

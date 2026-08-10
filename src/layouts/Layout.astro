@@ -53,13 +53,31 @@ const { title } = Astro.props;
 
   <script>
     import { gsap } from 'gsap';
-    // Global Entrance Animation to prevent the static feeling
+    import { ScrollTrigger } from 'gsap/ScrollTrigger';
+    gsap.registerPlugin(ScrollTrigger);
+
+    // Global Entrance Animation for page load
     gsap.from('.cc-app__content', {
       opacity: 0,
-      y: 20,
+      y: 15,
       duration: 0.8,
       ease: "power2.out",
       clearProps: "all"
+    });
+
+    // Animate panels and cards as they scroll into view (especially for mobile!)
+    gsap.utils.toArray('.cc-panel, .cc-card, .cc-film-card, .cc-photo-card, .cc-blog-main__body, .cc-project-markdown').forEach((el: any) => {
+      gsap.from(el, {
+        opacity: 0,
+        y: 25,
+        duration: 0.8,
+        ease: "power2.out",
+        scrollTrigger: {
+          trigger: el,
+          start: "top 95%", // triggers just before it comes into view
+          toggleActions: "play none none reverse"
+        }
+      });
     });
   </script>
 </body>

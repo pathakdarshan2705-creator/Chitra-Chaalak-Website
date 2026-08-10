@@ -259,13 +259,13 @@ button{
     color: var(--navy-deep);
   }
 
-  .cc-col {
+  .cc-home .cc-col {
     display: none !important;
     flex: 1;
     min-height: 0;
     grid-column: unset !important;
   }
-  .cc-col.is-active-mobile {
+  .cc-home .cc-col.is-active-mobile {
     display: flex !important;
   }
 
