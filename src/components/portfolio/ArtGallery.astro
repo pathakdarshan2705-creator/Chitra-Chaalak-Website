@@ -110,13 +110,34 @@ const { projects } = Astro.props;
     opacity: 1;
     transform: translateY(0) rotate(2deg);
   }
+  @media (max-width: 768px) {
+    .cc-art-canvas {
+      flex-direction: column;
+      flex-wrap: nowrap;
+      gap: 60px;
+      padding: 40px 20px 80px 20px;
+    }
+    .cc-art-piece {
+      width: 100% !important;
+      max-width: 320px;
+      transform: none !important;
+      margin: 0 !important;
+    }
+    .cc-art-label {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
 </style>
 
 <script>
   import { gsap } from 'gsap';
   import { Draggable } from 'gsap/Draggable';
-  gsap.registerPlugin(Draggable);
+  import { ScrollTrigger } from 'gsap/ScrollTrigger';
+  gsap.registerPlugin(Draggable, ScrollTrigger);
   
+  const isMobile = window.matchMedia('(max-width: 768px)').matches;
+
   // Entrance animation
   gsap.from('.cc-art-piece', {
     scale: 0.8,
@@ -127,36 +148,49 @@ const { projects } = Astro.props;
     ease: "back.out(1.5)"
   });
 
-  // Official GSAP Draggable Logic
-  Draggable.create('.cc-art-piece', {
-    type: 'x,y',
-    edgeResistance: 0.85,
-    bounds: '.cc-art-gallery', // Prevents going out of the screen
-    onPress: function() {
-      // Bring to front
-      gsap.to(this.target, { scale: 1.1, zIndex: 50, duration: 0.2 });
-    },
-    onRelease: function() {
-      gsap.to(this.target, { scale: 1.05, zIndex: 20, duration: 0.2 });
-    },
-    onClick: function(e) {
-      // If they just clicked (no drag), let them navigate
-      if (this.pointerEvent && this.pointerEvent.defaultPrevented) return;
-      const href = this.target.getAttribute('href');
-      if (href) window.location.href = href;
-    }
-  });
+  if (!isMobile) {
+    // Official GSAP Draggable Logic (Desktop only)
+    Draggable.create('.cc-art-piece', {
+      type: 'x,y',
+      edgeResistance: 0.85,
+      bounds: '.cc-art-gallery',
+      onPress: function() {
+        gsap.to(this.target, { scale: 1.1, zIndex: 50, duration: 0.2 });
+      },
+      onRelease: function() {
+        gsap.to(this.target, { scale: 1.05, zIndex: 20, duration: 0.2 });
+      },
+      onClick: function(e) {
+        if (this.pointerEvent && this.pointerEvent.defaultPrevented) return;
+        const href = this.target.getAttribute('href');
+        if (href) window.location.href = href;
+      }
+    });
 
-  // Prevent default <a> behavior so Draggable controls it
-  document.querySelectorAll('.cc-art-piece').forEach(el => {
-    el.addEventListener('click', e => e.preventDefault());
-    
-    // Add custom hover scale using GSAP instead of CSS !important
-    el.addEventListener('mouseenter', () => {
-      if (!Draggable.get(el)?.isDragging) gsap.to(el, { scale: 1.05, duration: 0.2 });
+    // Prevent default <a> behavior so Draggable controls it
+    document.querySelectorAll('.cc-art-piece').forEach(el => {
+      el.addEventListener('click', e => e.preventDefault());
+      el.addEventListener('mouseenter', () => {
+        if (!Draggable.get(el)?.isDragging) gsap.to(el, { scale: 1.05, duration: 0.2 });
+      });
+      el.addEventListener('mouseleave', () => {
+        if (!Draggable.get(el)?.isDragging) gsap.to(el, { scale: 1, duration: 0.2 });
+      });
     });
-    el.addEventListener('mouseleave', () => {
-      if (!Draggable.get(el)?.isDragging) gsap.to(el, { scale: 1, duration: 0.2 });
+  } else {
+    // Mobile Parallax
+    gsap.utils.toArray('.cc-art-piece').forEach((piece: any, i) => {
+      gsap.to(piece, {
+        yPercent: -20,
+        ease: "none",
+        scrollTrigger: {
+          trigger: piece,
+          scroller: '.cc-inner-content', // This is the scroll container on inner pages
+          start: "top bottom",
+          end: "bottom top",
+          scrub: true
+        }
+      });
     });
-  });
+  }
 </script>
