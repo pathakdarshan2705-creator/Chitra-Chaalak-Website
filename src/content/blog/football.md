@@ -2,7 +2,7 @@
 title: "Leo Messi"
 date: 2026-08-05
 topic: "ESSAY"
-image: "/images/cassette-shop.jpg"
+image: "/images/placeholder.png"
 imageAlt: "Old cassette shop in Mumbai"
 excerpt: "A dusty shop near the station where every cassette still played."
 ---
