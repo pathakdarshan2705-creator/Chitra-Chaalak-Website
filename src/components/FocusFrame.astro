@@ -45,42 +45,41 @@
 </style>
 
 <script>
-  if (!(window as any).__ccFocusFrameInit) {
-    (window as any).__ccFocusFrameInit = true;
+  if (!window.__ccFocusFrameInit) {
+    window.__ccFocusFrameInit = true;
 
     const frame = document.getElementById('cc-focus-frame');
     if (frame) {
       const TARGETS = '.cc-card, .cc-btn, .cc-icon-btn, .cc-panel__viewall, .cc-contact-panel__list a';
-      let current: Element | null = null;
+      let current = null;
 
-      function place(el: HTMLElement) {
+      function place(el) {
         const r = el.getBoundingClientRect();
         const pad = 5;
-        frame!.style.width = `${r.width + pad * 2}px`;
-        frame!.style.height = `${r.height + pad * 2}px`;
-        frame!.style.transform = `translate(${r.left - pad}px, ${r.top - pad}px)`;
-        frame!.classList.add('is-active', 'is-locking');
-        setTimeout(() => frame!.classList.remove('is-locking'), 250);
+        frame.style.width = `${r.width + pad * 2}px`;
+        frame.style.height = `${r.height + pad * 2}px`;
+        frame.style.transform = `translate(${r.left - pad}px, ${r.top - pad}px)`;
+        frame.classList.add('is-active', 'is-locking');
+        setTimeout(() => frame.classList.remove('is-locking'), 250);
       }
 
       document.addEventListener('mouseover', (e) => {
-        const target = (e.target as HTMLElement).closest(TARGETS);
+        const target = e.target.closest(TARGETS);
         if (!target || target === current) return;
         current = target;
-        place(target as HTMLElement);
+        place(target);
       });
 
       document.addEventListener('mouseout', (e) => {
-        const related = (e as MouseEvent).relatedTarget as HTMLElement | null;
+        const related = e.relatedTarget;
         if (related && related.closest(TARGETS)) return;
-        if (!(e.target as HTMLElement).closest(TARGETS)) return;
+        if (!e.target.closest(TARGETS)) return;
         current = null;
-        frame!.classList.remove('is-active');
+        frame.classList.remove('is-active');
       });
 
-      // keep the frame glued to its target while scrolling within a section
       document.addEventListener('scroll', () => {
-        if (current) place(current as HTMLElement);
+        if (current) place(current);
       }, true);
     }
   }

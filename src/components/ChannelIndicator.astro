@@ -51,8 +51,8 @@
 </style>
 
 <script>
-  if (!(window as any).__ccChannelIndicatorInit) {
-    (window as any).__ccChannelIndicatorInit = true;
+  if (!window.__ccChannelIndicatorInit) {
+    window.__ccChannelIndicatorInit = true;
 
     const badge = document.getElementById('cc-channel-indicator');
     const groupEl = document.getElementById('cc-channel-group');
@@ -60,9 +60,9 @@
     if (!badge || !groupEl || !numEl) {
       // guard clause only — nothing to init
     } else {
-      let lastShown: Element | null = null;
+      let lastShown = null;
 
-      function flash(card: HTMLElement) {
+      function flash(card) {
         if (card === lastShown) return; // don't re-flash the same card twice in a row
         lastShown = card;
 
@@ -72,28 +72,24 @@
         );
         const index = siblings.indexOf(card) + 1;
 
-        groupEl!.textContent = group;
-        numEl!.textContent = String(index).padStart(2, '0');
+        groupEl.textContent = group;
+        numEl.textContent = String(index).padStart(2, '0');
 
-        badge!.classList.remove('is-visible');
-        void badge!.offsetWidth; // force reflow so the animation restarts
-        badge!.classList.add('is-visible');
+        badge.classList.remove('is-visible');
+        void badge.offsetWidth; // force reflow so the animation restarts
+        badge.classList.add('is-visible');
       }
 
       const observer = new MutationObserver((mutations) => {
         for (const m of mutations) {
-          const el = m.target as HTMLElement;
+          const el = m.target;
           if (el.classList?.contains('cc-card') && el.classList.contains('is-selected')) {
             flash(el);
           }
         }
       });
 
-      observer.observe(document.body, {
-        subtree: true,
-        attributes: true,
-        attributeFilter: ['class'],
-      });
+      observer.observe(document.body, { attributes: true, attributeFilter: ['class'], subtree: true });
     }
   }
 </script>

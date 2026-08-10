@@ -105,11 +105,12 @@ const defaultImage = projects.length > 0 ? projects[0].data.image : '';
     cursor: pointer;
     transition: all 0.3s ease;
     border-bottom: 1px solid rgba(103, 200, 255, 0.1);
-    opacity: 1; /* Made consistent */
+    opacity: 0.5;
   }
 
   .cc-design-row.is-active, .cc-design-row:hover {
     background: rgba(103, 200, 255, 0.05);
+    opacity: 1;
   }
 
   .cc-design-row td {
@@ -123,13 +124,15 @@ const defaultImage = projects.length > 0 ? projects[0].data.image : '';
     color: var(--blue-lightest);
     text-transform: uppercase;
     transition: color 0.3s ease, transform 0.3s ease;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
   }
 
   .cc-design-number {
     font-size: 14px;
     color: var(--yellow);
-    margin-right: 10px;
-    vertical-align: top;
+    margin-top: 4px;
   }
 
   .cc-col-cat, .cc-col-date {
@@ -143,12 +146,23 @@ const defaultImage = projects.length > 0 ? projects[0].data.image : '';
   
   @media (max-width: 900px) {
     .cc-design-split { flex-direction: column; }
-    .cc-design-right { display: none; /* Hide preview on mobile */ }
-    .cc-design-left { padding: 20px; }
-    .cc-col-title { font-size: 16px; white-space: normal; }
-    .cc-design-table { display: block; overflow-x: hidden; }
-    .cc-design-table th { padding: 10px; }
-    .cc-design-row td { padding: 20px 10px; }
+    .cc-design-right { display: none; }
+    .cc-design-left { padding: 0 20px 40px; }
+    .cc-design-table, .cc-design-table tbody, .cc-design-table tr, .cc-design-table td {
+      display: block;
+      width: 100%;
+    }
+    .cc-design-table thead { display: none; }
+    .cc-design-row {
+      padding: 24px 0;
+      border-bottom: 1px solid rgba(103, 200, 255, 0.2);
+    }
+    .cc-design-row td {
+      padding: 4px 0;
+      text-align: left;
+    }
+    .cc-col-title { font-size: 20px; white-space: normal; margin-bottom: 8px; display: block; color: var(--blue-lightest) !important; }
+    .cc-col-cat, .cc-col-date { font-size: 14px; display: inline-block; margin-right: 12px; }
   }
 </style>
 

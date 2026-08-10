@@ -36,14 +36,10 @@
     import('gsap').then(({ gsap }) => {
       const TARGETS = '.cc-card, .cc-cassette, .cc-slideshow, .cc-update-entry';
       const MAX_TILT = 6; // degrees — subtle, not cartoonish
-      const registry = new WeakMap<HTMLElement, {
-        rotX: ReturnType<typeof gsap.quickTo>;
-        rotY: ReturnType<typeof gsap.quickTo>;
-        glare: HTMLElement;
-      }>();
+      const registry = new WeakMap();
 
-      function ensureGlare(el: HTMLElement): HTMLElement {
-        let glare = el.querySelector<HTMLElement>('.cc-tilt-glare');
+      function ensureGlare(el) {
+        let glare = el.querySelector('.cc-tilt-glare');
         if (!glare) {
           glare = document.createElement('div');
           glare.className = 'cc-tilt-glare';
@@ -52,8 +48,8 @@
         return glare;
       }
 
-      function setup(el: HTMLElement) {
-        if (registry.has(el)) return registry.get(el)!;
+      function setup(el) {
+        if (registry.has(el)) return registry.get(el);
         const rotX = gsap.quickTo(el, 'rotationX', { duration: 0.4, ease: 'power2.out' });
         const rotY = gsap.quickTo(el, 'rotationY', { duration: 0.4, ease: 'power2.out' });
         gsap.set(el, { transformPerspective: 700, transformOrigin: 'center' });

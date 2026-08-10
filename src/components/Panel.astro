@@ -222,15 +222,15 @@ const {
   if (!(window as any).__ccPanelControlsInit) {
     (window as any).__ccPanelControlsInit = true;
 
-    function cardsInGroup(group: string): HTMLElement[] {
+    function cardsInGroup(group) {
       return Array.from(document.querySelectorAll(`.cc-card[data-group="${group}"]`));
     }
 
-    function selectedInGroup(group: string): HTMLElement | null {
+    function selectedInGroup(group) {
       return document.querySelector(`.cc-card[data-group="${group}"].is-selected`);
     }
 
-    function setSelected(group: string, card: HTMLElement) {
+    function setSelected(group, card) {
       cardsInGroup(group).forEach((el) => el.classList.remove('is-selected'));
       card.classList.add('is-selected');
       card.scrollIntoView({ block: 'nearest', behavior: 'smooth' });

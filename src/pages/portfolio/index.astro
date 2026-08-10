@@ -230,6 +230,12 @@ import Panel from '../../components/Panel.astro';
       height: 380px;
       flex: none;
     }
+    .cc-accordion-panel:hover .cc-accordion-title,
+    .cc-accordion-panel.is-expanded .cc-accordion-title {
+      font-size: 32px;
+      writing-mode: horizontal-tb;
+      transform: rotate(0deg);
+    }
   }
 </style>
 
@@ -246,24 +252,45 @@ import Panel from '../../components/Panel.astro';
     delay: 0.2
   });
 
-  // Single click to expand, double click (or second click) to navigate
   const panels = document.querySelectorAll('.cc-accordion-panel');
   let currentIndex = -1;
 
+  function playPopOutAndNavigate(panel) {
+    const href = panel.getAttribute('href');
+    gsap.to(panel, {
+      scale: 1.1,
+      y: -30,
+      opacity: 0,
+      duration: 0.6,
+      ease: "back.in(1.7)",
+      onComplete: () => {
+        if (href) window.location.href = href;
+      }
+    });
+    panels.forEach(p => {
+      if (p !== panel) gsap.to(p, { opacity: 0, duration: 0.4 });
+    });
+  }
+
   panels.forEach((panel, i) => {
+    // Explicit double-click listener
+    panel.addEventListener('dblclick', (e) => {
+      e.preventDefault();
+      playPopOutAndNavigate(panel);
+    });
+
     panel.addEventListener('click', (e) => {
+      e.preventDefault(); // always prevent default
+      
       if (!panel.classList.contains('is-expanded')) {
-        // Prevent navigation on first click
-        e.preventDefault();
-        
-        // Remove expanded class from all
+        // First click: Expand
         panels.forEach(p => p.classList.remove('is-expanded'));
-        
-        // Add expanded to this one
         panel.classList.add('is-expanded');
         currentIndex = i;
+      } else {
+        // Second click (slow double tap): Animate and navigate
+        playPopOutAndNavigate(panel);
       }
-      // If it IS expanded, let the default <a> behavior happen (navigate)
     });
   });
 
@@ -291,7 +318,23 @@ import Panel from '../../components/Panel.astro';
   if (enterBtn) {
     enterBtn.addEventListener('click', () => {
       if (currentIndex !== -1 && panels[currentIndex]) {
-        window.location.href = panels[currentIndex].getAttribute('href');
+        const href = panels[currentIndex].getAttribute('href');
+        const panel = panels[currentIndex];
+        
+        gsap.to(panel, {
+          scale: 1.1,
+          y: -30,
+          opacity: 0,
+          duration: 0.6,
+          ease: "back.in(1.7)",
+          onComplete: () => {
+            if (href) window.location.href = href;
+          }
+        });
+        
+        panels.forEach(p => {
+          if (p !== panel) gsap.to(p, { opacity: 0, duration: 0.4 });
+        });
       }
     });
   }

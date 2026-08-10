@@ -65,6 +65,10 @@ const col3 = projects.filter((_, i) => i % 3 === 2);
     overflow-x: hidden;
     padding: 100px 40px;
     background: var(--navy-deep);
+    scrollbar-width: none;
+  }
+  .cc-photo-gallery::-webkit-scrollbar {
+    display: none;
   }
 
   .cc-parallax-grid {
@@ -196,13 +200,14 @@ const col3 = projects.filter((_, i) => i % 3 === 2);
     opacity: 0,
     duration: 0.8,
     stagger: 0.1,
-    ease: "power2.out"
+    ease: "power2.out",
+    clearProps: "all"
   });
 
   // 3D Tilt Logic
   const grid = document.querySelector('.cc-parallax-grid') as HTMLElement;
   if (gallery && grid) {
-    gallery.addEventListener('mousemove', (e: any) => {
+    gallery.addEventListener('mousemove', (e) => {
       const rect = gallery.getBoundingClientRect();
       const x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
       const y = ((e.clientY - rect.top) / rect.height) * 2 - 1;

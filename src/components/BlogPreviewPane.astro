@@ -84,10 +84,10 @@ const { group = 'blog' } = Astro.props;
       step();
     }
 
-    function renderPreview(pane: HTMLElement, source: HTMLElement) {
-      const img = pane.querySelector('.cc-blog-preview__img') as HTMLImageElement | null;
-      const titleEl = pane.querySelector('.cc-blog-preview__title') as HTMLElement | null;
-      const metaEl = pane.querySelector('.cc-blog-preview__meta') as HTMLElement | null;
+    function renderPreview(pane, source) {
+      const img = pane.querySelector('.cc-blog-preview__img');
+      const titleEl = pane.querySelector('.cc-blog-preview__title');
+      const metaEl = pane.querySelector('.cc-blog-preview__meta');
       if (img) {
         img.classList.add('is-loading');
         img.src = source.dataset.image ?? '';

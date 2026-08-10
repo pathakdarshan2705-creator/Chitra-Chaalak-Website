@@ -36,6 +36,11 @@
   box-sizing:border-box;
 }
 
+/* Global Performance Tweaks for Animations */
+.cc-panel, .cc-card, .cc-film-card, .cc-photo-card, .cc-accordion-panel, .cc-design-row {
+  will-change: transform, opacity;
+}
+
 html, body{
   margin:0;
   padding:0;
