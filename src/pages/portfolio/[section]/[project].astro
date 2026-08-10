@@ -1,5 +1,5 @@
 ---
-import { getCollection } from 'astro:content';
+import { getCollection, render } from 'astro:content';
 import Layout from '../../../layouts/Layout.astro';
 
 export async function getStaticPaths() {
@@ -9,7 +9,7 @@ export async function getStaticPaths() {
     return {
       params: { 
         section: project.data.section,
-        project: project.slug 
+        project: project.id.split('/').pop()
       },
       props: { project }
     };
@@ -17,7 +17,7 @@ export async function getStaticPaths() {
 }
 
 const { project } = Astro.props;
-const { Content } = await project.render();
+const { Content } = await render(project);
 ---
 <Layout title={`${project.data.title} — ${project.data.section.toUpperCase()}`}>
   <div class="cc-project-page" id="project-page">
@@ -41,22 +41,40 @@ const { Content } = await project.render();
       </div>
     </div>
 
-    <div class="cc-project-content">
-      {project.data.youtubeId && (
-        <div class="cc-youtube-embed js-fade-up">
-          <iframe 
-            src={`https://www.youtube.com/embed/${project.data.youtubeId}?autoplay=0&showinfo=0&controls=1&rel=0`} 
-            title={project.data.title} 
-            frameborder="0" 
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-            allowfullscreen>
-          </iframe>
-        </div>
-      )}
+    {project.data.youtubeId && (
+      <div class="cc-project-video">
+        <iframe 
+          src={`https://www.youtube.com/embed/${project.data.youtubeId}?autoplay=1&mute=1&loop=1&playlist=${project.data.youtubeId}&controls=0&showinfo=0&rel=0`}
+          frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen>
+        </iframe>
+      </div>
+    )}
 
-      <div class="cc-project-desc js-fade-up">{project.data.description}</div>
-      <div class="cc-project-markdown js-fade-up">
-        <Content />
+    <div class="cc-project-content">
+      <div class="cc-project-grid">
+        <aside class="cc-project-sidebar js-fade-up">
+          {project.data.description && (
+            <div class="cc-project-desc">
+              {project.data.description}
+            </div>
+          )}
+          <div class="cc-project-meta-list">
+            <div class="cc-meta-item">
+              <span class="cc-meta-label">DISCIPLINE</span>
+              <span class="cc-meta-value">{project.data.section.toUpperCase()}</span>
+            </div>
+            <div class="cc-meta-item">
+              <span class="cc-meta-label">DATE</span>
+              <span class="cc-meta-value">{project.data.date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+            </div>
+          </div>
+        </aside>
+        
+        <div class="cc-project-markdown js-fade-up">
+          <Content />
+        </div>
       </div>
     </div>
   </div>
@@ -161,22 +179,53 @@ const { Content } = await project.render();
   .cc-meta-section { color: var(--yellow); font-weight: 700; }
 
   .cc-project-content {
-    max-width: 900px;
-    margin: 80px auto 0 auto;
+    max-width: 1200px;
+    margin: 100px auto 120px auto;
     padding: 0 40px;
     color: var(--blue-lightest);
     font-family: var(--font-body);
   }
 
+  .cc-project-grid {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 80px;
+    align-items: start;
+  }
+
   .cc-project-desc {
-    font-size: 28px;
-    font-weight: 600;
+    font-size: 22px;
+    font-weight: 400;
+    color: var(--blue-lightest);
+    line-height: 1.6;
+    margin-bottom: 40px;
+    padding-bottom: 40px;
+    border-bottom: 1px solid rgba(103, 200, 255, 0.15);
+  }
+
+  .cc-project-meta-list {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .cc-meta-item {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .cc-meta-label {
+    font-family: var(--font-ui);
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: var(--blue-panel-light);
+  }
+
+  .cc-meta-value {
+    font-size: 16px;
     color: var(--yellow);
-    margin-bottom: 60px;
-    line-height: 1.4;
-    font-style: italic;
-    border-left: 4px solid var(--yellow);
-    padding-left: 24px;
+    font-weight: 600;
   }
 
   .cc-project-markdown {
@@ -203,14 +252,14 @@ const { Content } = await project.render();
   }
 
   .cc-project-markdown :global(blockquote) {
-    font-size: 32px;
-    line-height: 1.3;
+    font-size: 28px;
+    line-height: 1.4;
     font-style: italic;
     color: #fff;
-    margin: 60px -40px;
-    padding: 40px;
-    background: rgba(103, 200, 255, 0.05);
-    border-left: 4px solid var(--yellow);
+    margin: 60px 0;
+    padding: 0 0 0 30px;
+    background: transparent;
+    border-left: 2px solid var(--yellow);
   }
   
   .cc-project-markdown :global(ul) {
@@ -221,11 +270,31 @@ const { Content } = await project.render();
     margin-bottom: 10px;
   }
   
-  @media (max-width: 768px) {
+  .cc-project-markdown :global(strong) {
+    color: var(--yellow);
+    font-weight: 700;
+  }
+  
+  @media (max-width: 900px) {
     .cc-hero-text { left: 20px; right: 20px; bottom: 40px; }
-    .cc-project-content { padding: 0 20px; margin-top: 40px; }
-    .cc-project-desc { font-size: 22px; margin-bottom: 40px; }
-    .cc-project-markdown :global(blockquote) { margin: 40px -20px; padding: 20px; font-size: 24px; }
+    .cc-project-content { padding: 0 20px; margin-top: 60px; }
+    .cc-project-grid {
+      grid-template-columns: 1fr;
+      gap: 40px;
+    }
+    .cc-project-desc {
+      border-bottom: none;
+      padding-bottom: 0;
+      margin-bottom: 30px;
+    }
+    .cc-project-meta-list {
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: 30px;
+      padding-bottom: 40px;
+      border-bottom: 1px solid rgba(103, 200, 255, 0.15);
+    }
+    .cc-project-markdown :global(blockquote) { margin: 40px 0; padding-left: 20px; font-size: 24px; }
   }
 </style>
 

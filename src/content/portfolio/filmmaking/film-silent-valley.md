@@ -15,10 +15,22 @@ The Silent Valley is a short documentary that explores the fading traditions of 
 
 We relied entirely on natural light. The harsh contrast between the snow-covered landscapes and the dark, soot-stained interiors of the cabins created a natural cinematic grade that required very little post-production manipulation.
 
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+
+## Challenges on Set
+
+Shooting in sub-zero temperatures presented unique challenges. Our main A-cam froze on day three, forcing us to shoot entirely on our B-cam for the remainder of the trip. 
+
+- Batteries died within 15 minutes of exposure to the cold.
+- Lenses had to be kept close to body heat to prevent internal fogging.
+- Audio recording was complicated by the extreme winds.
+
+> "The environment wasn't just a backdrop; it was an active antagonist to the production."
+
 ## Gear Used
-- ARRI Alexa Mini LF
-- Signature Primes (18mm, 35mm, 47mm)
-- Easyrig Vario 5
-- Tiffen Black Pro-Mist 1/4
+- **Camera**: ARRI Alexa Mini LF
+- **Lenses**: Signature Primes (18mm, 35mm, 47mm)
+- **Support**: Easyrig Vario 5
+- **Filters**: Tiffen Black Pro-Mist 1/4
 
 The film is currently on its festival run, picking up awards for Best Cinematography at the Indie Shorts Fest.

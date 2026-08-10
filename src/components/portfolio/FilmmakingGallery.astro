@@ -7,7 +7,7 @@ const { projects } = Astro.props;
 
   <div class="cc-film-track">
     {projects.map((project, i) => (
-      <a href={`/portfolio/filmmaking/${project.slug}`} class="cc-film-card">
+      <a href={`/portfolio/filmmaking/${project.id.split('/').pop()}`} class="cc-film-card">
         <div class="cc-film-number">SCENE {String(i + 1).padStart(2, '0')}</div>
         <div class="cc-film-image-wrapper">
           <img src={project.data.image} alt={project.data.title} class="cc-film-image" />

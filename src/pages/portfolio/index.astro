@@ -237,7 +237,9 @@ import Panel from '../../components/Panel.astro';
 
   // Single click to expand, double click (or second click) to navigate
   const panels = document.querySelectorAll('.cc-accordion-panel');
-  panels.forEach(panel => {
+  let currentIndex = -1;
+
+  panels.forEach((panel, i) => {
     panel.addEventListener('click', (e) => {
       if (!panel.classList.contains('is-expanded')) {
         // Prevent navigation on first click
@@ -248,8 +250,38 @@ import Panel from '../../components/Panel.astro';
         
         // Add expanded to this one
         panel.classList.add('is-expanded');
+        currentIndex = i;
       }
       // If it IS expanded, let the default <a> behavior happen (navigate)
     });
   });
+
+  // Sidebar Controls Logic
+  const selectBtns = document.querySelectorAll('[data-select-group="portfolio"]');
+  const enterBtn = document.querySelector('[data-enter-group="portfolio"]');
+
+  selectBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const dir = parseInt(btn.getAttribute('data-dir') || '1', 10);
+      
+      if (currentIndex === -1) {
+        currentIndex = dir === 1 ? 0 : panels.length - 1;
+      } else {
+        currentIndex = (currentIndex + dir + panels.length) % panels.length;
+      }
+      
+      panels.forEach(p => p.classList.remove('is-expanded'));
+      if (panels[currentIndex]) {
+        panels[currentIndex].classList.add('is-expanded');
+      }
+    });
+  });
+
+  if (enterBtn) {
+    enterBtn.addEventListener('click', () => {
+      if (currentIndex !== -1 && panels[currentIndex]) {
+        window.location.href = panels[currentIndex].getAttribute('href');
+      }
+    });
+  }
 </script>

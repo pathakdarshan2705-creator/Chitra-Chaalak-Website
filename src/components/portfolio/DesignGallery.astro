@@ -15,7 +15,7 @@ const defaultImage = projects.length > 0 ? projects[0].data.image : '';
       </thead>
       <tbody class="cc-design-tbody">
         {projects.map((project, i) => (
-          <tr class={`cc-design-row ${i === 0 ? 'is-active' : ''}`} data-image={project.data.image} onclick={`window.location.href='/portfolio/design/${project.slug}'`}>
+          <tr class={`cc-design-row ${i === 0 ? 'is-active' : ''}`} data-image={project.data.image} onclick={`window.location.href='/portfolio/design/${project.id.split('/').pop()}'`}>
             <td class="cc-col-title">
               <span class="cc-design-number">#</span>
               {project.data.title}
@@ -139,7 +139,6 @@ const defaultImage = projects.length > 0 ? projects[0].data.image : '';
 
   .cc-design-row.is-active .cc-col-title, .cc-design-row:hover .cc-col-title {
     color: var(--yellow);
-    transform: translateX(20px);
   }
   
   @media (max-width: 900px) {

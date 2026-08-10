@@ -4,7 +4,7 @@ const { projects } = Astro.props;
 <div class="cc-art-gallery">
   <div class="cc-art-canvas">
     {projects.map((project, i) => (
-      <a href={`/portfolio/art/${project.slug}`} class={`cc-art-piece cc-art-piece--${i % 4}`}>
+      <a href={`/portfolio/art/${project.id.split('/').pop()}`} class={`cc-art-piece cc-art-piece--${i % 4}`}>
         <div class="cc-art-img-wrapper">
           <img src={project.data.image} alt={project.data.title} class="cc-art-img" />
         </div>
