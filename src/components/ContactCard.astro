@@ -3,24 +3,27 @@
 
 import Icon from './Icons.astro';
 const links = [
-  { label: 'Instagram', href: 'https://instagram.com/yourhandle' },
-  { label: 'Email', href: 'mailto:you@example.com' },
-  { label: 'LinkedIn', href: 'https://linkedin.com/in/yourhandle' },
-  { label: 'Behance', href: 'https://behance.net/yourhandle' },
+  { label: 'Instagram', href: 'https://instagram.com/chitra_chaalak' },
+  { label: 'Email', href: 'mailto:pathakdarshan2705@gmail.com' },
+  { label: 'LinkedIn', href: 'https://linkedin.com/in/darshan-pathak-9a7754223' },
+  { label: 'Behance', href: 'https://www.behance.net/darshanpathak' },
 ];
 ---
 <div class="cc-contact-panel">
   <div class="cc-contact-panel__header">
     <span class="cc-contact-panel__arrow"><Icon name="arrow" size={14} /></span>
-    <span class="cc-contact-panel__title">Get in Touch</span>
+    <span class="cc-contact-panel__title">Get in Touch <span class="pulse-dot"></span></span>
     <span class="cc-contact-panel__phone"><Icon name="phone" size={14} /></span>
   </div>
   <ul class="cc-contact-panel__list">
     {links.map(link => (
       <li>
-        <a href={link.href} target="_blank" rel="noopener noreferrer">
+        <a href={link.href} target="_blank" rel="noopener noreferrer" class="contact-link">
           <span class="cc-contact-panel__bullet"><Icon name="triangle" size={10} /></span>
-          {link.label}
+          <span class="contact-text">{link.label}</span>
+          <span class="contact-indicator">
+            <Icon name={link.label.toLowerCase() as any} size={14} />
+          </span>
         </a>
       </li>
     ))}
@@ -38,6 +41,7 @@ const links = [
       inset -1px -1px 0 rgba(0,10,40,0.4);
     clip-path: polygon(0 0, calc(100% - var(--notch)) 0, 100% var(--notch), 100% 100%, 0 100%);
     flex-shrink: 0;
+    overflow: hidden;
   }
   .cc-contact-panel__header {
     display: flex;
@@ -47,6 +51,7 @@ const links = [
     color: var(--navy-deep);
     padding: 6px 12px;
     padding-right: calc(var(--notch) + 8px);
+    position: relative;
   }
   .cc-contact-panel__arrow, .cc-contact-panel__phone { display:flex; align-items:center; flex-shrink:0; }
   .cc-contact-panel__title {
@@ -56,28 +61,95 @@ const links = [
     letter-spacing: 1px;
     text-transform: uppercase;
     flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 6px;
   }
+  
+  .pulse-dot {
+    width: 6px;
+    height: 6px;
+    background-color: var(--navy-deep);
+    border-radius: 50%;
+    animation: pulse 1.5s infinite;
+  }
+
+  @keyframes pulse {
+    0% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.3; transform: scale(0.8); }
+    100% { opacity: 1; transform: scale(1); }
+  }
+
   .cc-contact-panel__list {
     list-style: none;
     margin: 0;
-    padding: 10px 14px;
+    padding: 6px;
     display: flex;
     flex-direction: column;
     gap: 2px;
   }
-  .cc-contact-panel__list a {
+  
+  .contact-link {
     display: flex;
     align-items: center;
     gap: 8px;
-    font-family: var(--font-body);
+    font-family: var(--font-ui);
     font-weight: 600;
-    font-size: clamp(13px,1.1vw,15px);
+    font-size: clamp(12px, 1vw, 13px);
     color: var(--blue-lightest);
-    padding: 5px 0;
-    border-bottom: 1px solid rgba(166,232,255,0.12);
-    transition: color 0.1s steps(2);
+    padding: 4px 10px;
+    border: 1px solid transparent;
+    transition: all 0.2s cubic-bezier(0.25, 1, 0.5, 1);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    position: relative;
+    overflow: hidden;
   }
-  .cc-contact-panel__list li:last-child a { border-bottom: none; }
-  .cc-contact-panel__list a:hover { color: var(--yellow); }
-  .cc-contact-panel__bullet { color: var(--yellow); flex-shrink:0; }
+
+  .contact-text {
+    flex-grow: 1;
+    transition: transform 0.2s ease;
+  }
+
+  .contact-indicator {
+    font-size: 10px;
+    opacity: 0;
+    transform: translateX(-10px);
+    transition: all 0.2s ease;
+    color: var(--navy-deep);
+  }
+
+  .cc-contact-panel__bullet { 
+    color: var(--yellow); 
+    flex-shrink:0; 
+    transition: transform 0.2s ease;
+  }
+
+  /* Hover Effects - Retro UI Selection */
+  .contact-link:hover { 
+    background: var(--yellow);
+    color: var(--navy-deep);
+    border-color: var(--navy-deep);
+    box-shadow: 4px 4px 0 var(--navy-deep);
+    transform: translate(-2px, -2px);
+  }
+
+  .contact-link:hover .cc-contact-panel__bullet {
+    color: var(--navy-deep);
+    transform: rotate(90deg);
+  }
+
+  .contact-link:hover .contact-text {
+    transform: translateX(4px);
+  }
+
+  .contact-link:hover .contact-indicator {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  
+  .contact-link:active {
+    transform: translate(0, 0);
+    box-shadow: 0px 0px 0 var(--navy-deep);
+  }
 </style>

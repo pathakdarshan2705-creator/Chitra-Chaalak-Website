@@ -2,7 +2,7 @@
 // Arrow and Info icons, plus a few others. Used in Card.astro and elsewhere.
 
 interface Props {
-  name: 'arrow' | 'info' | 'dots' | 'phone' | 'triangle' | 'chevron-up' | 'chevron-down';
+  name: 'arrow' | 'info' | 'dots' | 'phone' | 'triangle' | 'chevron-up' | 'chevron-down' | 'instagram' | 'email' | 'linkedin' | 'behance';
   size?: number;
 }
 const { name, size = 18 } = Astro.props;
@@ -51,5 +51,30 @@ const { name, size = 18 } = Astro.props;
 {name === 'chevron-down' && (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M5 9l7 7 7-7" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>
+)}
+
+{name === 'instagram' && (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M12 2c2.717 0 3.056.01 4.122.06 1.065.049 1.79.217 2.428.465.66.254 1.216.598 1.772 1.153.555.556.899 1.11 1.153 1.77.248.639.416 1.363.465 2.428.049 1.066.06 1.405.06 4.122 0 2.717-.01 3.056-.06 4.122-.049 1.065-.217 1.79-.465 2.428a4.88 4.88 0 01-1.153 1.772 4.915 4.915 0 01-1.77 1.153c-.639.248-1.363.416-2.428.465-1.066.049-1.405.06-4.122.06-2.717 0-3.056-.01-4.122-.06-1.065-.049-1.79-.217-2.428-.465a4.89 4.89 0 01-1.772-1.153 4.904 4.904 0 01-1.153-1.77c-.248-.639-.416-1.363-.465-2.428C2.013 15.056 2 14.717 2 12c0-2.717.01-3.056.06-4.122.049-1.065.217-1.79.465-2.428a4.88 4.88 0 011.153-1.772A4.897 4.897 0 015.45 2.525c.639-.248 1.363-.416 2.428-.465C8.944 2.013 9.283 2 12 2zm0 5.838a4.162 4.162 0 100 8.324 4.162 4.162 0 000-8.324zM12 14a2 2 0 110-4 2 2 0 010 4zm5.236-8.136a1.28 1.28 0 10-1.81-1.81 1.28 1.28 0 001.81 1.81z" fill="currentColor"/>
+  </svg>
+)}
+
+{name === 'email' && (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" fill="none" stroke="currentColor" stroke-width="2"/>
+    <path d="M2 6l10 7 10-7" fill="none" stroke="currentColor" stroke-width="2"/>
+  </svg>
+)}
+
+{name === 'linkedin' && (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14zm-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.32 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.79zM6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68zm1.39 9.94v-8.37H5.5v8.37h2.77z" fill="currentColor"/>
+  </svg>
+)}
+
+{name === 'behance' && (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M22 7h-7v-2h7v2zm1.726 10c-.442 1.297-2.029 3-5.101 3-3.074 0-5.564-1.819-5.564-5.676 0-3.162 2.3-5.432 5.677-5.432 3.398 0 5.271 2.015 5.271 5.053h-8.083c.121 1.631 1.442 2.373 2.768 2.373 1.558 0 2.285-.826 2.62-2.015h2.412zm-3.04-3.153c-.02-1.042-1.05-1.93-2.316-1.93-1.42 0-2.35.856-2.585 1.93h4.901zM7.525 7h-7.525v13h7.625c2.141 0 3.392-.81 3.931-2.122.38-.921.365-2.061-.131-2.922-.395-.683-1.07-1.191-2.019-1.411 1.684-.539 2.515-1.776 2.515-3.32 0-1.078-.506-2.028-1.398-2.57-1.134-.69-2.905-.655-2.998-.655zm.188 4.708h-2.593v-3.056h2.898c1.698 0 1.975 1.341 1.975 1.67 0 1.579-1.346 1.386-2.28 1.386zm.139 6.292h-2.732v-3.765h2.836c.866 0 2.357-.123 2.357 1.83 0 1.808-1.332 1.935-2.461 1.935z" fill="currentColor"/>
   </svg>
 )}
