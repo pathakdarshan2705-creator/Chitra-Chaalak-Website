@@ -50,5 +50,17 @@ const { title } = Astro.props;
     <div class="cc-app__footer-spacer"></div>
     <FooterBanner />
   </div>
+
+  <script>
+    import { gsap } from 'gsap';
+    // Global Entrance Animation to prevent the static feeling
+    gsap.from('.cc-app__content', {
+      opacity: 0,
+      y: 20,
+      duration: 0.8,
+      ease: "power2.out",
+      clearProps: "all"
+    });
+  </script>
 </body>
 </html>

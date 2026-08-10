@@ -153,6 +153,29 @@ const { projects } = Astro.props;
     transform: translateY(0);
     opacity: 1;
   }
+  
+  @media (max-width: 768px) {
+    .cc-film-card {
+      flex: 0 0 85vw;
+    }
+    .cc-film-title {
+      font-size: 20px;
+    }
+    .cc-film-desc {
+      font-size: 14px;
+    }
+    /* Show info on mobile without hover */
+    .cc-film-info {
+      transform: translateY(0);
+      opacity: 1;
+    }
+    .cc-film-image {
+      filter: grayscale(0%) sepia(0%);
+    }
+    .cc-film-overlay {
+      opacity: 0;
+    }
+  }
 </style>
 
 <script>

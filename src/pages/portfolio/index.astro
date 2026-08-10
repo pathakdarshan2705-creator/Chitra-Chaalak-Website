@@ -213,11 +213,22 @@ import Panel from '../../components/Panel.astro';
   @media (max-width: 768px) {
     .cc-accordion-container {
       flex-direction: column;
+      min-height: 100%;
+      height: auto;
     }
     .cc-accordion-title {
       writing-mode: horizontal-tb;
       transform: rotate(0deg);
-      font-size: 24px;
+      font-size: 28px;
+    }
+    .cc-accordion-panel {
+      min-height: 160px;
+      flex: none;
+    }
+    .cc-accordion-panel:hover,
+    .cc-accordion-panel.is-expanded {
+      height: 380px;
+      flex: none;
     }
   }
 </style>
