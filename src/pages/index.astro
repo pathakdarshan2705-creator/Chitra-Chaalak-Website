@@ -273,11 +273,6 @@ const portfolioSections = [
     const WORKER_URL = 'https://chitra-chaalak-status.pathakdarshan2705.workers.dev/status';
     const POLL_INTERVAL = 30000;
     async function checkLiveStatus() {
-      // Mock LIVE status since the worker isn't deployed yet
-      badge.textContent = 'LIVE';
-      badge.classList.remove('is-offline');
-      
-      /*
       try {
         const res = await fetch(`${WORKER_URL}?t=${Date.now()}`, { cache: 'no-store' });
         if (!res.ok) throw new Error('Network response was not ok');
@@ -294,7 +289,6 @@ const portfolioSections = [
         badge.textContent = 'SOON';
         badge.classList.add('is-offline');
       }
-      */
     }
     checkLiveStatus();
     setInterval(checkLiveStatus, POLL_INTERVAL);
