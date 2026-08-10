@@ -67,4 +67,16 @@ const tour = defineCollection({
   }),
 });
 
-export const collections = { blog, updates, films, portfolio, tour };
+const music = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/music' }),
+  schema: z.object({
+    title: z.string(),
+    artist: z.string(),
+    coverImage: z.string(),
+    year: z.string().optional(),
+    spotifyLink: z.string().optional(),
+    youtubeLink: z.string().optional(),
+  }),
+});
+
+export const collections = { blog, updates, films, portfolio, tour, music };

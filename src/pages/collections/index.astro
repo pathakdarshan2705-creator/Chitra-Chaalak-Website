@@ -1,0 +1,53 @@
+---
+// src/pages/collections/index.astro
+import Layout from '../../layouts/Layout.astro';
+import Panel from '../../components/Panel.astro';
+import SidebarNav from '../../components/SidebarNav.astro';
+import Card from '../../components/Card.astro';
+---
+
+<Layout title="Visual Collection">
+  <div class="cc-inner-layout">
+    <div class="cc-inner-layout__sidebar">
+      <SidebarNav
+        activePage="collections"
+        pageTitle="Collections"
+        pageDescription="A curated gallery of aesthetics, sounds, and inspirations."
+        controlGroup="collections"
+        infoTitle="Collections Hub"
+        infoMeta="Explore different collections."
+      />
+    </div>
+
+    <div class="cc-inner-content">
+      <Panel title="All Collections" showControls={false}>
+        <div class="cc-tour-page">
+          <div class="cc-card-list">
+            <Card
+              href="/collections/music"
+              title="Music Collection"
+              meta="ROTATION"
+              imageSrc="https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?q=80&w=600&auto=format&fit=crop"
+              group="collections"
+            />
+            <!-- In the future, add more cards here like Photography, Cameras, etc. -->
+          </div>
+        </div>
+      </Panel>
+    </div>
+  </div>
+</Layout>
+
+<style>
+  .cc-tour-page {
+    padding: 20px;
+    height: 100%;
+    overflow-y: auto;
+  }
+
+  .cc-card-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+</style>

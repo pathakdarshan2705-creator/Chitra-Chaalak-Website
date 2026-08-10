@@ -1,0 +1,68 @@
+---
+// src/pages/collections/music.astro
+import Layout from '../../layouts/Layout.astro';
+import Panel from '../../components/Panel.astro';
+import SidebarNav from '../../components/SidebarNav.astro';
+import MusicCollectionCard from '../../components/MusicCollectionCard.astro';
+import { getCollection } from 'astro:content';
+
+// Fetch music collection items from markdown files
+const allMusic = await getCollection('music');
+const musicCollection = allMusic.map(item => ({
+  title: item.data.title,
+  artist: item.data.artist,
+  coverImage: item.data.coverImage,
+  spotifyLink: item.data.spotifyLink,
+  youtubeLink: item.data.youtubeLink,
+  year: item.data.year
+}));
+---
+
+<Layout title="Music Collection">
+  <div class="cc-inner-layout">
+    <div class="cc-inner-layout__sidebar">
+      <SidebarNav
+        activePage="collections"
+        pageTitle="Music Collection"
+        pageDescription="Tracks and albums currently on heavy rotation. Hover to spin the vinyl."
+        controlGroup="music"
+        infoTitle="Music Collection"
+        infoMeta="Discover what's on my rotation."
+      />
+    </div>
+
+    <div class="cc-inner-content">
+      <Panel title="Music Collection" showControls={false}>
+        <div class="cc-music-page">
+          <div class="music-grid">
+            {musicCollection.map((item) => (
+              <MusicCollectionCard 
+                title={item.title}
+                artist={item.artist}
+                coverImage={item.coverImage}
+                spotifyLink={item.spotifyLink}
+                youtubeLink={item.youtubeLink}
+                year={item.year}
+              />
+            ))}
+          </div>
+        </div>
+      </Panel>
+    </div>
+  </div>
+</Layout>
+
+<style>
+  .cc-music-page {
+    padding: 20px;
+    height: 100%;
+    overflow-y: auto;
+  }
+
+  .music-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 40px 30px;
+    padding-bottom: 50px;
+  }
+</style>
