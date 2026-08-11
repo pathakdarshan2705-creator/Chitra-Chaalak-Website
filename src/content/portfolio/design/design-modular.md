@@ -2,7 +2,7 @@
 title: The Road to Somewhere
 section: design
 date: 2025-10-30
-image: /uploads/Pothole Poster ill.jpg
+image: /uploads/pothole-poster-ill.jpg
 description: A satirical colour study turning India's everyday potholes into a visual commentary on development, political promises, and who actually gets the smooth road.
 youtubeId: ''
 ---
@@ -75,7 +75,7 @@ The combination of illustration, headline, subheading and body copy allows the w
 
 ## **The Poster**
 
-![Poster on Potholes on Indian Road](/uploads/Pothole%20Poster.jpg)
+![Poster on Potholes on Indian Road](/uploads/pothole-poster.jpg)
 
 The final composition brings together the colour study, illustration, typography and written commentary into one deliberately overloaded visual scene.
 
