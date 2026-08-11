@@ -22,7 +22,10 @@ interface Props {
   variant?: 'default' | 'poster' | 'text';
 }
 
+import { Image } from 'astro:assets';
+
 const { href, title, meta, imageSrc = '', imageAlt = '', group, variant = 'default' } = Astro.props;
+const isRemote = imageSrc.startsWith('http');
 ---
 <div
   class={`cc-card cc-card--${variant}`}
@@ -37,7 +40,11 @@ const { href, title, meta, imageSrc = '', imageAlt = '', group, variant = 'defau
 >
   {variant !== 'text' && (
     <div class="cc-card__img">
-      <img src={imageSrc} alt={imageAlt} loading="lazy" />
+      {isRemote ? (
+        <Image src={imageSrc} alt={imageAlt} inferSize={true} />
+      ) : (
+        <img src={imageSrc} alt={imageAlt} loading="lazy" />
+      )}
     </div>
   )}
   <div class="cc-card__body">

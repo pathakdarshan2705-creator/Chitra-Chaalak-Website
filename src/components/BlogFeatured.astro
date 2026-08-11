@@ -13,11 +13,17 @@ interface Props {
   imageAlt?: string;
   href: string;
 }
+import { Image } from 'astro:assets';
 const { title, date, topic, excerpt, imageSrc, imageAlt = '', href } = Astro.props;
+const isRemote = imageSrc.startsWith('http');
 ---
 <div class="cc-blog-featured" id="cc-blog-featured" tabindex="0" role="button" data-href={href}>
   <div class="cc-blog-featured__img">
-    <img id="cc-blog-featured-img" src={imageSrc} alt={imageAlt} />
+    {isRemote ? (
+      <Image id="cc-blog-featured-img" src={imageSrc} alt={imageAlt} inferSize={true} />
+    ) : (
+      <img id="cc-blog-featured-img" src={imageSrc} alt={imageAlt} />
+    )}
   </div>
   <div class="cc-blog-featured__body">
     <div class="cc-blog-featured__title" id="cc-blog-featured-title">{title}</div>
