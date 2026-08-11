@@ -65,7 +65,7 @@ const {
 
   <div class="cc-sidebar__footer mobile-hidden">
     <div class="cc-sidebar__title">{pageTitle}</div>
-    <div class="cc-sidebar__desc">{pageDescription}</div>
+    <div class="cc-sidebar__desc" set:html={pageDescription}></div>
 
     {controlGroup && (
       <div class="cc-sidebar__controls">
