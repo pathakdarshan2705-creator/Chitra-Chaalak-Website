@@ -1,0 +1,75 @@
+---
+// src/components/SoundEffects.astro
+// Global UI sound effects powered by the Web Audio API.
+// Generates synthetic, zero-payload clicks that match the CRT aesthetic.
+---
+<script>
+  let audioCtx = null;
+  
+  async function initAudio() {
+    if (!audioCtx) {
+      // @ts-ignore
+      const AudioContext = window.AudioContext || window.webkitAudioContext;
+      if (AudioContext) {
+        audioCtx = new AudioContext();
+        console.log('AudioContext created');
+      }
+    }
+    if (audioCtx && audioCtx.state === 'suspended') {
+      await audioCtx.resume();
+      console.log('AudioContext resumed');
+    }
+  }
+
+  function playSound() {
+    if (!audioCtx) return;
+    
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    const filter = audioCtx.createBiquadFilter();
+    
+    osc.connect(filter);
+    filter.connect(gain);
+    gain.connect(audioCtx.destination);
+    
+    const now = audioCtx.currentTime;
+    
+    // Soft, muted, deep thud
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(150, now);
+    osc.frequency.exponentialRampToValueAtTime(40, now + 0.04);
+    
+    filter.type = 'lowpass';
+    filter.frequency.value = 300;
+    
+    gain.gain.setValueAtTime(0.12, now); // Low volume (12%)
+    gain.gain.linearRampToValueAtTime(0, now + 0.04);
+    
+    osc.start(now);
+    osc.stop(now + 0.04);
+  }
+
+  // Bind globally to document
+  document.addEventListener('click', async (e) => {
+    // Attempt to initialize on any user interaction (browser policy)
+    await initAudio();
+    
+    // @ts-ignore
+    const target = e.target.closest('a, button, .cc-card');
+    if (!target) return;
+    
+    // Play the single unified subtle thud
+    playSound();
+
+    // Delay hard navigation slightly so the sound actually has time to play
+    if (target.tagName === 'A' && target.href && !target.target && !e.metaKey && !e.ctrlKey) {
+      const isInternal = target.href.startsWith(window.location.origin) || target.getAttribute('href').startsWith('/');
+      if (isInternal && !target.classList.contains('hero-btn')) {
+        e.preventDefault();
+        setTimeout(() => {
+          window.location.href = target.href;
+        }, 80);
+      }
+    }
+  });
+</script>
