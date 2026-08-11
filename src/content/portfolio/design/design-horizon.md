@@ -1,32 +1,103 @@
 ---
-title: "UI System: Horizon"
+title: Citizen Kane - A Study in Type
 section: design
-date: 2026-02-12
-image: https://images.unsplash.com/photo-1558655146-d09347e92766?q=80&w=1500&auto=format&fit=crop
-description: A massive design system built for a fintech dashboard, focusing on data density and clarity.
+date: 2025-10-07
+image: /uploads/Poster 1.jpg
+description: A typographic exploration of Citizen Kane, using four posters to investigate how type, hierarchy, composition and information can become the visual language of a film.
+youtubeId: ''
 ---
 
-> "Data is just noise until it's formatted."
+> **What happens when typography becomes the image?**
 
-Horizon is a comprehensive UI kit and design system built specifically for financial traders who need to monitor hundreds of data points simultaneously without cognitive overload.
+A series of typographic explorations for _Citizen Kane_ (1941), created as part of a typography study. Instead of relying on conventional imagery, the project explores how type, composition, scale, hierarchy and movement can communicate the character of a film.
 
-## The Problem Space
+The four posters approach the same film from different directions: some treating typography as information, some as structure, and others pushing it towards becoming the primary visual element.
 
-Financial dashboards are notoriously cluttered. Traders need to see massive amounts of information at a glance, but the traditional approach of cramming every pixel with text leads to fatigue and crucial missed signals.
+## **The Brief**
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam in dui mauris. Vivamus hendrerit arcu sed erat molestie vehicula. Sed auctor neque eu tellus rhoncus ut eleifend nibh porttitor.
+The starting point was simple: **design posters for a film using typography as the central visual language.**
 
-## Color Palette & Typography
+Rather than creating one final poster, I wanted to use the exercise as an opportunity to explore how far a single film could be interpreted through type alone.
 
-We utilized a deep slate dark mode to reduce eye strain over 12-hour sessions, paired with neon data-viz accents (cyan, magenta, and chartreuse) to ensure critical alerts pop instantly.
+_Citizen Kane_ felt particularly appropriate because its story revolves around memory, power, identity, ambition and the search for meaning, ideas that could be approached visually without depending entirely on photographic imagery.
 
-- **Background**: `#0F172A` (Slate 900)
-- **Primary Text**: `#F8FAFC` (Slate 50)
-- **Accent (Bullish)**: `#4ADE80` (Green 400)
-- **Accent (Bearish)**: `#F87171` (Red 400)
+The challenge was to make each poster feel connected to the same film while giving each one its own visual logic.
 
-> "By stripping away the borders and relying purely on spatial grouping, we increased data density by 15% while actually reducing cognitive load."
+***
 
-## Component Library
+## **The Explorations**
 
-The entire system is component-driven, built on a strict 4px spacing scale. We delivered over 200 distinct components, including complex data grids, interactive sparklines, and modular widgets.
+The series gradually moved between two broad approaches: **functional typography** and **expressive typography**.
+
+The functional explorations treat information as the material: synopsis, cast, director, genre, duration and other film details become part of the composition itself.
+
+The expressive exploration takes a more visual approach, allowing words to stretch, rotate, collide and occupy space like an image.
+
+### **01 - Expressive Exploration**
+
+This poster pushes typography away from its usual role as a means of readable information and towards something more physical.
+
+Large words become forms within the composition, changing scale and perspective to create movement across the page. The text is still carrying information, but its arrangement becomes equally important to what the poster communicates.
+
+![Expressive type poster](/uploads/Expressive.jpg)
+
+***
+
+### **02 - Functional Exploration I**
+
+Here, the poster works more like a compact editorial page.
+
+The synopsis, film information, cast, and other details are arranged in a clear hierarchy, while the large ROSEBUD / CITIZEN KANE title serves as the main anchor of the composition.
+
+The intention was to see how much visual interest could be created through **typographic hierarchy alone**, without adding unnecessary graphic elements.
+
+![Functional Poster](/uploads/Functional%201.jpg)
+
+***
+
+### **03 - Functional Exploration II**
+
+The third exploration takes the same informational material but breaks away from a conventional grid.
+
+The information radiates from a central point, creating a composition where different pieces of the film like cast, director, language, duration, genre and synopsis, occupy their own spatial directions.
+
+The poster becomes less about reading from top to bottom and more about **moving through the information**.
+
+![Second functional poster](/uploads/Functional%202.jpg)
+
+***
+
+### **04** - **Poster Exploration**
+
+The final poster brings typography and imagery together more traditionally, while still keeping type as a major part of the visual identity.
+
+A restrained colour palette, large-scale title treatment and grainy photographic texture give it a slightly archival character, referencing the visual language of classic cinema while keeping the composition contemporary.
+
+![Film Poster](/uploads/Poster%201.jpg)
+
+***
+
+## **The Approach**
+
+I wanted the four posters to feel like **four different answers to the same question** rather than four unrelated designs.
+
+The project became an exercise in understanding when typography should simply communicate, when it can become an image, and when information itself can become the composition.
+
+I also deliberately kept the visual system restrained. The posters were designed in **A4, CMYK**, with a limited typographic system and subtle grain used to give the work a printed, slightly imperfect quality.
+
+> **“The type doesn't have to sit on the poster. Sometimes, it can become the poster.”**
+
+***
+
+## **Typography & Print**
+
+The project was developed with a deliberately limited typographic system rather than relying on multiple typefaces to create variety.
+
+- **Format:** A4
+- **Colour:** CMYK
+- **Typefaces:** Two typefaces
+- **Primary focus:** Typography, hierarchy & composition
+- **Texture:** Subtle grain / print texture
+- **Medium:** Digital design prepared with print in mind
+
+The limitation of using only two typefaces became an important part of the exercise. Instead of searching for another font whenever the composition needed something different, I had to find those differences through **scale, weight, spacing, alignment, orientation and placement**.
