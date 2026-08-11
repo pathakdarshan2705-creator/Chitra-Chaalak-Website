@@ -10,35 +10,195 @@ collections:
     label: Blog
     folder: /src/content/blog
     create: true
-
     fields:
       - name: title
         label: Title
         widget: string
-
       - name: date
         label: Date
         widget: datetime
         type: date
-
       - name: topic
         label: Topic
         widget: string
-
       - name: image
         label: Image
         widget: image
-
       - name: imageAlt
         label: Image Alt
         widget: string
         required: false
-
       - name: excerpt
         label: Excerpt
         widget: text
         required: false
+      - name: time
+        label: Time
+        widget: string
+        required: false
+      - name: tags
+        label: Tags
+        widget: list
+        required: false
+      - name: references
+        label: References
+        widget: list
+        required: false
+        fields:
+          - name: term
+            label: Term
+            widget: string
+          - name: description
+            label: Description
+            widget: text
+      - name: body
+        label: Content
+        widget: richtext
 
+  - name: updates
+    label: Updates
+    folder: /src/content/updates
+    create: true
+    fields:
+      - name: title
+        label: Title
+        widget: string
+      - name: date
+        label: Date
+        widget: datetime
+        type: date
+      - name: location
+        label: Location
+        widget: string
+        required: false
+      - name: excerpt
+        label: Excerpt
+        widget: text
+        required: false
+      - name: body
+        label: Content
+        widget: richtext
+
+  - name: films
+    label: Films
+    folder: /src/content/films
+    create: true
+    fields:
+      - name: title
+        label: Title
+        widget: string
+      - name: director
+        label: Director
+        widget: string
+      - name: year
+        label: Year
+        widget: number
+        value_type: int
+      - name: genre
+        label: Genre
+        widget: string
+      - name: cast
+        label: Cast
+        widget: string
+        required: false
+      - name: image
+        label: Image
+        widget: image
+      - name: excerpt
+        label: Excerpt
+        widget: text
+        required: false
+      - name: body
+        label: Content
+        widget: richtext
+
+  - name: portfolio
+    label: Portfolio
+    folder: /src/content/portfolio
+    create: true
+    fields:
+      - name: title
+        label: Title
+        widget: string
+      - name: section
+        label: Section
+        widget: string
+      - name: date
+        label: Date
+        widget: datetime
+        type: date
+      - name: image
+        label: Image
+        widget: image
+      - name: description
+        label: Description
+        widget: text
+      - name: youtubeId
+        label: YouTube ID
+        widget: string
+        required: false
+      - name: body
+        label: Content
+        widget: richtext
+
+  - name: tour
+    label: Tour
+    folder: /src/content/tour
+    create: true
+    fields:
+      - name: title
+        label: Title
+        widget: string
+      - name: date
+        label: Date
+        widget: datetime
+        type: date
+      - name: cover
+        label: Cover Image
+        widget: image
+        required: false
+      - name: gallery
+        label: Gallery
+        widget: list
+        field:
+          name: image
+          label: Image
+          widget: image
+        required: false
+      - name: excerpt
+        label: Excerpt
+        widget: text
+        required: false
+      - name: body
+        label: Content
+        widget: richtext
+
+  - name: music
+    label: Music
+    folder: /src/content/music
+    create: true
+    fields:
+      - name: title
+        label: Title
+        widget: string
+      - name: artist
+        label: Artist
+        widget: string
+      - name: coverImage
+        label: Cover Image
+        widget: image
+      - name: year
+        label: Year
+        widget: string
+        required: false
+      - name: spotifyLink
+        label: Spotify Link
+        widget: string
+        required: false
+      - name: youtubeLink
+        label: YouTube Link
+        widget: string
+        required: false
       - name: body
         label: Content
         widget: richtext
