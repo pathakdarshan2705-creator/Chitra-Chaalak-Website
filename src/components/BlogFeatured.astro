@@ -47,7 +47,7 @@ const { title, date, topic, excerpt, imageSrc, imageAlt = '', href } = Astro.pro
     width: 100%;
     aspect-ratio: 21 / 9;
     max-height: 280px;
-    background: var(--blue-panel-light);
+    background: var(--navy-deep); /* Changed from blue-panel-light to avoid weird cutouts */
     overflow: hidden;
   }
   .cc-blog-featured__img img{
@@ -58,16 +58,18 @@ const { title, date, topic, excerpt, imageSrc, imageAlt = '', href } = Astro.pro
   }
 
   .cc-blog-featured__body{
-    padding: 20px 24px;
+    padding: clamp(16px, 4vw, 24px); /* Fluid padding for mobile to desktop */
   }
 
   .cc-blog-featured__title{
     font-family: var(--font-ui);
     font-weight: 700;
-    font-size: clamp(20px, 2.2vw, 28px);
+    font-size: clamp(20px, 2.5vw, 28px);
+    line-height: 1.25;
     letter-spacing: 0.5px;
     color: var(--yellow);
-    margin-bottom: 6px;
+    margin-top: 0;
+    margin-bottom: 8px;
   }
 
   .cc-blog-featured__meta{
@@ -98,88 +100,32 @@ const { title, date, topic, excerpt, imageSrc, imageAlt = '', href } = Astro.pro
     text-transform: uppercase;
     background: var(--navy-deep);
     color: var(--blue-lightest);
-    padding: 10px 0;
-    border-top: 2px solid rgba(0,10,40,0.3);
+    padding: 12px;
+    border-top: 1px solid rgba(166,232,255,0.2);
     transition: background 0.1s steps(2), color 0.1s steps(2);
   }
-  .cc-blog-featured__enter:hover{ background: var(--yellow); color: var(--navy-deep); }
+  .cc-blog-featured__enter:hover{
+    background: var(--yellow);
+    color: var(--navy-deep);
+  }
 </style>
 
 <script>
   // @ts-nocheck
-if (!window.__ccBlogFeaturedInit) {
+  if (!window.__ccBlogFeaturedInit) {
     window.__ccBlogFeaturedInit = true;
-
-    document.addEventListener('cc:blog-date-select', ((e: CustomEvent) => {
-      const date: string = e.detail.date;
-      const posts = window.__ccBlogPosts as Record<string, {
-        title: string; dateDisplay: string; topic: string; excerpt: string; image: string; href: string;
-      }> | undefined;
-      if (!posts || !posts[date]) return;
-      const p = posts[date];
-
-      const img = document.getElementById('cc-blog-featured-img') as HTMLImageElement;
-      img.style.opacity = '0.3';
-      img.onload = () => { img.style.opacity = '1'; };
-      img.src = p.image;
-
-      document.getElementById('cc-blog-featured-title')!.textContent = p.title;
-      document.getElementById('cc-blog-featured-date')!.textContent = p.dateDisplay;
-      document.getElementById('cc-blog-featured-topic')!.textContent = p.topic;
-      document.getElementById('cc-blog-featured-excerpt')!.textContent = p.excerpt;
-      (document.getElementById('cc-blog-featured-enter') as HTMLAnchorElement).href = p.href;
-      document.getElementById('cc-blog-featured')!.setAttribute('data-href', p.href);
-
-      // also select the matching card in the grid below, if it's rendered
-      document.querySelectorAll('.cc-blog-grid-card').forEach((el) => {
-        el.classList.toggle('is-selected', el.dataset.href === p.href);
+    document.querySelectorAll('.cc-blog-featured').forEach((card) => {
+      card.addEventListener('click', (e) => {
+        if ((e.target as HTMLElement).tagName === 'A') return;
+        const href = (card as HTMLElement).dataset.href;
+        if (href) window.location.href = href;
       });
-    }) as EventListener);
-
-    // Double-click the featured card to open it — same channel-wipe
-    // as every other card on the site, via CardInteractions.astro's
-    // shared handler (this element just needs to look like a .cc-card
-    // for that to already work, but this dblclick listener is a direct
-    // fallback in case CardInteractions loads after this script).
-    const featured = document.getElementById('cc-blog-featured')!;
-    featured.classList.add('cc-card'); // opt into the shared interaction system
-    featured.addEventListener('dblclick', () => {
-      const href = featured.dataset.href;
-      if (!href || href === '#') return;
-      document.dispatchEvent(new CustomEvent('cc:channel-jump'));
-      setTimeout(() => { window.location.href = href; }, 320);
-    });
-
-    // Left/Right arrow keys step the featured card through available
-    // dates (reuses BlogCalendar's own available-dates list so it never
-    // lands on a day with no post), Enter opens whatever's showing.
-    document.addEventListener('keydown', (e) => {
-      const active = document.activeElement;
-      if (active && ['INPUT', 'TEXTAREA'].includes(active.tagName)) return;
-
-      const cal = document.getElementById('cc-cal');
-      if (!cal) return;
-      const available: string[] = JSON.parse(cal.dataset.available || '[]').sort();
-      if (!available.length) return;
-
-      if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
-        e.preventDefault();
-        const current = cal.dataset.selected || cal.dataset.initial!;
-        const idx = available.indexOf(current);
-        let next = idx + (e.key === 'ArrowRight' ? 1 : -1);
-        if (next < 0) next = available.length - 1;
-        if (next >= available.length) next = 0;
-        cal.dataset.selected = available[next];
-        document.dispatchEvent(new CustomEvent('cc:blog-date-select', { detail: { date: available[next] } }));
-      }
-
-      if (e.key === 'Enter') {
-        const href = featured.dataset.href;
-        if (href && href !== '#') {
-          document.dispatchEvent(new CustomEvent('cc:channel-jump'));
-          setTimeout(() => { window.location.href = href; }, 320);
+      card.addEventListener('keydown', (e) => {
+        if ((e as KeyboardEvent).key === 'Enter') {
+          const href = (card as HTMLElement).dataset.href;
+          if (href) window.location.href = href;
         }
-      }
+      });
     });
   }
 </script>

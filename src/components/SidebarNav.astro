@@ -47,7 +47,10 @@ const {
 ---
 <nav class="cc-sidebar">
   <button class="cc-sidebar__hamburger" id="cc-sidebar-hamburger" aria-label="Toggle navigation" aria-expanded="false">
-    <span></span><span></span><span></span>
+    <div class="cc-sidebar__hamburger-icon">
+      <span></span><span></span><span></span>
+    </div>
+    <span class="cc-sidebar__hamburger-title">{pageTitle}</span>
   </button>
   <div class="cc-sidebar__grid" id="cc-sidebar-grid">
     {NAV_ITEMS.map((item) => (
@@ -60,7 +63,7 @@ const {
     ))}
   </div>
 
-  <div class="cc-sidebar__footer">
+  <div class="cc-sidebar__footer mobile-hidden">
     <div class="cc-sidebar__title">{pageTitle}</div>
     <div class="cc-sidebar__desc">{pageDescription}</div>
 
@@ -181,11 +184,17 @@ const {
   .cc-sidebar__enter:hover{ background: var(--yellow); color: var(--navy-deep); }
 
   .cc-sidebar__hamburger{ display: none; } /* shown only on mobile — see global.css */
+
+  @media (max-width: 768px) {
+    .mobile-hidden {
+      display: none !important;
+    }
+  }
 </style>
 
 <script>
   // @ts-nocheck
-if (!window.__ccSidebarHamburgerInit) {
+  if (!window.__ccSidebarHamburgerInit) {
     window.__ccSidebarHamburgerInit = true;
     const btn = document.getElementById('cc-sidebar-hamburger');
     const grid = document.getElementById('cc-sidebar-grid');

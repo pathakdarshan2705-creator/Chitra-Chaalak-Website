@@ -9,7 +9,7 @@
   /* ---- color roles ---- */
   --navy-deep: #003b99;      /* page background */
   --blue-column: #0054cc;    /* column / section bg */
-  --blue-card: #1f6bff;      /* card fill, default */
+  --blue-card: #0a4bc4;      /* card fill, default - deepened for better contrast */
   --blue-card-hover: #2d83ff;/* card fill, hover */
   --blue-panel-light: #67c8ff; /* inner panel / border / chrome fill */
   --blue-lightest: #a6e8ff;  /* lightest — text on dark */
@@ -30,6 +30,15 @@
   --col-gap-right: 32px;
   --footer-height: 52px;
   --footer-bottom-margin: 24px;
+}
+
+@media (max-width: 768px) {
+  :root {
+    --page-margin-left: 16px;
+    --page-margin-right: 16px;
+    --col-gap-left: 16px;
+    --col-gap-right: 16px;
+  }
 }
 
 *, *::before, *::after{
@@ -274,6 +283,12 @@ button{
   }
   .cc-home .cc-col.is-active-mobile {
     display: flex !important;
+    animation: mobileTabFadeSlide 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  @keyframes mobileTabFadeSlide {
+    from { opacity: 0; transform: translateY(15px); }
+    to { opacity: 1; transform: translateY(0); }
   }
 
   /* The "Watch" screen (Film + Blog + Tour/Collections) has too much
@@ -390,9 +405,9 @@ button{
 
   .cc-sidebar__hamburger{
     display: flex !important;
-    flex-direction: column;
-    justify-content: center;
-    gap: 4px;
+    flex-direction: row; /* Changed to row to hold icon and title */
+    align-items: center;
+    gap: 12px;
     width: 100%;
     padding: 12px;
     background: var(--blue-card);
@@ -402,15 +417,34 @@ button{
       inset 0 0 0 3px var(--navy-deep);
     cursor: pointer;
   }
-  .cc-sidebar__hamburger span{
+  .cc-sidebar__hamburger-icon {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 4px;
+  }
+  .cc-sidebar__hamburger-icon span{
     width: 22px;
     height: 2px;
     background: var(--blue-lightest);
     transition: transform 0.15s ease-out, opacity 0.15s ease-out;
   }
-  .cc-sidebar__hamburger[aria-expanded="true"] span:nth-child(1){ transform: translateY(6px) rotate(45deg); }
-  .cc-sidebar__hamburger[aria-expanded="true"] span:nth-child(2){ opacity: 0; }
-  .cc-sidebar__hamburger[aria-expanded="true"] span:nth-child(3){ transform: translateY(-6px) rotate(-45deg); }
+  .cc-sidebar__hamburger-title {
+    font-family: var(--font-ui);
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 2px;
+    color: var(--blue-lightest);
+    text-shadow: 0 0 5px rgba(255, 255, 255, 0.2);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 1;
+    text-align: left;
+  }
+  .cc-sidebar__hamburger[aria-expanded="true"] .cc-sidebar__hamburger-icon span:nth-child(1){ transform: translateY(6px) rotate(45deg); }
+  .cc-sidebar__hamburger[aria-expanded="true"] .cc-sidebar__hamburger-icon span:nth-child(2){ opacity: 0; }
+  .cc-sidebar__hamburger[aria-expanded="true"] .cc-sidebar__hamburger-icon span:nth-child(3){ transform: translateY(-6px) rotate(-45deg); }
 
   .cc-sidebar__grid{
     grid-template-columns: repeat(2, 1fr) !important;
