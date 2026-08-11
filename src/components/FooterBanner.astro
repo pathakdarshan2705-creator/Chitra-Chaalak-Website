@@ -8,29 +8,26 @@
   <span class="cc-footer__corner cc-footer__corner--tl"></span>
   <span class="cc-footer__corner cc-footer__corner--tr"></span>
 
-  <a href="/home" class="cc-footer__link cc-footer__segment cc-footer__home">
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 4px;">
-      <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-      <polyline points="9 22 9 12 15 12 15 22"></polyline>
-    </svg>
-    HOME
-  </a>
-  <div class="cc-footer__divider"></div>
-
-  <div class="cc-footer__segment">
+  <div class="cc-footer__segment cc-footer__sys-info">
     <span class="cc-footer__dot"></span>
-    <span id="cc-footer-date">--</span>
-  </div>
-  <div class="cc-footer__divider"></div>
-  <div class="cc-footer__segment">
-    <span id="cc-footer-time">--:--:--</span>
+    <span class="cc-footer__label">[ SYS.DATE // </span>
+    <span id="cc-footer-date" class="cc-footer__value">--</span>
+    <span class="cc-footer__label"> ]</span>
   </div>
   
-  <a href="/filter" class="cc-footer__link cc-footer__link--right">
-    <span>IMAGE FILTER</span>
+  <div class="cc-footer__divider"></div>
+  
+  <div class="cc-footer__segment cc-footer__sys-info">
+    <span class="cc-footer__label">[ T-MINUS // </span>
+    <span id="cc-footer-time" class="cc-footer__time-value">--<span class="cc-pulse">:</span>--<span class="cc-pulse">:</span>--</span>
+    <span class="cc-footer__label"> ]</span>
+  </div>
+  
+  <a href="/home" class="cc-footer__link cc-footer__link--right cc-footer__home">
+    <span>HOME</span>
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="cc-footer__link-icon" style="margin-left: 6px;">
-      <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
-      <circle cx="12" cy="13" r="4"></circle>
+      <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+      <polyline points="9 22 9 12 15 12 15 22"></polyline>
     </svg>
   </a>
 </div>
@@ -70,8 +67,37 @@
     align-items:center;
     gap:7px;
   }
-
-
+  
+  .cc-footer__sys-info {
+    font-family: 'IBM Plex Mono', monospace;
+  }
+  
+  .cc-footer__label {
+    color: var(--blue-panel-light);
+    opacity: 0.6;
+    letter-spacing: 0px;
+  }
+  
+  .cc-footer__value {
+    color: var(--blue-lightest);
+    font-weight: 700;
+  }
+  
+  .cc-footer__time-value {
+    color: var(--yellow);
+    font-weight: 700;
+    text-shadow: 0 0 8px rgba(255, 240, 0, 0.4);
+    letter-spacing: 2px;
+  }
+  
+  :global(.cc-pulse) {
+    animation: cc-colon-pulse 1s steps(2, start) infinite;
+  }
+  
+  @keyframes cc-colon-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
 
   .cc-footer__link{
     text-decoration: none;
@@ -135,23 +161,6 @@
     50%{ opacity:0.25; }
   }
 
-  .cc-footer__bars{
-    display:flex;
-    gap:2px;
-  }
-
-  .cc-footer__bar{
-    width:3px; height:10px;
-    background:var(--yellow);
-    opacity:0.85;
-    animation:cc-footer-bar-flicker 2s ease-in-out infinite;
-  }
-
-  @keyframes cc-footer-bar-flicker{
-    0%,100%{ opacity:0.85; }
-    50%{ opacity:0.3; }
-  }
-
   @media (max-width: 768px) {
     .cc-footer {
       height: 48px;
@@ -160,26 +169,31 @@
       border-top: 1px solid var(--blue-panel-light);
     }
     .cc-footer__corner { display: none; }
-    .cc-footer__home { font-size: 0; padding-right: 0; } 
-    .cc-footer__home svg { margin-right: 0 !important; width: 22px; height: 22px; }
-    #cc-footer-date { display: inline-block; font-size: 11px; }
-    .cc-footer__dot { display: inline-block; }
-    #cc-footer-time { font-size: 11px; font-weight: 700; color: var(--yellow); }
-    .cc-footer__link--right span { display: inline-block; font-size: 11px; letter-spacing: 1px; }
+    .cc-footer__label { display: none; }
+    .cc-footer__home span { display: none; } 
+    .cc-footer__home svg { margin-left: 0 !important; width: 18px; height: 18px; }
+    .cc-footer__value { font-size: 11px; }
+    .cc-footer__time-value { font-size: 11px; }
     .cc-footer__link--right { padding: 6px 12px; }
   }
 </style>
 
 <script>
   // @ts-nocheck
-function ccUpdateFooter(){
+  function ccUpdateFooter(){
     const now = new Date();
     const dateStr = now.toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' }).toUpperCase();
-    const timeStr = now.toLocaleTimeString('en-GB', { hour12:false });
+    
+    // Custom time string with span wrappers around colons for pulsing effect
+    const h = now.getHours().toString().padStart(2, '0');
+    const m = now.getMinutes().toString().padStart(2, '0');
+    const s = now.getSeconds().toString().padStart(2, '0');
+    const timeStr = `${h}<span class="cc-pulse">:</span>${m}<span class="cc-pulse">:</span>${s}`;
+    
     const dateEl = document.getElementById('cc-footer-date');
     const timeEl = document.getElementById('cc-footer-time');
     if (dateEl) dateEl.textContent = dateStr;
-    if (timeEl) timeEl.textContent = timeStr;
+    if (timeEl) timeEl.innerHTML = timeStr; // Use innerHTML to render the span
   }
   ccUpdateFooter();
   setInterval(ccUpdateFooter, 1000);
