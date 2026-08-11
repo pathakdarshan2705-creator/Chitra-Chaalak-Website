@@ -19,11 +19,21 @@ export async function getStaticPaths() {
 
 const { project } = Astro.props;
 const { Content } = await render(project);
+
+let youtubeId = project.data.youtubeId;
+if (youtubeId) {
+  const match = youtubeId.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([^&?]+)/);
+  if (match) {
+    youtubeId = match[1];
+  }
+}
 ---
 <Layout title={`${project.data.title} — ${project.data.section.toUpperCase()}`}>
   <div class="cc-project-page" id="project-page">
     <div class="cc-project-hero" id="project-hero">
-      <img src={project.data.image} alt={project.data.title} class="cc-hero-img" id="hero-img" />
+      {project.data.image && (
+        <img src={encodeURI(project.data.image)} alt={project.data.title} class="cc-hero-img" id="hero-img" />
+      )}
       <div class="cc-hero-overlay"></div>
       
       <div class="cc-hero-text">
@@ -42,10 +52,10 @@ const { Content } = await render(project);
       </div>
     </div>
 
-    {project.data.youtubeId && (
+    {youtubeId && (
       <div class="cc-project-video">
         <iframe 
-          src={`https://www.youtube.com/embed/${project.data.youtubeId}?autoplay=1&mute=1&loop=1&playlist=${project.data.youtubeId}&controls=0&showinfo=0&rel=0`}
+          src={`https://www.youtube.com/embed/${youtubeId}?autoplay=1&mute=1&loop=1&playlist=${youtubeId}&controls=0&showinfo=0&rel=0`}
           frameborder="0"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
           allowfullscreen>
