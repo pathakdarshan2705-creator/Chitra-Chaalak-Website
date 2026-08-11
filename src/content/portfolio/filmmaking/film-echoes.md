@@ -1,37 +1,42 @@
 ---
-title: Echoes of the Concrete
+title: Taal Taiyaar
 section: filmmaking
-date: 2026-06-14
-image: https://images.unsplash.com/photo-1478720568477-152d9b164e26?q=80&w=2000&auto=format&fit=crop
-description: An architectural visual poem exploring brutalism and human scale.
+date: 2026-05-09
+image: TAAL TAIYAAR_Final.jpg
+description: A documentary film tracing the hands, craft, and traditions behind the making of the Tabla.
+youtubeId: https://youtu.be/0pDm2iWP5QU
 ---
 
-> "Architecture is the frozen music of the city."
+> "The sound begins with the hands that make it."
 
-Echoes of the Concrete strips away the noise of urban life to focus purely on form, shadow, and geometry. 
+_Taal Taiyaar_ follows the making of the Tabla, a journey through wood, leather, fire, patience, and the skilled hands that bring a musical instrument to life.
 
 ## The Process
 
-This project was shot entirely on black-and-white 16mm film (Kodak Double-X). The organic grain structure of the film beautifully counteracted the harsh, rigid lines of the brutalist structures.
+This documentary was created as part of my Master's programme for a **Fundamentals of Filmmaking** module, within the non-fiction category.
 
-We used extreme wide angles and slow, deliberate dolly pushes to emphasize the monolithic scale of the buildings relative to the tiny, isolated human figures passing through them.
+Being deeply interested in music and having studied Indian classical music myself, I wanted to document something I had always been curious about: **how an instrument that carries so much sound, tradition, and history actually comes into being.**
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+We began with research, looking into the craft of Tabla making and the people who have kept this practice alive. The film then took us into the workshop, where the process unfolded slowly, from shaping the wood and preparing the materials to stretching, tuning, and giving the Tabla its final voice. Rather than treating the instrument simply as an object, we wanted to stay close to the people and the process behind it.
 
 ## The Approach
 
-We relied entirely on natural techniques. The harsh contrast created a natural cinematic grade that required very little post-production manipulation.
+We approached the film observationally, allowing the workshop and its rhythms to guide the camera.
 
-- Item 1: This is a placeholder list item.
-- Item 2: Another placeholder list item.
-- Item 3: A third placeholder list item.
+The sounds of cutting, shaping, hammering, stretching and tuning became an important part of the film itself. Instead of heavily stylising the visuals, we tried to let the textures of the workshop, the hands of the craftsmen, and the natural pace of the process speak for themselves.
 
-> "The environment wasn't just a backdrop; it was an active antagonist to the production."
+> "Before the Tabla becomes an instrument, it passes through many hands, many materials, and many hours of patience."
 
-## Equipment & Tools
-- **Hardware**: Custom Built PC
-- **Software**: Adobe Creative Cloud
-- **Tablet**: Wacom Cintiq Pro 24
-- **Extras**: Custom mechanical keyboard
+## The Film
 
-This project is currently being showcased in various international festivals.
+_Taal Taiyaar_ is ultimately a film about making, but also about the knowledge carried through making. Every Tabla that reaches a musician has already lived a small journey of its own. The film tries to capture that journey before the first note is ever played.
+
+## My Role
+
+**Research · Direction · Cinematography · Editing**
+
+## Tools
+
+**Camera:** Sony
+**Editing:** Adobe Premiere Pro
+**Sound:** Location sound + post-production mixing
