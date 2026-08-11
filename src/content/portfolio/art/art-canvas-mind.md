@@ -43,11 +43,11 @@ The warm reds and yellows create a sense of closeness, while the darker silhouet
 
 I began with the central figure and gradually built the surrounding space around it in Procreate. Instead of defining everything sharply, I allowed colour and texture to overlap, letting the background and figure almost dissolve into one another.
 
-![Baithi Hai ](/uploads/%27Baithi_Hai%27.jpg)
+![Baithi Hai](/uploads/%27Baithi_Hai%27.jpg)
 
-**Song Links:**
-- **YouTube:** [Click Here for YouTube video](https://youtu.be/wlznr4_NAUI?si=SiGUTMrE_qXSMtEy)
-- **Spotify:** [Click Here for Spotify App](https://open.spotify.com/track/3r7GtzkiE1W47QRpYmoOuL?si=66HoRYrJQAuM_1AsxtvOjA&utm_source=copy-link&sci=spotify%3Acard-config%3A4m6MRoEfov1w5bw4dTfz05)
+Song Link:
+YouTube:[ Click Here for YouTube video](https://youtu.be/wlznr4_NAUI?si=SiGUTMrE_qXSMtEy)
+Spotify: [Click Here for Spotify App](https://open.spotify.com/track/3r7GtzkiE1W47QRpYmoOuL?si=66HoRYrJQAuM_1AsxtvOjA&utm_source=copy-link&sci=spotify%3Acard-config%3A4m6MRoEfov1w5bw4dTfz05)
 
 ***
 
@@ -67,9 +67,9 @@ I built the composition around repeating frames and perspective lines, gradually
 
 ![Bandeh](/uploads/%27Bandeh%27.jpg)
 
-**Song Links:**
-- **YouTube:** [Click Here for YouTube video](https://youtu.be/ZxEWftSZHgA?si=Gz_vXf-bzEbC0ltj)
-- **Spotify:** [Click Here for Spotify App](https://open.spotify.com/track/1xo4KnZS1sgb6cm8Hgf2d7?si=B_27rl91TjeistT0Y6LnOw&utm_source=copy-link&sci=spotify%3Acard-config%3A7TFF86cnkdlrlwdH4O6vog)
+Song Link:
+YouTube:[ Click Here for YouTube video](https://youtu.be/ZxEWftSZHgA?si=Gz_vXf-bzEbC0ltj)
+Spotify: [Click Here for Spotify App](https://open.spotify.com/track/1xo4KnZS1sgb6cm8Hgf2d7?si=B_27rl91TjeistT0Y6LnOw&utm_source=copy-link&sci=spotify%3Acard-config%3A7TFF86cnkdlrlwdH4O6vog)
 
 ***
 
@@ -89,9 +89,9 @@ I started with the figure and the circular ground beneath him, then built the fl
 
 ![Beparwah](/uploads/Beparwah.jpg)
 
-**Song Links:**
-- **YouTube:** [Click Here for YouTube video](https://youtu.be/MNmiN43iAyQ?si=6QBQ99bPXw5_BVXL)
-- **Spotify:** [Click Here for Spotify App](https://open.spotify.com/track/1HFeaybugpNozcmcj91ZeR?si=I8XXaumXRhmQSePq5PRP-A&utm_source=copy-link&sci=spotify%3Acard-config%3A3fnS6asuRS2kxQslpL4XHB)
+Song Link:
+YouTube:[ Click Here for YouTube video](https://youtu.be/MNmiN43iAyQ?si=6QBQ99bPXw5_BVXL)
+Spotify: [Click Here for Spotify App](https://open.spotify.com/track/1HFeaybugpNozcmcj91ZeR?si=I8XXaumXRhmQSePq5PRP-A&utm_source=copy-link&sci=spotify%3Acard-config%3A3fnS6asuRS2kxQslpL4XHB)
 
 ***
 
