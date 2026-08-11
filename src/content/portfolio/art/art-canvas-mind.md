@@ -97,8 +97,8 @@ Spotify: [Click Here for Spotify App](https://open.spotify.com/track/1HFeaybugpN
 
 ## **Tools**
 
-**Software:** Procreate
-**Medium:** Digital Illustration
-**Approach:** Hand-drawn forms · Layered colour · Texture · Digital painting
+- **Software:** Procreate
+- **Medium:** Digital Illustration
+- **Approach:** Hand-drawn forms · Layered colour · Texture · Digital painting
 
 **Three songs. Three visual worlds. One experiment: seeing what music might look like.**
