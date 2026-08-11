@@ -143,7 +143,12 @@
     text-transform: uppercase;
   }
 
-  #cc-fs-main-canvas{ max-width: 100%; max-height: 640px; display: none; }
+  #cc-fs-main-canvas{ 
+    width: 100%; 
+    height: 100%; 
+    object-fit: cover; 
+    display: none; 
+  }
   #cc-fs-main-canvas.is-visible{ display: block; }
 
   .cc-fs__corner{ position: absolute; width: 16px; height: 16px; pointer-events: none; }
@@ -455,11 +460,13 @@
     }
 
     function setupCanvasSize(img: HTMLImageElement) {
-      const maxW = 900, maxH = 640;
-      const w = img.naturalWidth, h = img.naturalHeight;
-      const scale = Math.min(1, maxW / w, maxH / h);
-      mainCanvas.width = Math.round(w * scale);
-      mainCanvas.height = Math.round(h * scale);
+      const stage = document.getElementById('cc-fs-stage')!;
+      const rect = stage.getBoundingClientRect();
+      const stageRatio = rect.width / rect.height;
+      const maxW = 1200; // standard high-res output
+      
+      mainCanvas.width = maxW;
+      mainCanvas.height = maxW / stageRatio;
     }
 
     function renderMain() {
