@@ -14,16 +14,16 @@ const sortedFilms = films.sort((a, b) => b.data.year - a.data.year);
     <div class="cc-inner-layout__sidebar">
       <SidebarNav
         activePage="films"
-        pageTitle="Film Section"
-        pageDescription="A curated list of signal intercepts featuring must-watch films and documentaries."
+        pageTitle="The Film Shelf"
+        pageDescription="I watch a lot of films, and every now and then, one refuses to leave my head.<br><br>This is where I keep those films. Some will be recommendations I genuinely want more people to see. Some will lead to longer pieces about a scene, a character, or simply why the film stayed with me.<br><br>Think of this as my personal shelf of cinema: films I’ve watched, films I’ve returned to, and films I’m passing along."
         controlGroup="films-archive"
-        infoTitle="Film Section"
-        infoMeta="A curated list of signal intercepts featuring must-watch films and documentaries."
+        infoTitle="The Film Shelf"
+        infoMeta="Films I’ve loved, films I keep thinking about, and films I think you should see."
       />
     </div>
 
     <div class="cc-inner-content">
-      <Panel title="The Vault" showControls={false}>
+      <Panel title="The Film Shelf" showControls={false}>
         <div class="cc-film-vault">
           {sortedFilms.map((film, i) => (
             <VaultCard 

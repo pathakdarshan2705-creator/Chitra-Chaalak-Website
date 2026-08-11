@@ -19,10 +19,10 @@ import Icon from './Icons.astro';
 interface NavItem { label: string; href: string; key: string; }
 
 const NAV_ITEMS: NavItem[] = [
-  { label: 'Updates', href: '/updates', key: 'updates' },
+  { label: 'In the Meantime', href: '/updates', key: 'updates' },
   { label: 'Blogs', href: '/blog', key: 'blog' },
   { label: 'Portfolio', href: '/portfolio', key: 'portfolio' },
-  { label: 'Film Section', href: '/films', key: 'films' },
+  { label: 'The Film Shelf', href: '/films', key: 'films' },
   { label: 'Visual Tour', href: '/tour', key: 'tour' },
   { label: 'My Collection', href: '/collections', key: 'collections' },
 ];
@@ -177,7 +177,10 @@ const {
     opacity: 0.65;
     line-height: 1.4;
     flex: 1;
+    overflow-y: auto;
+    scrollbar-width: none;
   }
+  .cc-sidebar__desc::-webkit-scrollbar { display: none; }
 
   .cc-sidebar__controls{
     display: flex;
