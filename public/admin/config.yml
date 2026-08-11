@@ -115,6 +115,7 @@ collections:
   - name: portfolio
     label: Portfolio
     folder: /src/content/portfolio
+    path: '{{section}}/{{slug}}'
     create: true
     fields:
       - name: title
@@ -122,7 +123,8 @@ collections:
         widget: string
       - name: section
         label: Section
-        widget: string
+        widget: select
+        options: ['art', 'design', 'filmmaking', 'photography']
       - name: date
         label: Date
         widget: datetime
