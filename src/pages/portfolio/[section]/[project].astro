@@ -99,10 +99,11 @@ if (youtubeId) {
 <style>
   .cc-project-video {
     position: relative;
-    padding-bottom: 56.25%; /* 16:9 aspect ratio */
-    height: 0;
+    width: calc(100% - 40px);
+    max-width: 1000px;
+    margin: 40px auto 80px auto;
+    aspect-ratio: 16 / 9;
     overflow: hidden;
-    margin-bottom: 60px;
     border: 1px solid rgba(255, 255, 255, 0.1);
     background: #000;
   }
@@ -126,15 +127,19 @@ if (youtubeId) {
   .cc-project-hero {
     position: relative;
     width: 100%;
-    height: 80vh;
+    height: 70vh;
     border-bottom: 2px solid var(--yellow);
     overflow: hidden;
   }
 
   .cc-hero-img {
+    position: absolute;
+    top: -10%;
+    left: 0;
     width: 100%;
     height: 120%; /* extra height for intense parallax */
     object-fit: cover;
+    object-position: center 30%;
     transform-origin: center bottom;
   }
 
