@@ -46,9 +46,7 @@
 }
 
 /* Global Performance Tweaks for Animations */
-.cc-panel, .cc-card, .cc-film-card, .cc-photo-card, .cc-accordion-panel, .cc-design-row {
-  will-change: transform, opacity;
-}
+/* Removed global will-change to prevent VRAM bloat and scrolling lag */
 
 html, body{
   margin:0;
@@ -57,7 +55,7 @@ html, body{
 }
 
 body{
-  background:var(--navy-deep) url('/assets/bg-texture.png') center center / cover no-repeat fixed;
+  background:var(--navy-deep) url('/assets/bg-texture.png') center center / cover no-repeat;
   color:var(--blue-lightest);
   font-family:var(--font-body);
   overflow:hidden; /* the app shell below owns internal scrolling per-section, not the page */
@@ -116,7 +114,8 @@ button{
     transparent 3px
   );
   z-index:999;
-  opacity:0.3;
+  opacity:0.15; /* Softened from 0.3 */
+  transform: translateZ(0);
 }
 
 .cc-vignette{
@@ -126,12 +125,13 @@ button{
   z-index:997;
   background:radial-gradient(circle at 50% 40%, rgba(166,232,255,0.05), transparent 60%);
   will-change: opacity;
-  animation:cc-breathe 8s ease-in-out infinite;
+  transform: translateZ(0);
+  animation:cc-breathe 12s ease-in-out infinite; /* Slowed down from 8s */
 }
 
 @keyframes cc-breathe{
-  0%,100%{ opacity:0.5; }
-  50%{ opacity:1; }
+  0%,100%{ opacity:0.6; }
+  50%{ opacity:0.9; }
 }
 
 .cc-flicker{
@@ -142,14 +142,15 @@ button{
   opacity:0;
   z-index:998;
   will-change: opacity;
-  animation:cc-crt-flicker 6s infinite;
+  transform: translateZ(0);
+  animation:cc-crt-flicker 8s infinite; /* Slowed down */
 }
 
 @keyframes cc-crt-flicker{
   0%,96%,100%{ opacity:0; }
-  97%{ opacity:0.02; }
+  97%{ opacity:0.01; }
   98%{ opacity:0; }
-  99%{ opacity:0.015; }
+  99%{ opacity:0.008; }
 }
 
 /* Static CRT screen vignette — darkened, slightly warped-feeling
@@ -160,6 +161,7 @@ button{
   inset:0;
   pointer-events:none;
   z-index:996;
+  transform: translateZ(0);
   box-shadow:
     inset 0 0 140px rgba(0,10,40,0.55),
     inset 0 0 40px rgba(0,10,40,0.35);
