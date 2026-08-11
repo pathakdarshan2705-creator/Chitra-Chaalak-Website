@@ -116,6 +116,8 @@ collections:
     label: Portfolio
     folder: /src/content/portfolio
     path: '{{section}}/{{slug}}'
+    media_folder: /public/uploads
+    public_folder: /uploads
     create: true
     fields:
       - name: title

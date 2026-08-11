@@ -2,7 +2,7 @@
 title: Taal Taiyaar
 section: filmmaking
 date: 2026-05-09
-image: TAAL TAIYAAR_Final.jpg
+image: /uploads/TAAL TAIYAAR_Final.jpg
 description: A documentary film tracing the hands, craft, and traditions behind the making of the Tabla.
 youtubeId: https://youtu.be/0pDm2iWP5QU
 ---
