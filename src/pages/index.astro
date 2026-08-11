@@ -237,9 +237,50 @@ import Layout from '../layouts/Layout.astro';
   }
 
   @media (max-width: 768px) {
-    .video-wrapper { width: 90vw; height: 50vh; }
-    .btn-top-right { top: 1.5rem; right: 1.5rem; padding: 0.6rem 1rem; }
-    .btn-bottom-right { bottom: 1.5rem; right: 1.5rem; padding: 0.6rem 1rem; }
-    .hud-line, .crosshair { display: none; }
+    .video-wrapper { 
+      /* Make it full bleed on mobile for a cinematic, immersive feel */
+      width: 100vw; 
+      height: 100vh; 
+    }
+    .hero-video {
+      /* Cover the screen instead of leaving empty space */
+      object-fit: cover; 
+      object-position: center;
+      opacity: 0.75; /* Slightly darker to ensure buttons read well over it */
+    }
+    
+    /* Make the ENTER button wider and prominent at the bottom for mobile */
+    .btn-bottom-right { 
+      bottom: 2.5rem; 
+      left: 1.5rem; 
+      right: 1.5rem; 
+      justify-content: center;
+      padding: 1rem;
+      font-size: 0.85rem;
+    }
+    
+    .btn-top-right { 
+      top: 1.5rem; 
+      right: 1.5rem; 
+      padding: 0.6rem 1rem; 
+    }
+    
+    /* Bring back crosshairs on mobile but move them tighter to the frame */
+    .crosshair-tl { top: 12%; left: 8%; }
+    .crosshair-tr { top: 12%; right: 8%; }
+    .crosshair-bl { bottom: 18%; left: 8%; }
+    .crosshair-br { bottom: 18%; right: 8%; }
+    
+    /* Keep the HUD lines but adjust for mobile spacing */
+    .hud-line-top { top: 4rem; }
+    .hud-line-bottom { bottom: 6.5rem; }
+    .hud-line-left { left: 2rem; }
+    .hud-line-right { right: 2rem; }
+    
+    .ambient-glow {
+      width: 100vw;
+      height: 100vh;
+      border-radius: 0;
+    }
   }
 </style>
