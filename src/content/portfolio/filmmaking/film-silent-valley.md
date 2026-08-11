@@ -2,7 +2,7 @@
 title: અમદાવાદના 12 દરવાજાઓ
 section: filmmaking
 date: 2024-11-23
-image: Thumb.jpg
+image: /uploads/Silent_Valley_Thumb.jpg
 description: A visual journey through Ahmedabad’s historic gates, tracing the stories, architecture, and history that still live around them.
 youtubeId: https://youtu.be/cT4QbPKXx2Y?si=A4z-8CA8ZNF9f3aO
 ---
