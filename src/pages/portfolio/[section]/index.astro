@@ -115,4 +115,20 @@ const pageTitle = titleMap[section] || section;
     min-height: 0; /* Important for inner scrolling */
     position: relative;
   }
+  
+  @media (max-width: 768px) {
+    .cc-section-count {
+      display: none;
+    }
+    .cc-section-header {
+      padding: 15px 0;
+      margin-bottom: 15px;
+    }
+    .cc-section-title {
+      font-size: 18px;
+    }
+    .cc-back-btn {
+      font-size: 10px;
+    }
+  }
 </style>
