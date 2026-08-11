@@ -9,7 +9,6 @@ const defaultImage = projects.length > 0 ? projects[0].data.image : '';
       <thead>
         <tr>
           <th>PROJECT</th>
-          <th>CATEGORY</th>
           <th>DATE</th>
         </tr>
       </thead>
@@ -20,7 +19,6 @@ const defaultImage = projects.length > 0 ? projects[0].data.image : '';
               <span class="cc-design-number">#</span>
               {project.data.title}
             </td>
-            <td class="cc-col-cat">BRANDING / UI</td>
             <td class="cc-col-date">{project.data.date.getFullYear()}</td>
           </tr>
         ))}
@@ -137,7 +135,7 @@ const defaultImage = projects.length > 0 ? projects[0].data.image : '';
     margin-top: 4px;
   }
 
-  .cc-col-cat, .cc-col-date {
+  .cc-col-date {
     font-size: 14px;
     color: var(--blue-panel-light);
   }
