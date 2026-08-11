@@ -2,7 +2,7 @@
 title: Citizen Kane - A Study in Type
 section: design
 date: 2025-10-07
-image: /uploads/Poster 1.jpg
+image: /uploads/poster-1.jpg
 description: A typographic exploration of Citizen Kane, using four posters to investigate how type, hierarchy, composition and information can become the visual language of a film.
 youtubeId: ''
 ---
@@ -39,7 +39,7 @@ This poster pushes typography away from its usual role as a means of readable in
 
 Large words become forms within the composition, changing scale and perspective to create movement across the page. The text is still carrying information, but its arrangement becomes equally important to what the poster communicates.
 
-![Expressive type poster](/uploads/Expressive.jpg)
+![Expressive type poster](/uploads/expressive.jpg)
 
 ***
 
@@ -51,7 +51,7 @@ The synopsis, film information, cast, and other details are arranged in a clear 
 
 The intention was to see how much visual interest could be created through **typographic hierarchy alone**, without adding unnecessary graphic elements.
 
-![Functional Poster](/uploads/Functional%201.jpg)
+![Functional Poster](/uploads/functional-1.jpg)
 
 ***
 
@@ -63,7 +63,7 @@ The information radiates from a central point, creating a composition where diff
 
 The poster becomes less about reading from top to bottom and more about **moving through the information**.
 
-![Second functional poster](/uploads/Functional%202.jpg)
+![Second functional poster](/uploads/functional-2.jpg)
 
 ***
 
@@ -73,7 +73,7 @@ The final poster brings typography and imagery together more traditionally, whil
 
 A restrained colour palette, large-scale title treatment and grainy photographic texture give it a slightly archival character, referencing the visual language of classic cinema while keeping the composition contemporary.
 
-![Film Poster](/uploads/Poster%201.jpg)
+![Film Poster](/uploads/poster-1.jpg)
 
 ***
 
