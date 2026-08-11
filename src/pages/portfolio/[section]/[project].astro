@@ -254,6 +254,17 @@ if (youtubeId) {
     line-height: 1.8;
     color: rgba(255, 255, 255, 0.85);
   }
+  
+  .cc-project-markdown :global(a) {
+    color: var(--blue-lightest);
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    transition: color 0.2s ease;
+  }
+  
+  .cc-project-markdown :global(a:hover) {
+    color: var(--yellow);
+  }
 
   /* Editorial Markdown Styles */
   .cc-project-markdown :global(h2) {
@@ -366,6 +377,14 @@ import { gsap } from 'gsap';
       }
     });
   }
+
+  // Open external links inside markdown content in a new tab
+  document.querySelectorAll('.cc-project-markdown a').forEach(link => {
+    if (link.hostname !== window.location.hostname) {
+      link.setAttribute('target', '_blank');
+      link.setAttribute('rel', 'noopener noreferrer');
+    }
+  });
 
   // Entrance animations
   gsap.from('.cc-hero-title', {
