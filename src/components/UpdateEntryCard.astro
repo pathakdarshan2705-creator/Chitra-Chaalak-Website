@@ -24,7 +24,7 @@ const { date, items, href, group, isLatest = false } = Astro.props;
   <div class="cc-update-entry__header">
     <span class="cc-update-entry__dot"></span>
     <span class="cc-update-entry__date">{date}</span>
-    {isLatest && <span class="cc-update-entry__live is-offline" id="cc-live-badge">SOON</span>}
+    {isLatest && <span class="cc-update-entry__live" id="cc-live-badge">LIVE STATUS</span>}
     <span class="cc-update-entry__dots"><Icon name="dots" size={12} /></span>
   </div>
   <ul class="cc-update-entry__list">

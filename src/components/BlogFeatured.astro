@@ -13,17 +13,15 @@ interface Props {
   imageAlt?: string;
   href: string;
 }
-import { Image } from 'astro:assets';
 const { title, date, topic, excerpt, imageSrc, imageAlt = '', href } = Astro.props;
 const isRemote = imageSrc.startsWith('http');
+const optimizedSrc = isRemote && imageSrc.includes('unsplash.com') 
+  ? (imageSrc.includes('?') ? imageSrc + '&w=1200&q=70&auto=format' : imageSrc + '?w=1200&q=70&auto=format')
+  : imageSrc;
 ---
 <div class="cc-blog-featured" id="cc-blog-featured" tabindex="0" role="button" data-href={href}>
   <div class="cc-blog-featured__img">
-    {isRemote ? (
-      <Image id="cc-blog-featured-img" src={imageSrc} alt={imageAlt} inferSize={true} />
-    ) : (
-      <img id="cc-blog-featured-img" src={imageSrc} alt={imageAlt} />
-    )}
+    <img id="cc-blog-featured-img" src={optimizedSrc} alt={imageAlt} />
   </div>
   <div class="cc-blog-featured__body">
     <div class="cc-blog-featured__title" id="cc-blog-featured-title">{title}</div>

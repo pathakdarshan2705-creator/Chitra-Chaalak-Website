@@ -14,10 +14,11 @@ interface Props {
   group?: string;
 }
 
-import { Image } from 'astro:assets';
-
 const { href, title, date, topic, imageSrc, imageAlt = '', group = 'blog-archive' } = Astro.props;
 const isRemote = imageSrc.startsWith('http');
+const optimizedSrc = isRemote && imageSrc.includes('unsplash.com') 
+  ? (imageSrc.includes('?') ? imageSrc + '&w=800&q=70&auto=format' : imageSrc + '?w=800&q=70&auto=format')
+  : imageSrc;
 ---
 <div
   class="cc-card cc-blog-grid-card"
@@ -30,11 +31,7 @@ const isRemote = imageSrc.startsWith('http');
   role="button"
 >
   <div class="cc-blog-grid-card__img">
-    {isRemote ? (
-      <Image src={imageSrc} alt={imageAlt} inferSize={true} />
-    ) : (
-      <img src={imageSrc} alt={imageAlt} loading="lazy" />
-    )}
+    <img src={optimizedSrc} alt={imageAlt} loading="lazy" />
   </div>
   <div class="cc-blog-grid-card__body">
     <div class="cc-blog-grid-card__title">{title}</div>

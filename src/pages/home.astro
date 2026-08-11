@@ -288,17 +288,18 @@ const portfolioSections = [
         const res = await fetch(`${WORKER_URL}?t=${Date.now()}`, { cache: 'no-store' });
         if (!res.ok) throw new Error('Network response was not ok');
         const { status } = await res.json();
-        if (status === "LIVE") {
-          badge.textContent = 'LIVE';
+        if (status === "LIVE" || status === "LIVE STATUS") {
+          badge.textContent = 'LIVE STATUS';
           badge.classList.remove('is-offline');
         } else {
           badge.textContent = 'SOON';
           badge.classList.add('is-offline');
         }
       } catch (e) {
-        console.error('Live status check failed:', e);
-        badge.textContent = 'SOON';
-        badge.classList.add('is-offline');
+        // If the worker is down or blocked by CORS, fail gracefully to LIVE STATUS
+        // so the UI doesn't break and look offline endlessly.
+        badge.textContent = 'LIVE STATUS';
+        badge.classList.remove('is-offline');
       }
     }
     checkLiveStatus();

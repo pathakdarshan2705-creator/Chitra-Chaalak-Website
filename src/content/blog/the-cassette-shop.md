@@ -3,7 +3,7 @@ title: THE CASSETTE SHOP
 date: 2026-08-07
 topic: ESSAY
 time: 09:15 AM
-image: /images/placeholder.png
+image: https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=60&w=400&auto=format&fit=crop
 imageAlt: Old cassette shop in Mumbai
 excerpt: |
   A memory from the lanes of old Ahmedabad.
