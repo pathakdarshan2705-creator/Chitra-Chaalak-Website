@@ -116,6 +116,7 @@ button{
   pointer-events:none;
   z-index:997;
   background:radial-gradient(circle at 50% 40%, rgba(166,232,255,0.05), transparent 60%);
+  will-change: opacity;
   animation:cc-breathe 8s ease-in-out infinite;
 }
 
@@ -131,6 +132,7 @@ button{
   background:var(--blue-lightest);
   opacity:0;
   z-index:998;
+  will-change: opacity;
   animation:cc-crt-flicker 6s infinite;
 }
 

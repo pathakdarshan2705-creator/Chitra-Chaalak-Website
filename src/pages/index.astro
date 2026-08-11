@@ -1,357 +1,245 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import Panel from '../components/Panel.astro';
-import Card from '../components/Card.astro';
-import CassetteCard from '../components/CassetteCard.astro';
-import ContactCard from '../components/ContactCard.astro';
-import BlogPreviewPane from '../components/BlogPreviewPane.astro';
-import UpdateEntryCard from '../components/UpdateEntryCard.astro';
-import SlideshowCard from '../components/SlideshowCard.astro';
-import VaultCard from '../components/VaultCard.astro';
-import MusicListItem from '../components/MusicListItem.astro';
-import { getCollection } from 'astro:content';
-
-const allBlogPosts = await getCollection('blog');
-const blogPosts = allBlogPosts
-  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
-  .slice(0, 15)
-  .map(post => ({
-    title: post.data.title,
-    meta: `${post.data.date.toLocaleDateString('en-GB', {day:'2-digit',month:'short',year:'numeric'}).toUpperCase()} · ${post.data.topic}`,
-    imageSrc: post.data.image,
-    href: `/blog/${post.id}`,
-  }));
-
-const allUpdatesCol = await getCollection('updates');
-const sortedUpdates = allUpdatesCol.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
-
-// Group by date to match the existing UI of "one card per day with multiple items"
-const groupedUpdates = sortedUpdates.reduce((acc, curr) => {
-  const dateStr = curr.data.date.toLocaleDateString('en-GB', {day:'2-digit',month:'short',year:'numeric'}).toUpperCase();
-  if (!acc[dateStr]) {
-    acc[dateStr] = [];
-  }
-  acc[dateStr].push(curr.data.title);
-  return acc;
-}, {} as Record<string, string[]>);
-
-const updates = Object.entries(groupedUpdates).slice(0, 10).map(([date, items], index) => ({
-  date,
-  items,
-  href: '/updates',
-  isLatest: index === 0
-}));
-
-const allFilmsCol = await getCollection('films');
-const films = allFilmsCol
-  .sort((a, b) => b.data.year - a.data.year)
-  .slice(0, 5)
-  .map(f => ({
-    id: f.id,
-    title: f.data.title,
-    director: f.data.director,
-    year: f.data.year,
-    image: f.data.image
-  }));
-
-const allToursCol = await getCollection('tour');
-const visualTour = allToursCol
-  .sort((a, b) => new Date(b.data.date).valueOf() - new Date(a.data.date).valueOf())
-  .slice(0, 3)
-  .map(t => ({
-    title: t.data.title,
-    meta: 'VISUAL TOUR',
-    imageSrc: t.data.cover || '/images/placeholder.jpg',
-    href: `/tour/${t.id}`
-  }));
-
-const collections = [
-  { 
-    title: "Music Collection",
-    meta: "ROTATION",
-    imageSrc: "https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?q=80&w=600&auto=format&fit=crop",
-    href: "/collections/music"
-  }
-];
-
-const portfolioSections = [
-  { label: 'Filmmaking', href: '/portfolio/filmmaking' },
-  { label: 'Photography', href: '/portfolio/photography' },
-  { label: 'Design', href: '/portfolio/design' },
-  { label: 'Art', href: '/portfolio/art' },
-];
 ---
-<Layout title="Home">
-  <div class="cc-home">
 
-    <nav class="cc-mobile-tabs" id="cc-mobile-tabs">
-      <button class="cc-mobile-tab is-active" data-target="updates">CH 1 · UPDATES</button>
-      <button class="cc-mobile-tab" data-target="center">CH 2 · WATCH</button>
-      <button class="cc-mobile-tab" data-target="portfolio">CH 3 · WORK</button>
-    </nav>
+<Layout title="Welcome">
+  <div class="hero-container">
+    
+    <!-- Ambient glow behind the subject -->
+    <div class="ambient-glow"></div>
 
-    <!-- LEFT: Updates -->
-    <aside class="cc-col cc-col--updates" data-screen="updates">
-      <Panel 
-        title="Daily Transmission" 
-        viewAllHref="/updates" 
-        showControls 
-        group="updates"
-        infoTitle="Updates Section"
-        infoMeta="A dynamic chronicle of daily thoughts, progress, and location-based logs."
-      >
-        <div class="cc-card-list" id="updates-list">
-          {updates.map(u => (
-            <UpdateEntryCard
-              date={u.date}
-              items={u.items}
-              href={u.href}
-              group="updates"
-              isLatest={u.isLatest}
-            />
-          ))}
-        </div>
-      </Panel>
-    </aside>
+    <!-- Interesting layout elements: Floating targeting crosses -->
+    <div class="crosshair crosshair-tl"></div>
+    <div class="crosshair crosshair-tr"></div>
+    <div class="crosshair crosshair-bl"></div>
+    <div class="crosshair crosshair-br"></div>
 
-    <!-- CENTER: Film / Blog / Tour+Collections -->
-    <main class="cc-col cc-col--center" data-screen="center">
-
-      <div class="cc-row cc-row--film">
-        <Panel title="Film Recommendations" viewAllHref="/films" showControls group="films" infoTitle="Film Section" infoMeta="A curated list of signal intercepts featuring must-watch films and documentaries.">
-          <div class="cc-film-row">
-            {films.map((f, i) => (
-              <VaultCard 
-                id={f.id}
-                title={f.title}
-                director={f.director}
-                year={f.year}
-                image={f.image}
-                i={i}
-                group="films"
-                isHome={true}
-              />
-            ))}
-          </div>
-        </Panel>
-      </div>
-
-      <div class="cc-row cc-row--blog">
-        <Panel title="Blog" viewAllHref="/blog" showControls group="blog" infoTitle="Blog Database" infoMeta="In-depth thoughts, tutorials, and articles on design, code, and philosophy.">
-          <div class="cc-blog-split">
-            <div class="cc-card-list cc-blog-split__list" id="blog-list">
-              {blogPosts.map(b => (
-                <Card title={b.title} meta={b.meta} imageSrc={b.imageSrc} href={b.href} group="blog" variant="text" />
-              ))}
-            </div>
-            <BlogPreviewPane group="blog" />
-          </div>
-        </Panel>
-      </div>
-
-      <div class="cc-row cc-row--bottom">
-        <div class="cc-split-row">
-          <Panel title="Visual Tour" viewAllHref="/tour" showControls group="tour" infoTitle="Visual Tour" infoMeta="A visual journey through the concepts and design language of this universe.">
-            <SlideshowCard group="tour" items={visualTour} />
-          </Panel>
-          <Panel title="Collections" viewAllHref="/collections" showControls group="collections" infoTitle="My Collections" infoMeta="A curated inventory of personal items, resources, and inspirations.">
-            <SlideshowCard group="collections" items={collections} />
-          </Panel>
-        </div>
-      </div>
-
-    </main>
-
-    <!-- RIGHT: Portfolio + Contact -->
-    <aside class="cc-col cc-col--portfolio" data-screen="portfolio">
-      <Panel title="Portfolio" viewAllHref="/portfolio" showControls group="portfolio" infoTitle="Portfolio Archive" infoMeta="A structured repository of past projects, creations, and design work.">
-        <div class="cc-cassette-stack">
-          {portfolioSections.map(p => (
-            <CassetteCard label={p.label} href={p.href} group="portfolio" />
-          ))}
-        </div>
-      </Panel>
-      <ContactCard />
-    </aside>
-
-    <div class="cc-mobile-dots" id="cc-mobile-dots">
-      <span class="cc-mobile-dot is-active"></span>
-      <span class="cc-mobile-dot"></span>
-      <span class="cc-mobile-dot"></span>
+    <div class="video-wrapper">
+      <img 
+        src="/images/hero.gif" 
+        class="hero-video" 
+        alt="Hero Animation"
+      />
+      <div class="video-vignette"></div>
     </div>
 
+    <!-- Decorative Interface Lines -->
+    <div class="hud-line hud-line-top"></div>
+    <div class="hud-line hud-line-bottom"></div>
+    <div class="hud-line hud-line-left"></div>
+    <div class="hud-line hud-line-right"></div>
+
+    <!-- Buttons -->
+    <a href="/about" class="hero-btn btn-top-right">
+      <span>ABOUT</span>
+      <div class="btn-border"></div>
+    </a>
+    
+    <a href="/home" class="hero-btn btn-bottom-right pulse-btn">
+      <span class="next-text">ENTER</span>
+      <div class="arrow-box">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" stroke-linejoin="miter">
+          <line x1="2" y1="12" x2="20" y2="12"></line>
+          <polyline points="14 5 21 12 14 19"></polyline>
+        </svg>
+      </div>
+      <div class="btn-border"></div>
+    </a>
+
   </div>
+
+  <script>
+    // Listen for the 'Enter' key to navigate to the next page
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') {
+        window.location.href = '/home';
+      }
+    });
+  </script>
 </Layout>
 
-<style>
-  .cc-home {
-    height: 100%;
-    display: grid;
-    grid-template-columns:
-      minmax(240px, 396fr)
-      var(--col-gap-left)
-      minmax(500px, 1012fr)
-      var(--col-gap-right)
-      minmax(220px, 380fr);
-    overflow: hidden;
+<style is:global>
+  /* Completely hide the footer and its spacer on the hero page to prevent it from popping up during load/refresh */
+  .cc-footer, .cc-app__footer-spacer {
+    display: none !important;
   }
-
-  .cc-col {
-    min-width: 0; height: 100%;
-    display: flex; flex-direction: column;
-    gap: 0; overflow: hidden;
-  }
-
-  /* Updates column — the Panel itself is the single full-height child */
-  .cc-col--updates { grid-column: 1; }
-  .cc-col--updates > :global(.cc-panel) { flex: 1; }
-
-  /* Center column — fixed proportions so Blog is always biggest */
-  .cc-col--center { grid-column: 3; gap: 0; }
-  .cc-row { display: flex; min-height: 0; }
-  .cc-row > :global(.cc-panel) { flex: 1; }
-  .cc-row--film  { flex: 0 0 33%; }
-  .cc-row--blog  { flex: 1 1 auto; }
-  .cc-row--bottom { flex: 0 0 22%; }
-
-  /* Portfolio column */
-  .cc-col--portfolio {
-    grid-column: 5;
-    gap: 10px;
-    overflow: hidden;
-  }
-  .cc-col--portfolio > :global(.cc-panel) { flex: 1; min-height: 0; }
-  .cc-col--portfolio > :global(.cc-contact-panel) { flex-shrink: 0; }
-
-  /* Film row: poster cards side by side, taking full row height */
-  .cc-film-row {
-    display: flex;
-    gap: 12px;
-    height: 100%;
-    align-items: stretch;
-    justify-content: flex-start;
-    overflow-x: auto;
-    scrollbar-width: none;
-  }
-  .cc-film-row::-webkit-scrollbar { display: none; }
-  .cc-film-row > :global(.cc-card--poster) {
-    height: 100%;
-  }
-
-  /* Blog split */
-  .cc-blog-split {
-    display: flex; gap: 10px;
-    flex: 1; min-height: 0;
-  }
-  .cc-blog-split__list {
-    flex: 0 0 40%; gap: 2px;
-    overflow-y: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none;
-  }
-  .cc-blog-split__list::-webkit-scrollbar { display: none; }
-
-  /* Bottom split row */
-  .cc-split-row {
-    display: grid; grid-template-columns: 1fr 1fr;
-    gap: 14px; width: 100%; height: 100%;
-  }
-  .cc-split-row > :global(.cc-panel) { min-height: 0; }
-
-  /* Card list — used in Updates and Blog */
-  .cc-card-list {
-    display: flex; flex-direction: column; gap: 8px;
-    flex: 1; min-height: 0;
-    overflow-y: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none;
-  }
-  .cc-card-list::-webkit-scrollbar { display: none; }
-
-  /* Cassette stack — tight gap so all 4 fit; scrolls internally if
-     content ever exceeds available height, rather than the page/column */
-  .cc-cassette-stack {
-    display: flex; flex-direction: column; gap: 6px;
-    min-height: 0;
-    overflow-y: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none;
-  }
-  .cc-cassette-stack::-webkit-scrollbar { display: none; }
 </style>
 
-<!-- Live status polling for the Updates LIVE badge -->
-<script>
-  // @ts-nocheck
-  // Ensure the script runs after DOM is ready
-  const runLiveStatus = () => {
-    const badge = document.getElementById('cc-live-badge') || document.querySelector('.cc-update-entry__live');
-    if (!badge) return;
-    const WORKER_URL = 'https://chitra-chaalak-status.pathakdarshan2705.workers.dev/status';
-    const POLL_INTERVAL = 30000;
-    async function checkLiveStatus() {
-      try {
-        const res = await fetch(`${WORKER_URL}?t=${Date.now()}`, { cache: 'no-store' });
-        if (!res.ok) throw new Error('Network response was not ok');
-        const { status } = await res.json();
-        if (status === "LIVE") {
-          badge.textContent = 'LIVE';
-          badge.classList.remove('is-offline');
-        } else {
-          badge.textContent = 'SOON';
-          badge.classList.add('is-offline');
-        }
-      } catch (e) {
-        console.error('Live status check failed:', e);
-        badge.textContent = 'SOON';
-        badge.classList.add('is-offline');
-      }
-    }
-    checkLiveStatus();
-    setInterval(checkLiveStatus, POLL_INTERVAL);
-  };
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', runLiveStatus);
-  } else {
-    runLiveStatus();
+<style>
+  .hero-container {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    background-color: var(--navy-deep, #003b99);
+    z-index: 500;
   }
-</script>
 
-<script>
-  // @ts-nocheck
-if (!window.__ccMobileTabsInit) {
-    window.__ccMobileTabsInit = true;
-
-    const SCREENS = ['updates', 'center', 'portfolio'];
-    const tabs = document.querySelectorAll<HTMLElement>('.cc-mobile-tab');
-    const dots = document.querySelectorAll<HTMLElement>('.cc-mobile-dot');
-    const cols = document.querySelectorAll<HTMLElement>('.cc-col');
-    let current = 0;
-
-    function showScreen(index: number) {
-      current = index;
-      cols.forEach(col => {
-        col.classList.toggle('is-active-mobile', col.dataset.screen === SCREENS[index]);
-      });
-      tabs.forEach((tab, i) => tab.classList.toggle('is-active', i === index));
-      dots.forEach((dot, i) => dot.classList.toggle('is-active', i === index));
-    }
-
-    tabs.forEach((tab, i) => tab.addEventListener('click', () => showScreen(i)));
-
-    let touchStartX = -1;
-    const home = document.querySelector('.cc-home');
-    home?.addEventListener('touchstart', (e) => {
-      // Prevent global tab swipe if interacting with horizontally scrollable rows
-      const target = e.target as HTMLElement;
-      if (target.closest('.cc-film-row')) {
-        touchStartX = -1;
-        return;
-      }
-      touchStartX = e.touches[0].clientX;
-    });
-    home?.addEventListener('touchend', (e) => {
-      if (touchStartX === -1) return;
-      const dx = e.changedTouches[0].clientX - touchStartX;
-      if (Math.abs(dx) < 50) return;
-      if (dx < 0 && current < SCREENS.length - 1) showScreen(current + 1);
-      if (dx > 0 && current > 0) showScreen(current - 1);
-    });
-
-    showScreen(0);
+  .ambient-glow {
+    position: absolute;
+    width: 60vw;
+    height: 60vw;
+    background: radial-gradient(circle, rgba(166, 232, 255, 0.15) 0%, rgba(0, 59, 153, 0) 65%);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 501;
+    /* Removed breathing animation to heavily reduce GPU repaint load */
   }
-</script>
+
+  /* --- New Interesting Elements: Crosshairs --- */
+  .crosshair {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    z-index: 503;
+    opacity: 0.3;
+    will-change: opacity;
+    animation: fadeIn 2s 1s forwards;
+  }
+  .crosshair::before, .crosshair::after {
+    content: ''; position: absolute; background: var(--blue-lightest, #a6e8ff);
+  }
+  .crosshair::before { top: 14px; left: 0; right: 0; height: 1px; }
+  .crosshair::after { left: 14px; top: 0; bottom: 0; width: 1px; }
+
+  .crosshair-tl { top: 20%; left: 20%; }
+  .crosshair-tr { top: 20%; right: 20%; }
+  .crosshair-bl { bottom: 20%; left: 20%; }
+  .crosshair-br { bottom: 20%; right: 20%; }
+
+  .video-wrapper {
+    position: relative;
+    width: 65vw; 
+    height: 65vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 502;
+    will-change: transform, opacity;
+    animation: slideUpFade 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  .hero-video {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    /* Removed expensive CSS mix-blend-mode and filter to dramatically reduce GPU load */
+    opacity: 0.85; 
+    will-change: transform;
+  }
+
+  .video-vignette {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    /* Switched from expensive box-shadow to linear-gradients for performance */
+    background: radial-gradient(circle, transparent 40%, var(--navy-deep, #003b99) 100%);
+    border-radius: 12px;
+  }
+
+  /* --- HUD Lines --- */
+  .hud-line {
+    position: absolute;
+    background: rgba(166, 232, 255, 0.1);
+    z-index: 501;
+  }
+  .hud-line-top { top: 6rem; left: 0; right: 0; height: 1px; }
+  .hud-line-bottom { bottom: 6rem; left: 0; right: 0; height: 1px; }
+  .hud-line-left { top: 0; bottom: 0; left: 6rem; width: 1px; }
+  .hud-line-right { top: 0; bottom: 0; right: 6rem; width: 1px; }
+
+  /* --- Buttons --- */
+  .hero-btn {
+    position: absolute;
+    display: inline-flex;
+    align-items: center;
+    color: var(--blue-lightest, #a6e8ff);
+    text-decoration: none;
+    font-family: var(--font-ui, 'IBM Plex Mono', monospace);
+    font-size: 0.75rem;
+    letter-spacing: 0.2em;
+    font-weight: 600;
+    padding: 0.75rem 1.5rem;
+    background: rgba(0, 20, 50, 0.4);
+    backdrop-filter: blur(12px);
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 510;
+    overflow: hidden;
+  }
+
+  .btn-border {
+    position: absolute;
+    inset: 0;
+    border: 1px solid rgba(166, 232, 255, 0.15);
+    transition: border-color 0.4s ease;
+  }
+
+  .hero-btn:hover {
+    background: rgba(0, 84, 204, 0.2);
+    color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  }
+  .hero-btn:hover .btn-border {
+    border-color: rgba(166, 232, 255, 0.6);
+  }
+
+  .arrow-box {
+    margin-left: 1rem;
+    display: flex;
+    align-items: center;
+    transition: transform 0.4s ease;
+  }
+  .hero-btn:hover .arrow-box {
+    transform: translateX(6px);
+  }
+
+  .btn-top-right {
+    top: 2.5rem;
+    right: 2.5rem;
+  }
+
+  .btn-bottom-right {
+    bottom: 2.5rem;
+    right: 2.5rem;
+  }
+
+  .pulse-btn::after {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border: 1px solid var(--blue-panel-light, #67c8ff);
+    opacity: 0;
+    animation: ping 3s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+  }
+
+  /* --- Animations --- */
+  @keyframes slideUpFade {
+    from { opacity: 0; transform: translateY(40px) scale(0.95); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 0.3; }
+  }
+
+  @keyframes breathe {
+    0% { transform: scale(0.9); opacity: 0.8; }
+    100% { transform: scale(1.1); opacity: 1; }
+  }
+
+  @keyframes ping {
+    0% { transform: scale(1); opacity: 0.6; }
+    100% { transform: scale(1.15); opacity: 0; }
+  }
+
+  @media (max-width: 768px) {
+    .video-wrapper { width: 90vw; height: 50vh; }
+    .btn-top-right { top: 1.5rem; right: 1.5rem; padding: 0.6rem 1rem; }
+    .btn-bottom-right { bottom: 1.5rem; right: 1.5rem; padding: 0.6rem 1rem; }
+    .hud-line, .crosshair { display: none; }
+  }
+</style>
