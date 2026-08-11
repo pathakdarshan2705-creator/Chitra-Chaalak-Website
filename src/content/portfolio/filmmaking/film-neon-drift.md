@@ -2,7 +2,7 @@
 title: Mere Desh Ki Dharti
 section: filmmaking
 date: 2026-05-04
-image: Screenshot (511).png
+image: "/uploads/Screenshot (511).png"
 description: A satirical take on news, environmental neglect, and the uncomfortable gap between what we are told and what is actually happening.
 youtubeId: https://youtu.be/pJEQVtn_wFk
 ---
