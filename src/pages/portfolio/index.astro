@@ -18,6 +18,16 @@ import Panel from '../../components/Panel.astro';
 
     <div class="cc-inner-content">
       <Panel title="Select Discipline" showControls={false}>
+        <a slot="header-extra" href="/resume.jpg" target="_blank" class="cc-resume-btn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px; vertical-align: -2px;">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="16" y1="13" x2="8" y2="13"></line>
+            <line x1="16" y1="17" x2="8" y2="17"></line>
+            <polyline points="10 9 9 9 8 9"></polyline>
+          </svg>
+          My Resume
+        </a>
         <div class="cc-portfolio-index">
           <div class="cc-accordion-container">
             
@@ -81,6 +91,28 @@ import Panel from '../../components/Panel.astro';
     align-items: center;
     justify-content: center;
     background: var(--navy-deep);
+  }
+
+  .cc-resume-btn {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 14px;
+    background: var(--yellow);
+    color: var(--navy-deep);
+    font-family: var(--font-ui);
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-decoration: none;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    margin-left: auto;
+  }
+  
+  .cc-resume-btn:hover {
+    background: #fff;
+    transform: translateY(-2px);
   }
 
   .cc-accordion-container {
