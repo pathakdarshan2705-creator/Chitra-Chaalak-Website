@@ -2,7 +2,7 @@
 title: JALSO PODCAST
 section: filmmaking
 date: 2024-07-08
-image: podcast thumb.jpg
+image: /uploads/jalso_podcast_thumb.jpg
 description: A conversation brought to life through careful production, visual storytelling, and the rhythm of a live studio.
 youtubeId: https://youtu.be/aSkxYBw6zbY?si=qK6AwusAhSdh-a0z
 ---
