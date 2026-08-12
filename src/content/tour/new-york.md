@@ -1,11 +1,9 @@
 ---
-title: "New York City, USA"
-date: 2026-08-06
-cover: "/images/tour/ny_cover.png"
+title: Kolkata
+date: 2026-03-02
+cover: /uploads/7c5dc0b4-8248-4b3e-9a13-e7ed3b086613~1.jpg
 gallery: []
-excerpt: "The relentless energy of the concrete jungle under the glow of Times Square."
+excerpt: Will be added soon
 ---
 
-New York never sleeps, and neither did I while I was there. The sheer scale of the buildings is enough to make anyone feel wonderfully insignificant. 
-
-Standing in the middle of Times Square at midnight feels like standing in the center of the world. The constant movement, the yellow cabs blurring past, and the colossal digital billboards paint a chaotic yet strangely beautiful portrait.
+Will be added soon
