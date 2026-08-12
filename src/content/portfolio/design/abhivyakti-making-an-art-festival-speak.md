@@ -2,7 +2,7 @@
 title: Abhivyakti - Making an Art Festival Speak
 section: design
 date: 2023-11-18
-image: /uploads/Abhivyakti 4.png
+image: /uploads/Abhivyakti-4.png
 description: 'Visual communication for Abhivyakti: The City Arts Project, exploring how one cultural identity can stretch across artists, disciplines, announcements, events and audiences without losing its character.'
 youtubeId: ''
 ---
