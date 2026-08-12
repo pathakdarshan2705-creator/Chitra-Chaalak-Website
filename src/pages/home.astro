@@ -281,29 +281,8 @@ const portfolioSections = [
   const runLiveStatus = () => {
     const badge = document.getElementById('cc-live-badge') || document.querySelector('.cc-update-entry__live');
     if (!badge) return;
-    const WORKER_URL = 'https://chitra-chaalak-status.pathakdarshan2705.workers.dev/status';
-    const POLL_INTERVAL = 30000;
-    async function checkLiveStatus() {
-      try {
-        const res = await fetch(`${WORKER_URL}?t=${Date.now()}`, { cache: 'no-store' });
-        if (!res.ok) throw new Error('Network response was not ok');
-        const { status } = await res.json();
-        if (status === "LIVE" || status === "LIVE STATUS") {
-          badge.textContent = 'LIVE STATUS';
-          badge.classList.remove('is-offline');
-        } else {
-          badge.textContent = 'SOON';
-          badge.classList.add('is-offline');
-        }
-      } catch (e) {
-        // If the worker is down or blocked by CORS, fail gracefully to LIVE STATUS
-        // so the UI doesn't break and look offline endlessly.
-        badge.textContent = 'LIVE STATUS';
-        badge.classList.remove('is-offline');
-      }
-    }
-    checkLiveStatus();
-    setInterval(checkLiveStatus, POLL_INTERVAL);
+    badge.textContent = 'LIVE STATUS';
+    badge.classList.remove('is-offline');
   };
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', runLiveStatus);
