@@ -1,8 +1,8 @@
----
+﻿---
 title: Chitra Chaalak - The Idea
 date: 2026-08-12
 topic: CONCEPT
-image: /uploads/chitra-chaalak-idea.jpg
+image: /src/assets/uploads/chitra-chaalak-idea.jpg
 imageAlt: Project concept
 excerpt: Where it all started. The idea behind Chitra Chaalak.
 time: 10:00 AM

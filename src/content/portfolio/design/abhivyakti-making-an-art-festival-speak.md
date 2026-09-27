@@ -1,15 +1,15 @@
----
+﻿---
 title: Abhivyakti - Making an Art Festival Speak
 section: design
 date: 2023-11-18
-image: /uploads/Abhivyakti-4.png
+image: /src/assets/uploads/Abhivyakti-4.png
 description: 'Visual communication for Abhivyakti: The City Arts Project, exploring how one cultural identity can stretch across artists, disciplines, announcements, events and audiences without losing its character.'
 youtubeId: ''
 ---
 
 # **Abhivyakti - Making an Arts Festival Speak**
 
-> **“An arts festival is not only what happens on stage. It is everything that makes people want to walk in.”**
+> **â€œAn arts festival is not only what happens on stage. It is everything that makes people want to walk in.â€**
 
 Abhivyakti - The City Arts Project is a multidisciplinary arts initiative bringing together different forms of artistic expression, including art, music, dance, theatre and literature. This project involved designing communication around the festival and finding ways to make a large amount of information feel accessible, recognisable and connected to the larger identity of Abhivyakti.
 
@@ -39,9 +39,9 @@ The five discipline cards became one of the clearest examples of this approach -
 
 A large part of the work was translating the festival into a language that could work quickly on social media.
 
-Posts such as **“Calling All Dancers,” “Calling All Visual Artists,” “Music Curator,” “Theatre Curator,”** and artist application announcements had very different messages, but they needed to work as part of the same visual world.
+Posts such as **â€œCalling All Dancers,â€ â€œCalling All Visual Artists,â€ â€œMusic Curator,â€ â€œTheatre Curator,â€** and artist application announcements had very different messages, but they needed to work as part of the same visual world.
 
-![](/uploads/Screenshot_20260729-193656.png)
+![](/src/assets/uploads/Screenshot_20260729-193656.png)
 
 The challenge was to make the important information immediately visible - who the post was for, what was happening, what action was expected, and where the viewer needed to go next.
 
@@ -65,9 +65,9 @@ For me, the more useful question was:
 
 Not everything had to be an announcement.
 
-One of the posts asked the audience **“What elements do you see?”**, turning the visual identity itself into something to interact with rather than simply something to look at.
+One of the posts asked the audience **â€œWhat elements do you see?â€**, turning the visual identity itself into something to interact with rather than simply something to look at.
 
-![Different element designs](/uploads/Screenshot_20260729-193340.png)
+![Different element designs](/src/assets/uploads/Screenshot_20260729-193340.png)
 
 I liked this part of the project because it changed the relationship between the identity and the audience. Instead of only telling people about the festival, the design could also give them something to notice, interpret, and respond to.
 
@@ -98,6 +98,6 @@ Working on Abhivyakti allowed me to think about design beyond individual composi
 ### **Project Details**
 
 **Project:** Abhivyakti - The City Arts Project
-**Focus:** Visual Identity · Communication Design · Social Media · Cultural Communication
+**Focus:** Visual Identity Â· Communication Design Â· Social Media Â· Cultural Communication
 **Role:** Designer
-**Mediums:** Digital Design · Typography · Illustration · Photography · Social Media Communication
+**Mediums:** Digital Design Â· Typography Â· Illustration Â· Photography Â· Social Media Communication

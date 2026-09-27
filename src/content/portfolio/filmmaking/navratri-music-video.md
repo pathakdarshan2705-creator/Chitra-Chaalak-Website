@@ -1,15 +1,15 @@
----
+﻿---
 title: NAVRATRI MUSIC VIDEO
 section: filmmaking
 date: 2024-10-23
-image: /uploads/MV thumb.jpg
+image: /src/assets/uploads/MV thumb.jpg
 description: A festive Navratri music video made under tight time and space constraints, turning a limited studio setup into a lively visual performance.
 youtubeId: https://youtu.be/yr47RUbBeIA?si=-wDXRVnWzHQF3bgY
 ---
 
-### _Production · Cinematography · Editing_
+### _Production Â· Cinematography Â· Editing_
 
-> **“Sometimes the limitation is what makes you find a better way.”**
+> **â€œSometimes the limitation is what makes you find a better way.â€**
 
 ## The Process
 
@@ -27,7 +27,7 @@ The challenge was to make the studio feel larger, more energetic and visually va
 
 As cinematographer, I worked around these limitations through framing, camera movement, composition and coverage. As producer, I was involved in keeping the production moving within the available time. The edit then brought the different performances and shots together into the final music video.
 
-> **“You don't always need more space. Sometimes you just need to see the space differently.”**
+> **â€œYou don't always need more space. Sometimes you just need to see the space differently.â€**
 
 ## The Film
 
@@ -37,7 +37,7 @@ For me, the project was a valuable experience in **working fast without losing v
 
 ## My Role
 
-**Producer · Cinematographer · Editor**
+**Producer Â· Cinematographer Â· Editor**
 
 I was involved throughout the production, from planning and coordination to shooting and the final edit.
 
@@ -50,5 +50,5 @@ Depending on the project, my responsibilities included **production, writing, re
 This music video in particular was an opportunity to work in a much faster and more performance-driven format, where decisions had to be made quickly and the available resources had to be used carefully.
 
 **Production House:** Jalso Production House
-**Period:** July 2024 – November 2025
-**My Role on this project:** Producer · Cinematographer · Editor
+**Period:** July 2024 â€“ November 2025
+**My Role on this project:** Producer Â· Cinematographer Â· Editor

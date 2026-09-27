@@ -22,6 +22,9 @@ interface Props {
   variant?: 'default' | 'poster' | 'text';
 }
 
+import { Image } from 'astro:assets';
+const images = import.meta.glob('/src/assets/uploads/*.{jpeg,jpg,png,gif,webp}');
+
 const { href, title, meta, imageSrc = '', imageAlt = '', group, variant = 'default' } = Astro.props;
 const isRemote = imageSrc.startsWith('http');
 const optimizedSrc = isRemote && imageSrc.includes('unsplash.com') 
@@ -41,7 +44,13 @@ const optimizedSrc = isRemote && imageSrc.includes('unsplash.com')
 >
   {variant !== 'text' && (
     <div class="cc-card__img">
-      <img src={optimizedSrc} alt={imageAlt} loading="lazy" />
+      {isRemote ? (
+        <img src={optimizedSrc} alt={imageAlt} loading="lazy" />
+      ) : images[optimizedSrc] ? (
+        <Image src={images[optimizedSrc]()} alt={imageAlt} width={800} height={450} format="webp" loading="lazy" />
+      ) : (
+        <img src={optimizedSrc} alt={imageAlt} loading="lazy" />
+      )}
     </div>
   )}
   <div class="cc-card__body">

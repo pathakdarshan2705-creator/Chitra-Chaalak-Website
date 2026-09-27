@@ -1,4 +1,4 @@
----
+﻿---
 title: Exhibition Day!
 date: 2026-08-12
 location: Ahmedabad

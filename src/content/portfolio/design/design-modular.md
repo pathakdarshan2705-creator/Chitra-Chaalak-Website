@@ -1,13 +1,13 @@
----
+﻿---
 title: The Road to Somewhere
 section: design
 date: 2025-10-30
-image: /uploads/pothole-poster-ill.jpg
+image: /src/assets/uploads/pothole-poster-ill.jpg
 description: A satirical colour study turning India's everyday potholes into a visual commentary on development, political promises, and who actually gets the smooth road.
 youtubeId: ''
 ---
 
-> **“The future is smooth. Just not for you.”**
+> **â€œThe future is smooth. Just not for you.â€**
 
 _The Road to Somewhere_ is a satirical poster created as part of my **Colour Theory** module, using colour, contrast and visual storytelling to turn an everyday frustration into a larger commentary on development and political promises.
 
@@ -21,7 +21,7 @@ Potholes are so familiar that they have almost become part of the landscape. The
 
 I wanted to turn that familiarity into something more exaggerated.
 
-The central visual idea was to create a strange contrast between a perfectly smooth, almost ceremonial road and the broken roads surrounding it. The central car moves confidently towards a road marked **“FINISH”**, while everyone else is forced to navigate the rougher paths around it.
+The central visual idea was to create a strange contrast between a perfectly smooth, almost ceremonial road and the broken roads surrounding it. The central car moves confidently towards a road marked **â€œFINISHâ€**, while everyone else is forced to navigate the rougher paths around it.
 
 The result is deliberately humorous, but the humour comes from something very real.
 
@@ -37,9 +37,9 @@ The characters, vehicles, flags and exaggerated expressions add another layer of
 
 The typography reinforces this contrast.
 
-**“TIME PASS IN INDIA”** establishes the tone immediately, while **“THE FUTURE IS SMOOTH / JUST NOT FOR YOU”** turns the visual joke into the central argument of the poster.
+**â€œTIME PASS IN INDIAâ€** establishes the tone immediately, while **â€œTHE FUTURE IS SMOOTH / JUST NOT FOR YOUâ€** turns the visual joke into the central argument of the poster.
 
-> **“The joke is in the picture. The colour just makes it harder to ignore.”**
+> **â€œThe joke is in the picture. The colour just makes it harder to ignore.â€**
 
 ***
 
@@ -65,7 +65,7 @@ The composition was designed to make the viewer enter the image from the top and
 
 The central perspective creates a visual hierarchy:
 
-**Title → Road → Characters → Potholes → Finish**
+**Title â†’ Road â†’ Characters â†’ Potholes â†’ Finish**
 
 The typography follows the same exaggerated tone as the illustration. Large serif and display lettering gives the poster the feeling of an old newspaper or periodical, while the smaller editorial text underneath expands the joke into a written commentary.
 
@@ -75,7 +75,7 @@ The combination of illustration, headline, subheading and body copy allows the w
 
 ## **The Poster**
 
-![Poster on Potholes on Indian Road](/uploads/pothole-poster.jpg)
+![Poster on Potholes on Indian Road](/src/assets/uploads/pothole-poster.jpg)
 
 The final composition brings together the colour study, illustration, typography and written commentary into one deliberately overloaded visual scene.
 
@@ -98,4 +98,4 @@ For me, the project became less about designing a poster _about potholes_ and mo
 **Module:** Colour Theory
 **Format:** Poster
 **Medium:** Digital Illustration & Graphic Design
-**Focus:** Colour · Composition · Visual Storytelling · Typography · Satire
+**Focus:** Colour Â· Composition Â· Visual Storytelling Â· Typography Â· Satire

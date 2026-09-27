@@ -1,19 +1,19 @@
----
+﻿---
 title: The Thumbnail Game
 section: design
 date: 2024-09-15
-image: /uploads/1.png
-description: A collection of fast-turnaround YouTube thumbnails created for Jalso, where every 30–45 minute exercise was about finding the hook, building hierarchy and making a story impossible to miss.
+image: /src/assets/uploads/1.png
+description: A collection of fast-turnaround YouTube thumbnails created for Jalso, where every 30â€“45 minute exercise was about finding the hook, building hierarchy and making a story impossible to miss.
 youtubeId: https://www.youtube.com/@jalsopodcasts
 ---
 
 A collection of YouTube thumbnails designed for Jalso, turning conversations, films, people and ideas into visuals that have to make sense in a second.
 
-> **“You get a few seconds to make someone stop scrolling.”**
+> **â€œYou get a few seconds to make someone stop scrolling.â€**
 
 _The Thumbnail Game_ is a collection of YouTube thumbnail designs I created while working with **Jalso Production House**. What started as one of my responsibilities within the production team became a regular exercise in understanding how much information a single image can carry, and how quickly it has to communicate.
 
-These were not designs that had days to develop. Most thumbnails were made within **30–45 minutes**, often around ongoing productions and changing requirements. The challenge was to understand the subject quickly, identify the strongest hook, find the right image, build a clear hierarchy and make the whole thing work at a glance.
+These were not designs that had days to develop. Most thumbnails were made within **30â€“45 minutes**, often around ongoing productions and changing requirements. The challenge was to understand the subject quickly, identify the strongest hook, find the right image, build a clear hierarchy and make the whole thing work at a glance.
 
 ## **The Context**
 
@@ -37,11 +37,11 @@ The goal wasn't to make every thumbnail look beautiful in isolation.
 
 The goal was to make it **clear, recognisable and difficult to ignore when surrounded by dozens of other videos.**
 
-> **“A thumbnail isn't the whole story. It's the reason someone decides to hear the story.”**
+> **â€œA thumbnail isn't the whole story. It's the reason someone decides to hear the story.â€**
 
 ## **01 - The First Batch**
 
-![Thumbnail Example One](/uploads/1.png)
+![Thumbnail Example One](/src/assets/uploads/1.png)
 
 These thumbnails show some of the different visual situations I had to work with: film conversations, interviews, financial discussions and cultural topics.
 
@@ -51,7 +51,7 @@ The subjects are completely different, so the visual language changes with them.
 
 ## **02 - Finding the Hook**
 
-![Another example for thumbnails](/uploads/2.png)
+![Another example for thumbnails](/src/assets/uploads/2.png)
 
 As the subjects became more varied, the challenge became less about making a consistent visual style and more about finding the **specific hook of each episode**.
 
@@ -61,11 +61,11 @@ For example, a film discussion could be built around the film itself, while a co
 
 ## **03** - **Designing at Speed**
 
-![Quickly made thumbnails](/uploads/3.png)
+![Quickly made thumbnails](/src/assets/uploads/3.png)
 
 These are examples of the quick-turnaround work that became part of the production process.
 
-With roughly **30–45 minutes per thumbnail**, there wasn't much room for endless experimentation. Decisions had to happen quickly, which photograph to use, what to remove, what to enlarge, where the headline should sit, and what colour would make it visible immediately.
+With roughly **30â€“45 minutes per thumbnail**, there wasn't much room for endless experimentation. Decisions had to happen quickly, which photograph to use, what to remove, what to enlarge, where the headline should sit, and what colour would make it visible immediately.
 
 That constraint became part of the exercise.
 
@@ -84,7 +84,7 @@ That meant learning to prioritise.
 **Hierarchy before decoration.**
 **Recognition before detail.**
 
-The speed also became valuable. Designing repeatedly under real production conditions taught me to make decisions without getting overly attached to them — something that has carried into my other design and filmmaking work.
+The speed also became valuable. Designing repeatedly under real production conditions taught me to make decisions without getting overly attached to them â€” something that has carried into my other design and filmmaking work.
 
 ## **Working with Jalso**
 
@@ -97,8 +97,8 @@ The thumbnails were a small part of that larger role, but they gave me a differe
 ### **Project Details**
 
 **Production House:** Jalso Production House
-**Period:** July 2024 – November 2025
+**Period:** July 2024 â€“ November 2025
 **Role:** Designer
-**Typical turnaround:** 30–45 minutes
+**Typical turnaround:** 30â€“45 minutes
 **Medium:** Digital design
 **Work:** YouTube thumbnails for podcasts, interviews, films, and other Jalso productions

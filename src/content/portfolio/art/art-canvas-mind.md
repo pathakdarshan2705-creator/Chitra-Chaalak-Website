@@ -1,8 +1,8 @@
----
+﻿---
 title: Songs I could see
 section: art
 date: 2026-06-11
-image: /uploads/'Baithi_Hai'.jpg
+image: /src/assets/uploads/'Baithi_Hai'.jpg
 description: Three songs translated into three visual worlds, personal interpretations of Baithi Hai, Bandeh, and Beparwah, drawn entirely in Procreate.
 youtubeId: ''
 ---
@@ -43,7 +43,7 @@ The warm reds and yellows create a sense of closeness, while the darker silhouet
 
 I began with the central figure and gradually built the surrounding space around it in Procreate. Instead of defining everything sharply, I allowed colour and texture to overlap, letting the background and figure almost dissolve into one another.
 
-![Baithi Hai](/uploads/%27Baithi_Hai%27.jpg)
+![Baithi Hai](/src/assets/uploads/%27Baithi_Hai%27.jpg)
 
 Song Link:
 YouTube:[ Click Here for YouTube video](https://youtu.be/wlznr4_NAUI?si=SiGUTMrE_qXSMtEy)
@@ -65,7 +65,7 @@ I was interested in the idea of movement without knowing exactly where you are g
 
 I built the composition around repeating frames and perspective lines, gradually pushing them deeper into the image. The limited colour palette and hand-drawn marks were used to give the architectural forms a graphic, almost print-like character.
 
-![Bandeh](/uploads/%27Bandeh%27.jpg)
+![Bandeh](/src/assets/uploads/%27Bandeh%27.jpg)
 
 Song Link:
 YouTube:[ Click Here for YouTube video](https://youtu.be/ZxEWftSZHgA?si=Gz_vXf-bzEbC0ltj)
@@ -87,7 +87,7 @@ The image became less about illustrating a particular moment and more about crea
 
 I started with the figure and the circular ground beneath him, then built the flowing forms outward. Each ribbon was drawn as a separate visual element before being layered and intertwined to create the sense of movement around the character.
 
-![Beparwah](/uploads/Beparwah.jpg)
+![Beparwah](/src/assets/uploads/Beparwah.jpg)
 
 Song Link:
 YouTube:[ Click Here for YouTube video](https://youtu.be/MNmiN43iAyQ?si=6QBQ99bPXw5_BVXL)
@@ -99,6 +99,6 @@ Spotify: [Click Here for Spotify App](https://open.spotify.com/track/1HFeaybugpN
 
 - **Software:** Procreate
 - **Medium:** Digital Illustration
-- **Approach:** Hand-drawn forms · Layered colour · Texture · Digital painting
+- **Approach:** Hand-drawn forms Â· Layered colour Â· Texture Â· Digital painting
 
 **Three songs. Three visual worlds. One experiment: seeing what music might look like.**

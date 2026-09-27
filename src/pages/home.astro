@@ -9,6 +9,7 @@ import UpdateEntryCard from '../components/UpdateEntryCard.astro';
 import SlideshowCard from '../components/SlideshowCard.astro';
 import VaultCard from '../components/VaultCard.astro';
 import MusicListItem from '../components/MusicListItem.astro';
+import { MOBILE_TABS } from '../nav.config';
 import { getCollection } from 'astro:content';
 
 const allBlogPosts = await getCollection('blog');
@@ -85,9 +86,9 @@ const portfolioSections = [
   <div class="cc-home">
 
     <nav class="cc-mobile-tabs" id="cc-mobile-tabs">
-      <button class="cc-mobile-tab is-active" data-target="updates">CH 1 · UPDATES</button>
-      <button class="cc-mobile-tab" data-target="center">CH 2 · WATCH</button>
-      <button class="cc-mobile-tab" data-target="portfolio">CH 3 · WORK</button>
+      {MOBILE_TABS.map((tab, idx) => (
+        <button class={`cc-mobile-tab ${idx === 0 ? 'is-active' : ''}`} data-target={tab.target}>{tab.label}</button>
+      ))}
     </nav>
 
     <!-- LEFT: Updates -->
@@ -332,6 +333,10 @@ if (!window.__ccMobileTabsInit) {
       if (dx > 0 && current > 0) showScreen(current - 1);
     });
 
-    showScreen(0);
+    if (window.innerWidth <= 768) {
+      showScreen(2); // Mobile default: My Work (portfolio)
+    } else {
+      showScreen(0); // Desktop default: Updates
+    }
   }
 </script>

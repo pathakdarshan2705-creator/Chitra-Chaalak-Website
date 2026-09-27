@@ -1,17 +1,17 @@
----
-title: અમદાવાદના 12 દરવાજાઓ
+﻿---
+title: àª…àª®àª¦àª¾àªµàª¾àª¦àª¨àª¾ 12 àª¦àª°àªµàª¾àªœàª¾àª“
 section: filmmaking
 date: 2024-11-23
-image: /uploads/Silent_Valley_Thumb.jpg
-description: A visual journey through Ahmedabad’s historic gates, tracing the stories, architecture, and history that still live around them.
+image: /src/assets/uploads/Silent_Valley_Thumb.jpg
+description: A visual journey through Ahmedabadâ€™s historic gates, tracing the stories, architecture, and history that still live around them.
 youtubeId: https://youtu.be/cT4QbPKXx2Y?si=A4z-8CA8ZNF9f3aO
 ---
 
 > _Ahmedabad Heritage Special_
 
-> **“A city remembers through the things it refuses to forget.”**
+> **â€œA city remembers through the things it refuses to forget.â€**
 
-_Ahmedabad’s 12 Darwaja_ explores the historic gateways of Ahmedabad and the stories held within them, looking beyond the structures themselves to the history, architecture and living heritage of the old city.
+_Ahmedabadâ€™s 12 Darwaja_ explores the historic gateways of Ahmedabad and the stories held within them, looking beyond the structures themselves to the history, architecture and living heritage of the old city.
 
 ## The Process
 
@@ -29,7 +29,7 @@ Rather than presenting the Darwajas simply as static monuments, we wanted the fi
 
 The film takes the viewer through the city's historic gateways while uncovering the stories behind them, allowing the architecture and the history to work together.
 
-> **“The gates may have been built to mark the edge of a city, but the city kept growing around them.”**
+> **â€œThe gates may have been built to mark the edge of a city, but the city kept growing around them.â€**
 
 ## The Film
 
@@ -39,7 +39,7 @@ The project was also an opportunity for me to work with a subject that sits clos
 
 ## My Role
 
-**Research · Writing · Cinematography · Editing**
+**Research Â· Writing Â· Cinematography Â· Editing**
 
 I was involved in the film across the process, from researching the subject and developing the narrative to filming the visuals and shaping the final edit.
 
@@ -52,7 +52,7 @@ Through Jalso, I had the opportunity to work on multiple documentary films and p
 Working across these projects gave me the chance to experience documentary filmmaking beyond an academic setting, working with real subjects, real locations, real stories and the practical constraints that come with producing films for actual audiences and clients.
 
 **Client / Production:** Jalso Production House
-**My Role:** Researcher · Writer · Cinematographer · Editor
+**My Role:** Researcher Â· Writer Â· Cinematographer Â· Editor
 **Year:** 2024
 
 The film was published by **Jalso Culture** on YouTube on November 23, 2024.

@@ -16,16 +16,7 @@
 
 import Icon from './Icons.astro';
 
-interface NavItem { label: string; href: string; key: string; }
-
-const NAV_ITEMS: NavItem[] = [
-  { label: 'In the Meantime', href: '/updates', key: 'updates' },
-  { label: 'Making Sense', href: '/blog', key: 'blog' },
-  { label: 'My Work', href: '/portfolio', key: 'portfolio' },
-  { label: 'The Film Shelf', href: '/films', key: 'films' },
-  { label: 'Visual Tours', href: '/tour', key: 'tour' },
-  { label: 'The Collection', href: '/collections', key: 'collections' },
-];
+import { NAV_LINKS } from '../nav.config';
 
 interface Props {
   activePage: string;      // must match a NAV_ITEMS[].key
@@ -53,7 +44,7 @@ const {
     <span class="cc-sidebar__hamburger-title">{pageTitle}</span>
   </button>
   <div class="cc-sidebar__grid" id="cc-sidebar-grid">
-    {NAV_ITEMS.map((item) => (
+    {NAV_LINKS.map((item) => (
       <a
         href={item.href}
         class={`cc-sidebar__link ${item.key === activePage ? 'is-active' : ''}`}

@@ -1,13 +1,13 @@
----
+﻿---
 title: Mere Desh Ki Dharti
 section: filmmaking
 date: 2026-05-04
-image: "/uploads/Screenshot (511).png"
+image: "/src/assets/uploads/Screenshot (511).png"
 description: A satirical take on news, environmental neglect, and the uncomfortable gap between what we are told and what is actually happening.
 youtubeId: https://youtu.be/pJEQVtn_wFk
 ---
 
-> **“Tum camera roll karo, aage ka mai sambhal lunga!”**
+> **â€œTum camera roll karo, aage ka mai sambhal lunga!â€**
 
 _Mere Desh Ki Dharti_ is a satirical fictional film about a news reporter caught between manufactured narratives and the reality unfolding in front of his camera.
 
@@ -31,7 +31,7 @@ A recurring visual device was the gradual widening of the frame. What begins as 
 
 The film also shifts with Ranjish. What begins as comedy slowly becomes frustration, and eventually determination, as he decides to stop playing along and report what he actually sees.
 
-> **“The camera can frame the truth, but it cannot make the truth disappear.”**
+> **â€œThe camera can frame the truth, but it cannot make the truth disappear.â€**
 
 ## The Film
 
@@ -43,7 +43,7 @@ The title, _Mere Desh Ki Dharti_, becomes deliberately ironic: a familiar patrio
 
 ## My Role
 
-**Story · Screenplay · Direction · Cinematography · Editing**
+**Story Â· Screenplay Â· Direction Â· Cinematography Â· Editing**
 
 **Original Story:** Asish Gajjar & Darshan Pathak
 **Screenplay:** Darshan Pathak

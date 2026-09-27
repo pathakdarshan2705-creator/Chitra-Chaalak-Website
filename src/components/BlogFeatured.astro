@@ -124,12 +124,6 @@ const optimizedSrc = isRemote && imageSrc.includes('unsplash.com')
         const href = (card as HTMLElement).dataset.href;
         if (href) window.location.href = href;
       });
-      card.addEventListener('keydown', (e) => {
-        if ((e as KeyboardEvent).key === 'Enter') {
-          const href = (card as HTMLElement).dataset.href;
-          if (href) window.location.href = href;
-        }
-      });
     });
   }
 </script>

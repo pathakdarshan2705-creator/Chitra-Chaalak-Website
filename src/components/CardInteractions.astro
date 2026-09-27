@@ -1,10 +1,10 @@
----
+﻿---
 // src/components/CardInteractions.astro
 //
 // Extracted from Card.astro so this logic is guaranteed present on
 // EVERY page, not just ones that happen to render a <Card> component
 // directly. Astro only bundles a component's script when that exact
-// component is used on the page — CassetteCard, UpdateEntryCard,
+// component is used on the page â€” CassetteCard, UpdateEntryCard,
 // SlideshowCard, and BlogGridCard all reuse the `.cc-card` class but
 // are separate components, so without this extraction, a page using
 // only e.g. BlogGridCard would silently have no click/dblclick behavior.
@@ -55,13 +55,6 @@ if (!window.__ccCardHandlersInit) {
       }
     });
 
-    document.addEventListener('keydown', (e) => {
-      if (e.key !== 'Enter' && e.key !== ' ') return;
-      const card = e.target.closest('.cc-card');
-      if (!card) return;
-      e.preventDefault();
-      const href = card.dataset.href;
-      if (href) window.location.href = href;
-    });
+    
   }
 </script>
