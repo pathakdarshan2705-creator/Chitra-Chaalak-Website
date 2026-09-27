@@ -15,11 +15,15 @@ import Layout from '../layouts/Layout.astro';
     <div class="crosshair crosshair-br"></div>
 
     <div class="video-wrapper">
-      <img 
-        src="/images/hero.gif" 
+      <video 
+        src="/images/hero.mp4" 
         class="hero-video" 
-        alt="Hero Animation"
-      />
+        autoplay 
+        muted 
+        loop 
+        playsinline
+        poster="/images/hero.gif"
+      ></video>
       <div class="video-vignette"></div>
     </div>
 

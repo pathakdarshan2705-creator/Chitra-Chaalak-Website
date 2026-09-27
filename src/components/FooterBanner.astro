@@ -3,8 +3,9 @@
 // Broadcast ticker — matches the double-border/bevel language used
 // everywhere else, plus a live signal-bar meter (same visual family
 // as UpdateEntryCard) so it reads as part of the same system.
+import { SITE_CONFIG } from '../config';
 ---
-<div class="cc-footer">
+<div class="cc-footer" data-target={SITE_CONFIG.T_MINUS_TARGET_DATE}>
   <span class="cc-footer__corner cc-footer__corner--tl"></span>
   <span class="cc-footer__corner cc-footer__corner--tr"></span>
 
@@ -182,19 +183,40 @@
   // @ts-nocheck
   function ccUpdateFooter(){
     const now = new Date();
+    
+    // SYS.DATE logic
     const dateStr = now.toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' }).toUpperCase();
-    
-    // Custom time string with span wrappers around colons for pulsing effect
-    const h = now.getHours().toString().padStart(2, '0');
-    const m = now.getMinutes().toString().padStart(2, '0');
-    const s = now.getSeconds().toString().padStart(2, '0');
-    const timeStr = `${h}<span class="cc-pulse">:</span>${m}<span class="cc-pulse">:</span>${s}`;
-    
     const dateEl = document.getElementById('cc-footer-date');
-    const timeEl = document.getElementById('cc-footer-time');
     if (dateEl) dateEl.textContent = dateStr;
-    if (timeEl) timeEl.innerHTML = timeStr; // Use innerHTML to render the span
+    
+    // T-MINUS logic
+    const timeEl = document.getElementById('cc-footer-time');
+    const footerEl = document.querySelector('.cc-footer');
+    if (timeEl && footerEl) {
+      const targetDateStr = footerEl.getAttribute('data-target');
+      if (targetDateStr) {
+        const target = new Date(targetDateStr);
+        const diff = target.getTime() - now.getTime();
+        
+        if (diff <= 0) {
+          timeEl.innerHTML = `00<span class="cc-pulse">:</span>00<span class="cc-pulse">:</span>00`;
+        } else {
+          const totalSeconds = Math.floor(diff / 1000);
+          const hours = Math.floor(totalSeconds / 3600);
+          const minutes = Math.floor((totalSeconds % 3600) / 60);
+          const seconds = totalSeconds % 60;
+          
+          const h = hours.toString().padStart(2, '0');
+          const m = minutes.toString().padStart(2, '0');
+          const s = seconds.toString().padStart(2, '0');
+          
+          timeEl.innerHTML = `${h}<span class="cc-pulse">:</span>${m}<span class="cc-pulse">:</span>${s}`;
+        }
+      }
+    }
   }
+  
   ccUpdateFooter();
-  setInterval(ccUpdateFooter, 1000);
+  if (window.__ccFooterInterval) clearInterval(window.__ccFooterInterval);
+  window.__ccFooterInterval = setInterval(ccUpdateFooter, 1000);
 </script>
