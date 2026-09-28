@@ -1,0 +1,1351 @@
+---
+// src/components/FarmaishPostcard.astro
+// "Farmaish Postcard" — Viewer request postcard for the Blog ("Making Sense") page.
+// In vintage broadcast culture, viewers sent request letters (farmaish) to the station.
+---
+
+<section class="cc-farmaish-section" aria-label="Viewer Request Postcard">
+  <!-- Section Title Banner -->
+  <div class="cc-farmaish-header">
+    <div class="cc-farmaish-header__tag">
+      <span class="cc-farmaish-header__dot"></span>
+      <span class="cc-farmaish-header__title">FARMAISH // VIEWER REQUEST POSTBOX</span>
+    </div>
+    <span class="cc-farmaish-header__meta">CHITRA-CHAALAK BROADCAST SERVICE</span>
+  </div>
+
+  <div class="cc-farmaish-wrapper">
+    <!-- Postcard Main Card -->
+    <div class="cc-postcard" id="cc-postcard">
+      <span class="cc-card__corner-br" aria-hidden="true"></span>
+
+      <!-- Left Side: Message & From -->
+      <div class="cc-postcard__left">
+        <div class="cc-postcard__field-header">
+          <label for="farmaish-message" class="cc-postcard__label">
+            MESSAGE / REQUEST
+          </label>
+          <span class="cc-postcard__counter" id="farmaish-char-count" aria-live="polite">0 / 500</span>
+        </div>
+
+        <textarea
+          id="farmaish-message"
+          name="message"
+          class="cc-postcard__textarea"
+          rows="5"
+          maxlength="500"
+          placeholder="Write a note, request a topic, or leave a question for Chitra-Chaalak..."
+          spellcheck="false"
+        ></textarea>
+
+        <div class="cc-postcard__from-row">
+          <label for="farmaish-from" class="cc-postcard__from-label">FROM:</label>
+          <input
+            type="text"
+            id="farmaish-from"
+            name="from"
+            maxlength="40"
+            class="cc-postcard__from-input"
+            placeholder="Anonymous / Your Name (optional)"
+            autocomplete="off"
+          />
+        </div>
+
+        <!-- Hidden honeypot for bot detection -->
+        <input
+          type="text"
+          id="farmaish-website"
+          name="website"
+          tabindex="-1"
+          autocomplete="off"
+          aria-hidden="true"
+          class="cc-farmaish-honeypot"
+        />
+      </div>
+
+      <!-- Center Vertical Divider -->
+      <div class="cc-postcard__divider" aria-hidden="true">
+        <span class="cc-postcard__divider-text">CHITRA-CHAALAK POSTCARD</span>
+      </div>
+
+      <!-- Right Side: Stamp, Dropzone & Postmark -->
+      <div class="cc-postcard__right">
+        <div class="cc-postcard__stamp-area">
+          <!-- Drop target zone with dotted outline -->
+          <div class="cc-postcard__dropzone" id="farmaish-dropzone">
+            <span class="cc-postcard__dropzone-label">AFFIX<br />STAMP</span>
+            <div class="cc-postcard__pulse-ring" id="farmaish-pulse-ring" aria-hidden="true"></div>
+
+            <!-- Postmark (rendered on valid drop) -->
+            <div class="cc-postmark" id="farmaish-postmark" aria-hidden="true">
+              <svg viewBox="0 0 100 100" class="cc-postmark__svg">
+                <circle cx="50" cy="50" r="46" fill="none" stroke="currentColor" stroke-width="2.5" stroke-dasharray="3 2" />
+                <circle cx="50" cy="50" r="38" fill="none" stroke="currentColor" stroke-width="1.5" />
+                <path id="postmark-arc-top" d="M 18,50 A 32,32 0 0,1 82,50" fill="none" />
+                <text class="cc-postmark__curved-text">
+                  <textPath href="#postmark-arc-top" startOffset="50%" text-anchor="middle">
+                    CHITRA-CHAALAK
+                  </textPath>
+                </text>
+                <line x1="20" y1="50" x2="80" y2="50" stroke="currentColor" stroke-width="1.5" />
+                <text x="50" y="47" class="cc-postmark__date" id="farmaish-postmark-date" text-anchor="middle">-- --- ----</text>
+                <text x="50" y="62" class="cc-postmark__sub" text-anchor="middle">AIRMAIL</text>
+              </svg>
+            </div>
+          </div>
+
+          <!-- Postage Stamp (Draggable item) -->
+          <div
+            class="cc-stamp"
+            id="farmaish-stamp"
+            role="button"
+            tabindex="0"
+            aria-label="Postage stamp. Drag onto dotted target or press Enter to stamp & send."
+          >
+            <div class="cc-stamp__inner">
+              <div class="cc-stamp__header">
+                <span>POSTAGE</span>
+                <span class="cc-stamp__value">50 P.</span>
+              </div>
+              <div class="cc-stamp__graphic">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <rect x="2" y="7" width="20" height="15" rx="2" ry="2" />
+                  <polyline points="17 2 12 7 7 2" />
+                  <circle cx="12" cy="14" r="3" />
+                </svg>
+              </div>
+              <div class="cc-stamp__footer">CHITRA-CHAALAK</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Ghost hand guide for first-time visitors -->
+        <div class="cc-ghost-hand" id="farmaish-ghost-hand" aria-hidden="true">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff000" stroke-width="2">
+            <path d="M18 11V6a2 2 0 0 0-4 0v5" />
+            <path d="M14 10V4a2 2 0 0 0-4 0v7" />
+            <path d="M10 10.5V6a2 2 0 0 0-4 0v8" />
+            <path d="M6 14v1a6 6 0 0 0 12 0v-4" />
+          </svg>
+        </div>
+
+        <!-- Alternative / Accessible Trigger Button -->
+        <button type="button" class="cc-farmaish-btn" id="farmaish-send-btn">
+          STAMP & SEND
+        </button>
+      </div>
+    </div>
+
+    <!-- Letterbox Unit (Slot + Ticker) -->
+    <div class="cc-letterbox" id="cc-letterbox">
+      <div class="cc-letterbox__pillar">
+        <div class="cc-letterbox__hood">
+          <span class="cc-letterbox__hood-crest">POST</span>
+        </div>
+
+        <!-- Mail Slot with swinging brass flap -->
+        <div class="cc-letterbox__slot-frame">
+          <div class="cc-letterbox__flap" id="farmaish-flap">
+            <span class="cc-letterbox__flap-line"></span>
+            <span class="cc-letterbox__flap-text">LETTERS</span>
+          </div>
+        </div>
+
+        <div class="cc-letterbox__body-lines">
+          <span></span><span></span><span></span>
+        </div>
+      </div>
+
+      <!-- Ticker Strip Beneath Letterbox -->
+      <div class="cc-letterbox__ticker-wrap">
+        <div class="cc-letterbox__ticker-dot"></div>
+        <div class="cc-letterbox__ticker" id="farmaish-ticker">
+          <span class="cc-letterbox__ticker-text" id="farmaish-ticker-text">[ POSTBOX // READY FOR REQUESTS ]</span>
+        </div>
+      </div>
+
+      <!-- Reset action for sending another message -->
+      <button type="button" class="cc-farmaish-reset-btn" id="farmaish-reset-btn" hidden>
+        WRITE ANOTHER
+      </button>
+    </div>
+  </div>
+
+  <!-- Screen reader live announcement area -->
+  <div class="cc-farmaish-sr" id="farmaish-sr-announcer" aria-live="polite"></div>
+</section>
+
+<style>
+  .cc-farmaish-section {
+    margin-top: 28px;
+    padding-top: 20px;
+    border-top: 2px dashed rgba(103, 200, 255, 0.25);
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .cc-farmaish-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 12px;
+    background: var(--navy-deep);
+    border: 1px solid var(--blue-panel-light);
+    box-shadow: inset 0 0 8px rgba(0, 10, 40, 0.5);
+  }
+
+  .cc-farmaish-header__tag {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .cc-farmaish-header__dot {
+    width: 6px;
+    height: 6px;
+    background: var(--yellow);
+    border-radius: 50%;
+    animation: cc-pulse-dot 1.5s ease-in-out infinite;
+  }
+
+  @keyframes cc-pulse-dot {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.25; }
+  }
+
+  .cc-farmaish-header__title {
+    font-family: var(--font-ui);
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: 1.2px;
+    color: var(--yellow);
+    text-transform: uppercase;
+  }
+
+  .cc-farmaish-header__meta {
+    font-family: var(--font-ui);
+    font-size: 9px;
+    letter-spacing: 1px;
+    color: var(--blue-panel-light);
+    opacity: 0.7;
+    text-transform: uppercase;
+  }
+
+  /* Two-column layout on desktop: Postcard + Letterbox */
+  .cc-farmaish-wrapper {
+    display: grid;
+    grid-template-columns: 1fr 220px;
+    gap: 20px;
+    align-items: stretch;
+  }
+
+  /* ==========================================================
+     THE POSTCARD
+     ========================================================== */
+  .cc-postcard {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr 14px 180px;
+    background:
+      linear-gradient(rgba(10, 75, 196, 0.95), rgba(0, 59, 153, 0.98)),
+      repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 23px,
+        rgba(103, 200, 255, 0.05) 23px,
+        rgba(103, 200, 255, 0.05) 24px
+      );
+    border: 2px solid var(--navy-deep);
+    box-shadow:
+      inset 0 0 0 2px var(--blue-panel-light),
+      inset 0 0 0 3px var(--navy-deep),
+      inset 1px 1px 0 rgba(255, 255, 255, 0.15),
+      inset -1px -1px 0 rgba(0, 10, 40, 0.4),
+      4px 6px 18px rgba(0, 10, 40, 0.5);
+    padding: 16px;
+    border-radius: 2px;
+    transform: rotate(-0.5deg);
+    transition: transform 0.3s cubic-bezier(0.2, 0.9, 0.3, 1), box-shadow 0.3s ease;
+  }
+
+  .cc-postcard::before {
+    content: "";
+    position: absolute;
+    top: 3px; left: 3px;
+    width: 8px; height: 8px;
+    border-top: 2px solid var(--blue-panel-light);
+    border-left: 2px solid var(--blue-panel-light);
+    opacity: 0.8;
+    pointer-events: none;
+  }
+
+  .cc-card__corner-br {
+    position: absolute;
+    bottom: 3px; right: 3px;
+    width: 8px; height: 8px;
+    border-bottom: 2px solid var(--blue-panel-light);
+    border-right: 2px solid var(--blue-panel-light);
+    opacity: 0.8;
+    pointer-events: none;
+  }
+
+  /* Left Side: Message */
+  .cc-postcard__left {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 0;
+  }
+
+  .cc-postcard__field-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .cc-postcard__label {
+    font-family: var(--font-ui);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: var(--yellow);
+    text-transform: uppercase;
+  }
+
+  .cc-postcard__counter {
+    font-family: var(--font-ui);
+    font-size: 9px;
+    letter-spacing: 0.5px;
+    color: var(--blue-panel-light);
+    opacity: 0.8;
+    transition: color 0.2s ease;
+  }
+
+  .cc-postcard__counter.is-near-limit {
+    color: var(--yellow);
+    font-weight: 700;
+  }
+
+  .cc-postcard__textarea {
+    width: 100%;
+    box-sizing: border-box;
+    background: rgba(0, 10, 40, 0.45);
+    border: 1px solid var(--blue-panel-light);
+    color: var(--blue-lightest);
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.5;
+    padding: 10px 12px;
+    resize: none;
+    outline: none;
+    border-radius: 2px;
+    box-shadow: inset 1px 1px 4px rgba(0, 0, 0, 0.4);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .cc-postcard__textarea:focus {
+    border-color: var(--yellow);
+    box-shadow: 0 0 8px rgba(255, 240, 0, 0.3), inset 1px 1px 4px rgba(0, 0, 0, 0.4);
+  }
+
+  .cc-postcard__textarea::placeholder {
+    color: var(--blue-lightest);
+    opacity: 0.4;
+  }
+
+  .cc-postcard__from-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(0, 10, 40, 0.3);
+    border: 1px dashed rgba(103, 200, 255, 0.4);
+    padding: 4px 10px;
+    border-radius: 2px;
+  }
+
+  .cc-postcard__from-label {
+    font-family: var(--font-ui);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: var(--blue-panel-light);
+    flex-shrink: 0;
+  }
+
+  .cc-postcard__from-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: var(--blue-lightest);
+    font-family: var(--font-ui);
+    font-size: 11px;
+    outline: none;
+    padding: 2px 0;
+  }
+
+  .cc-postcard__from-input::placeholder {
+    color: var(--blue-lightest);
+    opacity: 0.35;
+  }
+
+  .cc-farmaish-honeypot {
+    position: absolute;
+    left: -9999px;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  /* Center Vertical Divider */
+  .cc-postcard__divider {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+
+  .cc-postcard__divider::before {
+    content: "";
+    position: absolute;
+    top: 0; bottom: 0; left: 50%;
+    width: 1px;
+    background: dashed rgba(103, 200, 255, 0.3);
+    border-left: 1px dashed rgba(103, 200, 255, 0.3);
+  }
+
+  .cc-postcard__divider-text {
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    font-family: var(--font-ui);
+    font-size: 7px;
+    letter-spacing: 2px;
+    color: var(--blue-panel-light);
+    opacity: 0.5;
+    background: var(--blue-card);
+    padding: 6px 0;
+  }
+
+  /* Right Side: Stamp & Actions */
+  .cc-postcard__right {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    padding-left: 6px;
+  }
+
+  .cc-postcard__stamp-area {
+    position: relative;
+    width: 100px;
+    height: 110px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Dotted Stamp Dropzone */
+  .cc-postcard__dropzone {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    width: 76px;
+    height: 90px;
+    border: 2px dashed var(--blue-panel-light);
+    border-radius: 2px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 10, 40, 0.25);
+    box-sizing: border-box;
+  }
+
+  .cc-postcard__dropzone-label {
+    font-family: var(--font-ui);
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: var(--blue-panel-light);
+    opacity: 0.6;
+    text-align: center;
+    line-height: 1.2;
+    pointer-events: none;
+  }
+
+  .cc-postcard__pulse-ring {
+    position: absolute;
+    inset: -4px;
+    border: 1px solid var(--yellow);
+    border-radius: 3px;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .cc-postcard__pulse-ring.is-pulsing {
+    animation: cc-pulse-ring 2s cubic-bezier(0.2, 0.8, 0.4, 1) infinite;
+  }
+
+  @keyframes cc-pulse-ring {
+    0% { transform: scale(0.96); opacity: 0.8; }
+    50% { transform: scale(1.05); opacity: 0; }
+    100% { transform: scale(0.96); opacity: 0; }
+  }
+
+  /* The Stamp */
+  .cc-stamp {
+    position: absolute;
+    top: 0;
+    left: -12px;
+    width: 76px;
+    height: 90px;
+    background: var(--navy-deep);
+    border: 2px solid var(--yellow);
+    box-shadow:
+      2px 4px 10px rgba(0, 0, 0, 0.45),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.15);
+    border-radius: 2px;
+    cursor: grab;
+    user-select: none;
+    touch-action: none;
+    z-index: 20;
+    transition: transform 0.15s ease-out, box-shadow 0.15s ease-out;
+  }
+
+  .cc-stamp:active {
+    cursor: grabbing;
+    box-shadow: 4px 8px 16px rgba(0, 0, 0, 0.6);
+  }
+
+  .cc-stamp:focus-visible {
+    outline: 2px solid var(--yellow);
+    outline-offset: 3px;
+  }
+
+  .cc-stamp__inner {
+    width: 100%;
+    height: 100%;
+    padding: 5px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px dashed rgba(255, 240, 0, 0.4);
+    box-sizing: border-box;
+    background: linear-gradient(135deg, rgba(0, 59, 153, 0.8) 0%, rgba(10, 75, 196, 0.8) 100%);
+  }
+
+  .cc-stamp__header {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--font-ui);
+    font-size: 7px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    color: var(--yellow);
+  }
+
+  .cc-stamp__value {
+    color: #ffffff;
+  }
+
+  .cc-stamp__graphic {
+    color: var(--yellow);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 2px 0;
+  }
+
+  .cc-stamp__footer {
+    font-family: var(--font-ui);
+    font-size: 6px;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    color: var(--blue-panel-light);
+    text-transform: uppercase;
+  }
+
+  /* Postmark Stamp */
+  .cc-postmark {
+    position: absolute;
+    width: 90px;
+    height: 90px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-12deg);
+    color: rgba(255, 240, 0, 0.85);
+    pointer-events: none;
+    opacity: 0;
+    z-index: 25;
+    transition: opacity 0.3s ease;
+  }
+
+  .cc-postmark.is-stamped {
+    opacity: 0.9;
+  }
+
+  .cc-postmark__svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  .cc-postmark__curved-text {
+    font-family: var(--font-ui);
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    fill: currentColor;
+  }
+
+  .cc-postmark__date {
+    font-family: var(--font-ui);
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    fill: currentColor;
+  }
+
+  .cc-postmark__sub {
+    font-family: var(--font-ui);
+    font-size: 7px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    fill: currentColor;
+  }
+
+  /* Ghost hand indicator */
+  .cc-ghost-hand {
+    position: absolute;
+    top: 25px;
+    left: -5px;
+    pointer-events: none;
+    opacity: 0;
+    z-index: 30;
+    transform: translate(0, 0);
+  }
+
+  /* Accessible Send Button */
+  .cc-farmaish-btn {
+    width: 100%;
+    padding: 7px 10px;
+    background: var(--navy-deep);
+    color: var(--yellow);
+    border: 1px solid var(--yellow);
+    font-family: var(--font-ui);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    cursor: pointer;
+    box-shadow: 2px 2px 0 var(--navy-deep);
+    transition: background 0.15s ease, color 0.15s ease, transform 0.1s ease;
+  }
+
+  .cc-farmaish-btn:hover {
+    background: var(--yellow);
+    color: var(--navy-deep);
+    transform: translateY(-1px);
+  }
+
+  .cc-farmaish-btn:active {
+    transform: translate(1px, 1px);
+    box-shadow: none;
+  }
+
+  /* ==========================================================
+     THE LETTERBOX
+     ========================================================== */
+  .cc-letterbox {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background: var(--blue-card);
+    border: 2px solid var(--navy-deep);
+    box-shadow:
+      inset 0 0 0 2px var(--blue-panel-light),
+      inset 0 0 0 3px var(--navy-deep),
+      inset 1px 1px 0 rgba(255, 255, 255, 0.15),
+      inset -1px -1px 0 rgba(0, 10, 40, 0.4);
+    padding: 14px;
+    border-radius: 2px;
+    position: relative;
+  }
+
+  .cc-letterbox__pillar {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .cc-letterbox__hood {
+    width: 100%;
+    padding: 4px 8px;
+    background: var(--navy-deep);
+    border: 1px solid var(--blue-panel-light);
+    text-align: center;
+    border-radius: 2px 2px 0 0;
+  }
+
+  .cc-letterbox__hood-crest {
+    font-family: var(--font-ui);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--yellow);
+  }
+
+  .cc-letterbox__slot-frame {
+    width: 100%;
+    height: 48px;
+    background: #00122e;
+    border: 2px solid var(--navy-deep);
+    box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.8);
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    perspective: 400px;
+  }
+
+  .cc-letterbox__flap {
+    width: 86%;
+    height: 32px;
+    background: linear-gradient(180deg, #67c8ff 0%, #0054cc 100%);
+    border: 1px solid var(--yellow);
+    border-top: 2px solid var(--yellow);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transform-origin: top center;
+    transform-style: preserve-3d;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+  }
+
+  .cc-letterbox__flap-line {
+    width: 70%;
+    height: 1px;
+    background: rgba(255, 240, 0, 0.6);
+    margin-bottom: 2px;
+  }
+
+  .cc-letterbox__flap-text {
+    font-family: var(--font-ui);
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--yellow);
+  }
+
+  .cc-letterbox__body-lines {
+    width: 60%;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    opacity: 0.4;
+  }
+
+  .cc-letterbox__body-lines span {
+    height: 1px;
+    background: var(--blue-panel-light);
+    width: 100%;
+  }
+
+  /* Ticker Strip Beneath Letterbox */
+  .cc-letterbox__ticker-wrap {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(0, 10, 40, 0.7);
+    border: 1px solid rgba(103, 200, 255, 0.25);
+    padding: 4px 8px;
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .cc-letterbox__ticker-dot {
+    width: 5px;
+    height: 5px;
+    background: var(--yellow);
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .cc-letterbox__ticker {
+    flex: 1;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+
+  .cc-letterbox__ticker-text {
+    font-family: var(--font-ui);
+    font-size: 9px;
+    letter-spacing: 0.8px;
+    color: var(--blue-lightest);
+    display: inline-block;
+  }
+
+  .cc-farmaish-reset-btn {
+    margin-top: 6px;
+    width: 100%;
+    padding: 5px 8px;
+    background: var(--navy-deep);
+    border: 1px solid var(--blue-panel-light);
+    color: var(--blue-lightest);
+    font-family: var(--font-ui);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: all 0.15s ease;
+  }
+
+  .cc-farmaish-reset-btn:hover {
+    background: var(--yellow);
+    color: var(--navy-deep);
+    border-color: var(--yellow);
+  }
+
+  .cc-farmaish-sr {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  /* ==========================================================
+     RESPONSIVE / MOBILE LAYOUT
+     ========================================================== */
+  @media (max-width: 900px) {
+    .cc-farmaish-wrapper {
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+    .cc-postcard {
+      grid-template-columns: 1fr 14px 160px;
+    }
+    .cc-letterbox {
+      flex-direction: row;
+      align-items: center;
+      gap: 16px;
+    }
+    .cc-letterbox__pillar {
+      flex-direction: row;
+      flex: 1;
+    }
+    .cc-letterbox__slot-frame {
+      max-width: 220px;
+    }
+    .cc-letterbox__ticker-wrap {
+      flex: 1;
+    }
+  }
+
+  @media (max-width: 600px) {
+    .cc-postcard {
+      grid-template-columns: 1fr;
+      gap: 14px;
+      padding: 12px;
+      transform: none;
+    }
+
+    .cc-postcard__divider {
+      display: none;
+    }
+
+    .cc-postcard__right {
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+      padding-left: 0;
+      padding-top: 10px;
+      border-top: 1px dashed rgba(103, 200, 255, 0.25);
+    }
+
+    .cc-postcard__stamp-area {
+      width: 80px;
+      height: 95px;
+    }
+
+    .cc-postcard__dropzone {
+      width: 68px;
+      height: 82px;
+    }
+
+    .cc-stamp {
+      width: 68px;
+      height: 82px;
+      left: -8px;
+    }
+
+    .cc-farmaish-btn {
+      width: auto;
+      flex: 1;
+      margin-left: 16px;
+      padding: 10px 14px;
+    }
+
+    .cc-letterbox {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 12px;
+    }
+
+    .cc-letterbox__pillar {
+      flex-direction: column;
+      width: 100%;
+    }
+
+    .cc-letterbox__slot-frame {
+      max-width: 100%;
+    }
+  }
+</style>
+
+<script>
+  // @ts-nocheck
+  (async function initFarmaishPostcard() {
+    const postcardEl = document.getElementById('cc-postcard');
+    const stampEl = document.getElementById('farmaish-stamp');
+    const dropzoneEl = document.getElementById('farmaish-dropzone');
+    const postmarkEl = document.getElementById('farmaish-postmark');
+    const postmarkDateEl = document.getElementById('farmaish-postmark-date');
+    const textareaEl = document.getElementById('farmaish-message');
+    const fromInputEl = document.getElementById('farmaish-from');
+    const countEl = document.getElementById('farmaish-char-count');
+    const sendBtnEl = document.getElementById('farmaish-send-btn');
+    const pulseRingEl = document.getElementById('farmaish-pulse-ring');
+    const ghostHandEl = document.getElementById('farmaish-ghost-hand');
+    const announcerEl = document.getElementById('farmaish-sr-announcer');
+    const tickerTextEl = document.getElementById('farmaish-ticker-text');
+    const letterboxFlapEl = document.getElementById('farmaish-flap');
+    const resetBtnEl = document.getElementById('farmaish-reset-btn');
+
+    if (!postcardEl || !stampEl || !dropzoneEl) return;
+
+    // 1. Format today's date in monospace uppercase
+    const today = new Date();
+    if (postmarkDateEl) {
+      postmarkDateEl.textContent = today.toLocaleDateString('en-GB', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric'
+      }).toUpperCase();
+    }
+
+    // 2. Screen reader announcement helper
+    function announce(msg) {
+      if (announcerEl) {
+        announcerEl.textContent = '';
+        setTimeout(() => { announcerEl.textContent = msg; }, 50);
+      }
+    }
+
+    // 3. Live character count
+    if (textareaEl && countEl) {
+      textareaEl.addEventListener('input', () => {
+        const len = textareaEl.value.length;
+        countEl.textContent = `${len} / 500`;
+        if (len >= 450) {
+          countEl.classList.add('is-near-limit');
+        } else {
+          countEl.classList.remove('is-near-limit');
+        }
+        resetIdleTimer();
+      });
+    }
+
+    // Prevent number keys 1-6 or arrows from triggering page navigation while typing
+    const stopNavProp = (e) => { e.stopPropagation(); };
+    textareaEl?.addEventListener('keydown', stopNavProp);
+    fromInputEl?.addEventListener('keydown', stopNavProp);
+
+    // 4. GSAP & Draggable import
+    let gsapInstance = null;
+    let draggableInstance = null;
+    let isStamped = false;
+    let isSending = false;
+    let isSent = false;
+
+    // Reduced motion check
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    try {
+      const gsapModule = await import('gsap');
+      const draggableModule = await import('gsap/Draggable.js');
+      gsapInstance = gsapModule.gsap;
+      gsapInstance.registerPlugin(draggableModule.Draggable);
+
+      // Check if already sent in this browser session
+      try {
+        if (localStorage.getItem('cc_farmaish_sent') === 'true') {
+          isSent = true;
+          if (tickerTextEl) tickerTextEl.textContent = '[ VIEWER REQUEST RECEIVED // ARCHIVED ]';
+          if (resetBtnEl) resetBtnEl.hidden = false;
+          if (sendBtnEl) sendBtnEl.disabled = true;
+          stampEl.style.opacity = '0';
+          stampEl.style.pointerEvents = 'none';
+          postmarkEl?.classList.add('is-stamped');
+          postcardEl.style.opacity = '0.4';
+          return;
+        }
+      } catch (e) {
+        // localStorage unavailable, ignore
+      }
+
+      // Guidance helpers
+      let idleTimer = null;
+      let ghostHandShown = false;
+      let idleWiggleTween = null;
+      let ghostHandTween = null;
+
+      function startGuidance() {
+        if (prefersReducedMotion || isStamped || isSending || isSent) return;
+
+        // Pulse ring around dropzone
+        pulseRingEl?.classList.add('is-pulsing');
+
+        // Idle wiggle on stamp
+        if (!idleWiggleTween) {
+          idleWiggleTween = gsapInstance.to(stampEl, {
+            x: 8,
+            y: -3,
+            duration: 0.35,
+            yoyo: true,
+            repeat: 3,
+            ease: 'power1.inOut',
+            onComplete: () => {
+              gsapInstance.to(stampEl, { x: 0, y: 0, duration: 0.2 });
+              idleWiggleTween = null;
+            }
+          });
+        }
+
+        // Ghost hand guide (once per visit or after 15s idle)
+        if (!ghostHandShown && ghostHandEl) {
+          ghostHandShown = true;
+          const dropOffset = getDropTargetOffset(stampEl, dropzoneEl);
+          ghostHandTween = gsapInstance.timeline()
+            .set(ghostHandEl, { opacity: 0, x: 0, y: 0 })
+            .to(ghostHandEl, { opacity: 1, duration: 0.3 })
+            .to(ghostHandEl, { x: dropOffset.deltaX * 0.7, y: dropOffset.deltaY * 0.7, duration: 1.2, ease: 'power2.inOut' })
+            .to(ghostHandEl, { opacity: 0, duration: 0.4 }, '+=0.2');
+        }
+      }
+
+      function stopGuidance() {
+        pulseRingEl?.classList.remove('is-pulsing');
+        if (idleWiggleTween) {
+          idleWiggleTween.kill();
+          idleWiggleTween = null;
+          gsapInstance.set(stampEl, { x: 0, y: 0 });
+        }
+        if (ghostHandTween) {
+          ghostHandTween.kill();
+          ghostHandTween = null;
+          if (ghostHandEl) gsapInstance.set(ghostHandEl, { opacity: 0 });
+        }
+      }
+
+      function resetIdleTimer() {
+        stopGuidance();
+        if (idleTimer) clearTimeout(idleTimer);
+        if (isStamped || isSending || isSent) return;
+
+        const charCount = textareaEl ? textareaEl.value.trim().length : 0;
+        const delay = charCount >= 3 ? 2000 : 4000;
+
+        idleTimer = setTimeout(() => {
+          startGuidance();
+        }, delay);
+      }
+
+      // Start initial guidance timer
+      resetIdleTimer();
+
+      // Reset guidance on interaction
+      ['mousedown', 'touchstart', 'input'].forEach((evt) => {
+        document.addEventListener(evt, resetIdleTimer, { passive: true });
+      });
+
+      // Calculate target offset between stamp and dropzone
+      function getDropTargetOffset(stamp, dropzone) {
+        const sRect = stamp.getBoundingClientRect();
+        const dRect = dropzone.getBoundingClientRect();
+        const curX = gsapInstance.getProperty(stamp, 'x') || 0;
+        const curY = gsapInstance.getProperty(stamp, 'y') || 0;
+        const deltaX = (dRect.left + dRect.width / 2) - (sRect.left + sRect.width / 2);
+        const deltaY = (dRect.top + dRect.height / 2) - (sRect.top + sRect.height / 2);
+        return { targetX: curX + deltaX, targetY: curY + deltaY, deltaX, deltaY };
+      }
+
+      // Valid stamp sequence
+      function handleValidStamp() {
+        if (isStamped || isSending || isSent) return;
+        isStamped = true;
+        stopGuidance();
+
+        // 1. Calculate drop alignment
+        const { targetX, targetY } = getDropTargetOffset(stampEl, dropzoneEl);
+
+        if (prefersReducedMotion) {
+          gsapInstance.set(stampEl, { x: targetX, y: targetY });
+          postmarkEl?.classList.add('is-stamped');
+          announce('Postcard stamped and ready to send.');
+          executePostingSequence();
+          return;
+        }
+
+        // 2. Thunk stamp into place
+        gsapInstance.to(stampEl, {
+          x: targetX,
+          y: targetY,
+          scale: 1,
+          duration: 0.14,
+          ease: 'power2.out',
+          onComplete: () => {
+            // Postcard settle shake
+            gsapInstance.to(postcardEl, {
+              y: 2,
+              duration: 0.08,
+              yoyo: true,
+              repeat: 1,
+              ease: 'power1.inOut'
+            });
+
+            // Postmark appearance
+            postmarkEl?.classList.add('is-stamped');
+            gsapInstance.fromTo(
+              postmarkEl,
+              { scale: 1.35, opacity: 0, rotation: -20 },
+              { scale: 1, opacity: 0.9, rotation: -12, duration: 0.28, ease: 'power2.out' }
+            );
+
+            announce('Postcard stamped. Posting message...');
+            // Step 3 sequence trigger
+            setTimeout(executePostingSequence, 400);
+          }
+        });
+      }
+
+      // Invalid attempt (< 3 characters)
+      function handleInvalidAttempt() {
+        stopGuidance();
+        announce('Please write a message before stamping.');
+
+        if (!prefersReducedMotion) {
+          // Snap stamp back elastically
+          gsapInstance.to(stampEl, {
+            x: 0,
+            y: 0,
+            duration: 0.5,
+            ease: 'elastic.out(1, 0.4)'
+          });
+
+          // Postcard "no" shake
+          gsapInstance.to(postcardEl, {
+            x: -4,
+            duration: 0.05,
+            yoyo: true,
+            repeat: 5,
+            ease: 'power1.inOut',
+            onComplete: () => {
+              gsapInstance.set(postcardEl, { x: 0 });
+            }
+          });
+        } else {
+          gsapInstance.set(stampEl, { x: 0, y: 0 });
+        }
+
+        // Focus & highlight textarea
+        if (textareaEl) {
+          textareaEl.focus();
+          textareaEl.style.boxShadow = '0 0 12px rgba(255, 240, 0, 0.6)';
+          setTimeout(() => {
+            textareaEl.style.boxShadow = '';
+          }, 600);
+        }
+      }
+
+      // Check message validity
+      function validateAndTrigger() {
+        const val = textareaEl ? textareaEl.value.trim() : '';
+        if (val.length < 3) {
+          handleInvalidAttempt();
+          return false;
+        }
+        handleValidStamp();
+        return true;
+      }
+
+      // Draggable configuration
+      const [draggable] = draggableModule.Draggable.create(stampEl, {
+        type: 'x,y',
+        edgeResistance: 0.65,
+        bounds: postcardEl,
+        cursor: 'grab',
+        activeCursor: 'grabbing',
+        onPress: () => {
+          stopGuidance();
+          gsapInstance.to(stampEl, { scale: 1.08, duration: 0.12 });
+        },
+        onRelease: function () {
+          if (isStamped) return;
+
+          // Check hitTest against dropzone
+          if (this.hitTest(dropzoneEl, '50%')) {
+            validateAndTrigger();
+          } else {
+            // Spring back
+            gsapInstance.to(stampEl, {
+              x: 0,
+              y: 0,
+              scale: 1,
+              duration: 0.5,
+              ease: 'elastic.out(1, 0.4)'
+            });
+            resetIdleTimer();
+          }
+        }
+      });
+      draggableInstance = draggable;
+
+      // Accessible one-tap button alternative
+      sendBtnEl?.addEventListener('click', () => {
+        validateAndTrigger();
+      });
+
+      // Keyboard accessible trigger on stamp (Enter / Space)
+      stampEl.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          validateAndTrigger();
+        }
+      });
+
+      // Posting Sequence Mock (Step 2/3 bridge)
+      function executePostingSequence() {
+        isSending = true;
+        if (sendBtnEl) sendBtnEl.disabled = true;
+        if (tickerTextEl) tickerTextEl.textContent = '[ TRANSMITTING FARMAISH ... ]';
+
+        const letterboxEl = document.getElementById('cc-letterbox');
+        if (!letterboxEl) return;
+
+        if (prefersReducedMotion) {
+          // Instant cross-fade
+          postcardEl.style.opacity = '0.3';
+          onPostSuccess();
+          return;
+        }
+
+        // Postcard flight to letterbox
+        const pRect = postcardEl.getBoundingClientRect();
+        const lRect = letterboxEl.getBoundingClientRect();
+        const moveX = (lRect.left + lRect.width / 2) - (pRect.left + pRect.width / 2);
+        const moveY = (lRect.top + 30) - (pRect.top + pRect.height / 2);
+
+        const tl = gsapInstance.timeline();
+
+        // 1. Postcard folds & flies into letterbox slot
+        tl.to(postcardEl, {
+          x: moveX * 0.85,
+          y: moveY,
+          scale: 0.28,
+          rotation: 8,
+          duration: 0.7,
+          ease: 'power2.in'
+        })
+        // 2. Letterbox flap clacks open
+        .to(letterboxFlapEl, {
+          rotationX: -65,
+          duration: 0.15,
+          ease: 'power2.out'
+        }, '-=0.25')
+        // 3. Postcard slips in
+        .to(postcardEl, {
+          opacity: 0,
+          scale: 0.1,
+          duration: 0.2,
+          ease: 'power1.in'
+        }, '-=0.1')
+        // 4. Letterbox flap clacks shut with bounce
+        .to(letterboxFlapEl, {
+          rotationX: 0,
+          duration: 0.35,
+          ease: 'bounce.out',
+          onComplete: () => {
+            onPostSuccess();
+          }
+        });
+      }
+
+      function onPostSuccess() {
+        isSending = false;
+        isSent = true;
+        announce('Viewer request received. Thank you!');
+        if (tickerTextEl) {
+          tickerTextEl.textContent = 'VIEWER REQUEST RECEIVED';
+          tickerTextEl.style.color = '#fff000';
+        }
+        try {
+          localStorage.setItem('cc_farmaish_sent', 'true');
+        } catch (e) {}
+
+        if (resetBtnEl) {
+          resetBtnEl.hidden = false;
+        }
+      }
+
+      // Reset affordance
+      resetBtnEl?.addEventListener('click', () => {
+        try {
+          localStorage.removeItem('cc_farmaish_sent');
+        } catch (e) {}
+        isStamped = false;
+        isSending = false;
+        isSent = false;
+        if (textareaEl) textareaEl.value = '';
+        if (fromInputEl) fromInputEl.value = '';
+        if (countEl) countEl.textContent = '0 / 500';
+        if (tickerTextEl) {
+          tickerTextEl.textContent = '[ POSTBOX // READY FOR REQUESTS ]';
+          tickerTextEl.style.color = '';
+        }
+        if (sendBtnEl) sendBtnEl.disabled = false;
+        resetBtnEl.hidden = true;
+        postmarkEl?.classList.remove('is-stamped');
+        stampEl.style.opacity = '1';
+        stampEl.style.pointerEvents = 'auto';
+        postcardEl.style.opacity = '1';
+        gsapInstance.set([postcardEl, stampEl], { clearProps: 'all' });
+        resetIdleTimer();
+      });
+
+      // Cleanup on cc:channel-jump navigation
+      const cleanup = () => {
+        stopGuidance();
+        if (idleTimer) clearTimeout(idleTimer);
+        if (draggableInstance) draggableInstance.kill();
+        document.removeEventListener('cc:channel-jump', cleanup);
+      };
+      document.addEventListener('cc:channel-jump', cleanup);
+
+    } catch (err) {
+      console.error('FarmaishPostcard animation error:', err);
+    }
+  })();
+</script>

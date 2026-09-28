@@ -1,0 +1,12 @@
+# .dev.vars.example
+# Cloudflare Pages Functions local environment variables & secrets
+# Copy to .dev.vars for local testing with wrangler
+
+# Cloudflare Turnstile dummy test secret key (always passes)
+TURNSTILE_SECRET=1x0000000000000000000000000000000AA
+
+# Admin token for viewing /admin/farmaish and calling /api/farmaish-admin
+ADMIN_TOKEN=chitrachaalak-admin-secret-token
+
+# Build-time public sitekey for Turnstile widget (dummy test key: always passes)
+PUBLIC_TURNSTILE_SITEKEY=1x00000000000000000000AA

@@ -356,7 +356,7 @@ button{
     gap: 16px;
     width: 100% !important;
   }
-  .cc-col--center.is-active-mobile .cc-split-row > :global(.cc-panel) {
+  .cc-col--center.is-active-mobile .cc-split-row > .cc-panel {
     min-height: 160px !important;
   }
 

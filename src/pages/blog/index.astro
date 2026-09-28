@@ -6,7 +6,11 @@ import SidebarNav from '../../components/SidebarNav.astro';
 import BlogCalendar from '../../components/BlogCalendar.astro';
 import BlogFeatured from '../../components/BlogFeatured.astro';
 import BlogGridCard from '../../components/BlogGridCard.astro';
+import FarmaishPostcard from '../../components/FarmaishPostcard.astro';
 import { getCollection } from 'astro:content';
+
+// Placement constant: set to 'below' (default) or 'above' to move the postcard relative to the post list
+export const POSTCARD_PLACEMENT: 'below' | 'above' = 'below';
 
 const allPosts = await getCollection('blog');
 const sorted = allPosts.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
@@ -74,6 +78,8 @@ const postsMap = Object.fromEntries(
             href={featured.href}
           />
 
+          {POSTCARD_PLACEMENT === 'above' && <FarmaishPostcard />}
+
           <div class="cc-blog-grid">
             {posts.map((p) => (
               <BlogGridCard
@@ -87,6 +93,8 @@ const postsMap = Object.fromEntries(
               />
             ))}
           </div>
+
+          {POSTCARD_PLACEMENT === 'below' && <FarmaishPostcard />}
         </div>
       </Panel>
     </div>

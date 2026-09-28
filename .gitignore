@@ -16,6 +16,8 @@ pnpm-debug.log*
 # environment variables
 .env
 .env.production
+.dev.vars
+.wrangler/
 
 # live-status heartbeat script — contains SECRET_TOKEN, never commit
 live-status/
