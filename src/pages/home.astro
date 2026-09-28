@@ -268,9 +268,16 @@ const portfolioSections = [
   /* Cassette stack — tight gap so all 4 fit; scrolls internally if
      content ever exceeds available height, rather than the page/column */
   .cc-cassette-stack {
-    display: flex; flex-direction: column; gap: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex: 1;
     min-height: 0;
-    overflow-y: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none;
+    height: 100%;
+    justify-content: space-between;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
   }
   .cc-cassette-stack::-webkit-scrollbar { display: none; }
 </style>

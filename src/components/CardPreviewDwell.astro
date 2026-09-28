@@ -1,0 +1,196 @@
+---
+// src/components/CardPreviewDwell.astro
+//
+// Task 8 & 9: Hover-dwell auto-preview (600ms uninterrupted hover)
+// with synchronized blinking REC indicator on portfolio/film/tour cards.
+---
+<style is:global>
+  /* Secondary Preview Overlay */
+  .cc-card-preview-overlay {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 6;
+    transition: opacity 0.4s ease-in-out;
+  }
+
+  .is-dwelling-preview .cc-card-preview-overlay {
+    opacity: 1;
+  }
+
+  /* Task 9: REC Indicator */
+  .cc-card-rec {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 2px 6px;
+    background: rgba(0, 10, 30, 0.85);
+    border: 1px solid rgba(255, 60, 60, 0.6);
+    box-shadow: 0 0 8px rgba(255, 0, 0, 0.3);
+    color: #ff3b30;
+    font-family: var(--font-ui, monospace);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    pointer-events: none;
+    z-index: 12;
+    opacity: 0;
+    transition: opacity 0.25s ease-out;
+  }
+
+  .cc-card-rec__dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #ff3b30;
+    box-shadow: 0 0 6px #ff3b30;
+  }
+
+  .is-dwelling-preview .cc-card-rec {
+    opacity: 1;
+  }
+
+  .is-dwelling-preview .cc-card-rec__dot {
+    animation: cc-rec-blink 1s steps(2, start) infinite;
+  }
+
+  @keyframes cc-rec-blink {
+    0%, 100% { opacity: 1; }
+    50%      { opacity: 0; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cc-card-preview-overlay {
+      transition: none !important;
+    }
+    .is-dwelling-preview .cc-card-rec__dot {
+      animation: none !important;
+    }
+  }
+</style>
+
+<script>
+  // @ts-nocheck
+  if (!window.__ccCardPreviewDwellInit) {
+    window.__ccCardPreviewDwellInit = true;
+
+    const TARGETS = '.cc-card, .cc-vault-card, .cc-film-card, .cc-slideshow';
+    let activeCard = null;
+    let dwellTimer = null;
+    let lastX = 0;
+    let lastY = 0;
+
+    function getSecondaryAsset(card: HTMLElement): string | null {
+      // 1. Explicit data-preview-src attribute
+      if (card.dataset.previewSrc) return card.dataset.previewSrc;
+
+      // 2. SlideshowCard with secondary item
+      if (card.dataset.items) {
+        try {
+          const items = JSON.parse(card.dataset.items);
+          if (items.length > 1 && items[1].imageSrc && items[1].imageSrc !== items[0].imageSrc) {
+            return items[1].imageSrc;
+          }
+        } catch {}
+      }
+
+      // 3. Pre-existing preview image in DOM
+      const preImg = card.querySelector<HTMLImageElement>('.cc-card-preview-overlay');
+      if (preImg && preImg.src) return preImg.src;
+
+      return null;
+    }
+
+    function ensurePreviewElements(card: HTMLElement, assetUrl: string) {
+      const container = card.querySelector('.cc-card__img, .cc-vault-card__inner, .cc-film-image-wrapper, .cc-slideshow__img-wrap, .cc-blog-grid-card__img') || card;
+
+      let overlay = container.querySelector('.cc-card-preview-overlay') as HTMLImageElement | null;
+      if (!overlay) {
+        overlay = document.createElement('img');
+        overlay.className = 'cc-card-preview-overlay';
+        overlay.src = assetUrl;
+        overlay.alt = 'Preview';
+        overlay.loading = 'lazy';
+        container.appendChild(overlay);
+      }
+
+      let rec = container.querySelector('.cc-card-rec');
+      if (!rec) {
+        rec = document.createElement('div');
+        rec.className = 'cc-card-rec';
+        rec.setAttribute('aria-hidden', 'true');
+        rec.innerHTML = '<span class="cc-card-rec__dot"></span>REC';
+        container.appendChild(rec);
+      }
+    }
+
+    function cleanupActive() {
+      if (dwellTimer) {
+        clearTimeout(dwellTimer);
+        dwellTimer = null;
+      }
+      if (activeCard) {
+        activeCard.classList.remove('is-dwelling-preview');
+        activeCard = null;
+      }
+    }
+
+    document.addEventListener('mouseover', (e: MouseEvent) => {
+      const card = (e.target as HTMLElement)?.closest(TARGETS) as HTMLElement | null;
+      if (!card || card === activeCard) return;
+
+      cleanupActive();
+
+      const secondaryAsset = getSecondaryAsset(card);
+      if (!secondaryAsset) return; // Gracefully skip if card lacks secondary asset
+
+      activeCard = card;
+      lastX = e.clientX;
+      lastY = e.clientY;
+
+      ensurePreviewElements(card, secondaryAsset);
+
+      dwellTimer = setTimeout(() => {
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        if (activeCard === card) {
+          card.classList.add('is-dwelling-preview');
+        }
+      }, 600);
+    });
+
+    document.addEventListener('mousemove', (e: MouseEvent) => {
+      if (!activeCard) return;
+
+      const dist = Math.hypot(e.clientX - lastX, e.clientY - lastY);
+      if (dist > 4) {
+        lastX = e.clientX;
+        lastY = e.clientY;
+        // If preview has not triggered yet, reset the 600ms dwell countdown
+        if (!activeCard.classList.contains('is-dwelling-preview')) {
+          if (dwellTimer) clearTimeout(dwellTimer);
+          const card = activeCard;
+          dwellTimer = setTimeout(() => {
+            if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+            if (activeCard === card) {
+              card.classList.add('is-dwelling-preview');
+            }
+          }, 600);
+        }
+      }
+    });
+
+    document.addEventListener('mouseout', (e: MouseEvent) => {
+      if (!activeCard) return;
+      const related = e.relatedTarget as HTMLElement | null;
+      if (related && related.closest(TARGETS) === activeCard) return;
+      cleanupActive();
+    });
+  }
+</script>

@@ -100,6 +100,7 @@ const { availableDates, initialDate } = Astro.props;
     display: grid;
     grid-template-columns: repeat(7, 1fr);
     margin-bottom: 4px;
+    user-select: none;
   }
   .cc-cal__weekdays span{
     font-family: var(--font-ui);
@@ -114,6 +115,8 @@ const { availableDates, initialDate } = Astro.props;
     display: grid;
     grid-template-columns: repeat(7, 1fr);
     gap: 3px;
+    touch-action: none;
+    user-select: none;
   }
 
   .cc-cal__day{
@@ -127,6 +130,7 @@ const { availableDates, initialDate } = Astro.props;
     background: var(--blue-card);
     cursor: pointer;
     border: none;
+    transition: transform 0.1s ease, background 0.1s ease;
   }
   .cc-cal__day:hover{ background: var(--blue-card-hover); }
   .cc-cal__day.is-empty{ background: transparent; cursor: default; pointer-events: none; }
@@ -138,6 +142,20 @@ const { availableDates, initialDate } = Astro.props;
     pointer-events: none;
   }
   .cc-cal__day.is-selected{ background: var(--yellow); color: var(--navy-deep); font-weight: 700; }
+  .cc-cal__day.is-tuning{
+    outline: 2px solid var(--yellow);
+    background: var(--blue-card-hover) !important;
+    transform: scale(1.08);
+    z-index: 2;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cc-cal__day,
+    .cc-cal__day.is-tuning {
+      transition: none !important;
+      transform: none !important;
+    }
+  }
 
   .cc-cal__today{
     margin-top: 12px;
@@ -151,7 +169,7 @@ const { availableDates, initialDate } = Astro.props;
 
 <script>
   // @ts-nocheck
-if (!window.__ccBlogCalendarInit) {
+  if (!window.__ccBlogCalendarInit) {
     window.__ccBlogCalendarInit = true;
 
     const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
@@ -181,6 +199,14 @@ if (!window.__ccBlogCalendarInit) {
         return `${String(d.getDate()).padStart(2,'0')} ${MONTHS[d.getMonth()].slice(0,3).toUpperCase()} ${d.getFullYear()}`;
       }
 
+      function selectDate(iso: string) {
+        selected = iso;
+        root.dataset.selected = iso;
+        panel.hidden = true;
+        render();
+        document.dispatchEvent(new CustomEvent('cc:blog-date-select', { detail: { date: iso } }));
+      }
+
       function render() {
         valueEl.textContent = formatDisplay(selected);
         monthEl.textContent = MONTHS[viewMonth].toUpperCase();
@@ -203,22 +229,100 @@ if (!window.__ccBlogCalendarInit) {
           const iso = `${viewYear}-${String(viewMonth + 1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
           const btn = document.createElement('button');
           btn.className = 'cc-cal__day';
+          btn.dataset.iso = iso;
           btn.textContent = String(day);
           if (!availableSet.has(iso)) {
             btn.classList.add('is-disabled');
           } else {
             if (iso === selected) btn.classList.add('is-selected');
             btn.addEventListener('click', () => {
-              selected = iso;
-              root.dataset.selected = iso;
-              panel.hidden = true;
-              render();
-              document.dispatchEvent(new CustomEvent('cc:blog-date-select', { detail: { date: iso } }));
+              selectDate(iso);
             });
           }
           gridEl.appendChild(btn);
         }
       }
+
+      // Drag-to-scrub pointer handling across the filter strip
+      let isDragging = false;
+      let startX = 0;
+      let startY = 0;
+      let activeTunedBtn: HTMLButtonElement | null = null;
+
+      function getNearestDayBtn(clientX: number, clientY: number): HTMLButtonElement | null {
+        const buttons = Array.from(
+          gridEl.querySelectorAll('.cc-cal__day:not(.is-disabled):not(.is-empty)')
+        ) as HTMLButtonElement[];
+        if (!buttons.length) return null;
+
+        let bestBtn: HTMLButtonElement | null = null;
+        let bestDist = Infinity;
+
+        buttons.forEach((btn) => {
+          const rect = btn.getBoundingClientRect();
+          const centerX = rect.left + rect.width / 2;
+          const centerY = rect.top + rect.height / 2;
+          const dx = clientX - centerX;
+          const dy = (clientY - centerY) * 1.5;
+          const dist = Math.hypot(dx, dy);
+          if (dist < bestDist) {
+            bestDist = dist;
+            bestBtn = btn;
+          }
+        });
+        return bestBtn;
+      }
+
+      gridEl.addEventListener('pointerdown', (e: PointerEvent) => {
+        startX = e.clientX;
+        startY = e.clientY;
+        isDragging = false;
+        activeTunedBtn = null;
+      });
+
+      gridEl.addEventListener('pointermove', (e: PointerEvent) => {
+        const dx = Math.abs(e.clientX - startX);
+        if (!isDragging && dx > 6) {
+          isDragging = true;
+          try {
+            gridEl.setPointerCapture(e.pointerId);
+          } catch {}
+        }
+        if (isDragging) {
+          const nearest = getNearestDayBtn(e.clientX, e.clientY);
+          if (nearest !== activeTunedBtn) {
+            if (activeTunedBtn) activeTunedBtn.classList.remove('is-tuning');
+            activeTunedBtn = nearest;
+            if (activeTunedBtn) activeTunedBtn.classList.add('is-tuning');
+          }
+        }
+      });
+
+      gridEl.addEventListener('pointerup', (e: PointerEvent) => {
+        if (isDragging) {
+          if (activeTunedBtn) {
+            activeTunedBtn.classList.remove('is-tuning');
+            const iso = activeTunedBtn.dataset.iso;
+            if (iso) selectDate(iso);
+          } else {
+            const nearest = getNearestDayBtn(e.clientX, e.clientY);
+            if (nearest && nearest.dataset.iso) {
+              selectDate(nearest.dataset.iso);
+            }
+          }
+          isDragging = false;
+          activeTunedBtn = null;
+          try {
+            gridEl.releasePointerCapture(e.pointerId);
+          } catch {}
+        }
+      });
+
+      gridEl.addEventListener('pointercancel', () => {
+        if (activeTunedBtn) activeTunedBtn.classList.remove('is-tuning');
+        isDragging = false;
+        activeTunedBtn = null;
+      });
 
       trigger.addEventListener('click', () => {
         panel.hidden = !panel.hidden;

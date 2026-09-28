@@ -23,7 +23,41 @@
   <div class="cc-testcard__noise"></div>
 </div>
 
+<div class="cc-static-burst" id="cc-static-burst" aria-hidden="true"></div>
+
 <style>
+  .cc-static-burst {
+    position: fixed;
+    inset: 0;
+    z-index: 5002;
+    pointer-events: none;
+    opacity: 0;
+    background:
+      repeating-radial-gradient(circle at 50% 50%, rgba(255,255,255,0.8) 0px, rgba(0,20,60,0.85) 1px, transparent 2px, rgba(255,240,0,0.4) 3px),
+      repeating-linear-gradient(0deg, rgba(255,255,255,0.35) 0px, transparent 1px, rgba(0,0,0,0.5) 2px);
+    background-size: 4px 4px, 100% 3px;
+    mix-blend-mode: screen;
+  }
+
+  .cc-testcard.cc-testcard--out + .cc-static-burst,
+  .cc-static-burst.is-flashing {
+    animation: cc-static-flash 0.15s steps(3) forwards;
+  }
+
+  @keyframes cc-static-flash {
+    0%   { opacity: 0; transform: scaleY(0.98); }
+    30%  { opacity: 0.95; transform: scaleY(1.02) scaleX(1.01); filter: brightness(2.2) contrast(200%); }
+    70%  { opacity: 0.75; transform: scaleY(0.99); filter: brightness(1.6) contrast(160%); }
+    100% { opacity: 0; transform: scaleY(1); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cc-static-burst {
+      display: none !important;
+      animation: none !important;
+    }
+  }
+
   .cc-testcard{
     position:fixed;
     inset:0;

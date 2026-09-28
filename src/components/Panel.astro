@@ -235,6 +235,7 @@ if (!window.__ccPanelControlsInit) {
       cardsInGroup(group).forEach((el) => el.classList.remove('is-selected'));
       card.classList.add('is-selected');
       card.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+      document.dispatchEvent(new CustomEvent('cc:card-selected', { detail: { group, card } }));
     }
 
     document.addEventListener('click', (e) => {

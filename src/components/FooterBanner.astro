@@ -3,9 +3,8 @@
 // Broadcast ticker — matches the double-border/bevel language used
 // everywhere else, plus a live signal-bar meter (same visual family
 // as UpdateEntryCard) so it reads as part of the same system.
-import { SITE_CONFIG } from '../config';
 ---
-<div class="cc-footer" data-target={SITE_CONFIG.T_MINUS_TARGET_DATE}>
+<div class="cc-footer">
   <span class="cc-footer__corner cc-footer__corner--tl"></span>
   <span class="cc-footer__corner cc-footer__corner--tr"></span>
 
@@ -19,9 +18,19 @@ import { SITE_CONFIG } from '../config';
   <div class="cc-footer__divider"></div>
   
   <div class="cc-footer__segment cc-footer__sys-info">
-    <span class="cc-footer__label">[ T-MINUS // </span>
-    <span id="cc-footer-time" class="cc-footer__time-value">--<span class="cc-pulse">:</span>--<span class="cc-pulse">:</span>--</span>
+    <span class="cc-footer__label">[ TIME // </span>
+    <span id="cc-footer-time" class="cc-footer__time-value">--<span class="cc-pulse">:</span>--<span class="cc-pulse">:</span>-- --</span>
     <span class="cc-footer__label"> ]</span>
+  </div>
+
+  <div class="cc-footer__divider cc-footer__divider--channel"></div>
+
+  <!-- Real-time Broadcast Channel Status in the footer center empty space -->
+  <div class="cc-footer__segment cc-footer__channel-monitor" id="cc-footer-channel-monitor">
+    <span class="cc-footer__channel-live-dot"></span>
+    <span class="cc-footer__channel-tag">[ CHANNEL // </span>
+    <span class="cc-footer__channel-msg" id="cc-footer-channel-msg">YOU ARE ON 'IN THE MEANTIME' CHANNEL</span>
+    <span class="cc-footer__channel-tag"> ]</span>
   </div>
   
   <a href="/home" class="cc-footer__link cc-footer__link--right cc-footer__home">
@@ -67,6 +76,7 @@ import { SITE_CONFIG } from '../config';
     display:flex;
     align-items:center;
     gap:7px;
+    flex-shrink: 0;
   }
   
   .cc-footer__sys-info {
@@ -100,6 +110,64 @@ import { SITE_CONFIG } from '../config';
     50% { opacity: 0; }
   }
 
+  /* Channel status in center empty space */
+  .cc-footer__channel-monitor {
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: clamp(10px, 0.8vw, 11px);
+    letter-spacing: 1px;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding: 3px 12px;
+    background: rgba(0, 10, 40, 0.6);
+    border: 1px solid rgba(166, 232, 255, 0.2);
+    border-radius: 2px;
+    box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.5);
+  }
+
+  .cc-footer__channel-live-dot {
+    width: 6px;
+    height: 6px;
+    background: var(--yellow);
+    border-radius: 50%;
+    animation: cc-pulse-dot 1.2s ease-in-out infinite;
+    flex-shrink: 0;
+  }
+
+  .cc-footer__channel-tag {
+    color: var(--blue-panel-light);
+    opacity: 0.6;
+    letter-spacing: 0px;
+    flex-shrink: 0;
+  }
+
+  .cc-footer__channel-msg {
+    color: var(--yellow);
+    font-weight: 700;
+    text-transform: uppercase;
+    text-shadow: 0 0 8px rgba(255, 240, 0, 0.4);
+    letter-spacing: 1px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+  }
+
+  .cc-footer__channel-msg.is-updated {
+    animation: cc-channel-flash 0.5s ease-out;
+  }
+
+  @keyframes cc-channel-flash {
+    0% { color: #ffffff; text-shadow: 0 0 16px #ffffff; transform: scale(1.02); }
+    50% { color: var(--yellow); text-shadow: 0 0 12px rgba(255, 240, 0, 0.8); }
+    100% { color: var(--yellow); text-shadow: 0 0 8px rgba(255, 240, 0, 0.4); transform: scale(1); }
+  }
+
   .cc-footer__link{
     text-decoration: none;
     color: inherit;
@@ -112,7 +180,7 @@ import { SITE_CONFIG } from '../config';
   }
   
   .cc-footer__link--right {
-    margin-left: auto;
+    margin-left: 0;
     background: var(--blue-card);
     color: var(--yellow);
     padding: 6px 18px;
@@ -125,6 +193,7 @@ import { SITE_CONFIG } from '../config';
     letter-spacing: 1.5px;
     border: 1px solid var(--blue-panel-light);
     box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    flex-shrink: 0;
   }
   
   .cc-footer__link--right:hover {
@@ -162,6 +231,10 @@ import { SITE_CONFIG } from '../config';
     50%{ opacity:0.25; }
   }
 
+  @media (max-width: 1024px) {
+    .cc-footer__channel-tag { display: none; }
+  }
+
   @media (max-width: 768px) {
     .cc-footer {
       height: 48px;
@@ -171,6 +244,8 @@ import { SITE_CONFIG } from '../config';
     }
     .cc-footer__corner { display: none; }
     .cc-footer__label { display: none; }
+    .cc-footer__divider--channel { display: none; }
+    .cc-footer__channel-monitor { display: none; }
     .cc-footer__home span { display: none; } 
     .cc-footer__home svg { margin-left: 0 !important; width: 18px; height: 18px; }
     .cc-footer__value { font-size: 11px; }
@@ -189,34 +264,164 @@ import { SITE_CONFIG } from '../config';
     const dateEl = document.getElementById('cc-footer-date');
     if (dateEl) dateEl.textContent = dateStr;
     
-    // T-MINUS logic
+    // Standard clock logic (12-hour format: HH:MM:SS AM/PM)
     const timeEl = document.getElementById('cc-footer-time');
-    const footerEl = document.querySelector('.cc-footer');
-    if (timeEl && footerEl) {
-      const targetDateStr = footerEl.getAttribute('data-target');
-      if (targetDateStr) {
-        const target = new Date(targetDateStr);
-        const diff = target.getTime() - now.getTime();
-        
-        if (diff <= 0) {
-          timeEl.innerHTML = `00<span class="cc-pulse">:</span>00<span class="cc-pulse">:</span>00`;
-        } else {
-          const totalSeconds = Math.floor(diff / 1000);
-          const hours = Math.floor(totalSeconds / 3600);
-          const minutes = Math.floor((totalSeconds % 3600) / 60);
-          const seconds = totalSeconds % 60;
-          
-          const h = hours.toString().padStart(2, '0');
-          const m = minutes.toString().padStart(2, '0');
-          const s = seconds.toString().padStart(2, '0');
-          
-          timeEl.innerHTML = `${h}<span class="cc-pulse">:</span>${m}<span class="cc-pulse">:</span>${s}`;
-        }
-      }
+    if (timeEl) {
+      let hours = now.getHours();
+      const minutes = String(now.getMinutes()).padStart(2, '0');
+      const seconds = String(now.getSeconds()).padStart(2, '0');
+      const ampm = hours >= 12 ? 'PM' : 'AM';
+      hours = hours % 12;
+      hours = hours ? hours : 12;
+      const h = String(hours).padStart(2, '0');
+      
+      timeEl.innerHTML = `${h}<span class="cc-pulse">:</span>${minutes}<span class="cc-pulse">:</span>${seconds} <span style="font-size: 0.85em; opacity: 0.85;">${ampm}</span>`;
     }
   }
   
   ccUpdateFooter();
   if (window.__ccFooterInterval) clearInterval(window.__ccFooterInterval);
   window.__ccFooterInterval = setInterval(ccUpdateFooter, 1000);
+
+  // ==========================================================
+  // Channel Navigation Status Monitor
+  // ==========================================================
+  const CHANNEL_MAP = {
+    updates: "In the Meantime",
+    blog: "Making Sense",
+    portfolio: "My Work",
+    films: "The Film Shelf",
+    tour: "Visual Tours",
+    collections: "The Collection",
+    contact: "Get in Touch",
+    about: "Transmission"
+  };
+
+  const PATH_CHANNEL_MAP = {
+    '/updates': "In the Meantime",
+    '/blog': "Making Sense",
+    '/portfolio': "My Work",
+    '/films': "The Film Shelf",
+    '/tour': "Visual Tours",
+    '/collections': "The Collection",
+    '/about': "Transmission"
+  };
+
+  function updateFooterChannel(channelName, itemTitle = '') {
+    const msgEl = document.getElementById('cc-footer-channel-msg');
+    if (!msgEl) return;
+    
+    let text = `YOU ARE ON '${channelName.toUpperCase()}' CHANNEL`;
+    if (itemTitle && itemTitle.trim().toUpperCase() !== channelName.trim().toUpperCase()) {
+      text += ` · ${itemTitle.trim().toUpperCase()}`;
+    }
+    
+    if (msgEl.textContent === text) return;
+    
+    msgEl.textContent = text;
+    msgEl.classList.remove('is-updated');
+    void msgEl.offsetWidth; // force reflow for pulse animation
+    msgEl.classList.add('is-updated');
+  }
+
+  // 1. Listen for cc:card-selected event (dispatched on selection)
+  document.addEventListener('cc:card-selected', (e) => {
+    const group = e.detail?.group;
+    const card = e.detail?.card;
+    const channelName = CHANNEL_MAP[group] || group;
+    const itemTitle = card?.dataset?.title || '';
+    if (channelName) {
+      updateFooterChannel(channelName, itemTitle);
+    }
+  });
+
+  // 2. Global click listener for cards, sections, buttons, links, contact
+  document.addEventListener('click', (e) => {
+    const target = e.target;
+    if (!target) return;
+
+    // Contact card click
+    if (target.closest('.cc-contact-panel')) {
+      updateFooterChannel("Get in Touch");
+      return;
+    }
+
+    // Card click
+    const card = target.closest('.cc-card');
+    if (card) {
+      const group = card.dataset.group || card.closest('[data-group]')?.getAttribute('data-group');
+      const channelName = CHANNEL_MAP[group];
+      const itemTitle = card.dataset.title || '';
+      if (channelName) {
+        updateFooterChannel(channelName, itemTitle);
+        return;
+      }
+    }
+
+    // Panel click
+    const panel = target.closest('.cc-panel');
+    if (panel) {
+      const title = panel.querySelector('.cc-panel__title')?.textContent?.trim();
+      const group = panel.querySelector('[data-select-group]')?.dataset?.selectGroup;
+      const channelName = CHANNEL_MAP[group] || title;
+      if (channelName) {
+        updateFooterChannel(channelName);
+      }
+    }
+  }, true);
+
+  // 3. Global focusin listener for keyboard navigation
+  document.addEventListener('focusin', (e) => {
+    const target = e.target;
+    if (!target) return;
+
+    if (target.closest('.cc-contact-panel')) {
+      updateFooterChannel("Get in Touch");
+      return;
+    }
+
+    const card = target.closest('.cc-card');
+    if (card) {
+      const group = card.dataset.group || card.closest('[data-group]')?.getAttribute('data-group');
+      const channelName = CHANNEL_MAP[group];
+      const itemTitle = card.dataset.title || '';
+      if (channelName) {
+        updateFooterChannel(channelName, itemTitle);
+      }
+    }
+  });
+
+  // 4. Initial Channel determination on page load
+  function initFooterChannel() {
+    const pathname = window.location.pathname;
+    let initialChannel = "";
+    for (const [path, name] of Object.entries(PATH_CHANNEL_MAP)) {
+      if (pathname.startsWith(path)) {
+        initialChannel = name;
+        break;
+      }
+    }
+    
+    if (initialChannel) {
+      updateFooterChannel(initialChannel);
+    } else {
+      const selected = document.querySelector('.cc-card.is-selected');
+      if (selected) {
+        const group = selected.dataset.group;
+        const channelName = CHANNEL_MAP[group];
+        const title = selected.dataset.title || '';
+        if (channelName) {
+          updateFooterChannel(channelName, title);
+          return;
+        }
+      }
+      updateFooterChannel("In the Meantime");
+    }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initFooterChannel);
+  } else {
+    initFooterChannel();
+  }
 </script>

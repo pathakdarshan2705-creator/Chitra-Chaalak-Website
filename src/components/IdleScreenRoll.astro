@@ -1,0 +1,107 @@
+---
+// src/components/IdleScreenRoll.astro
+//
+// Triggers one single CRT vertical-roll animation if mouse is idle for ~20s,
+// resetting cleanly on next user interaction and cleaning up on navigation.
+---
+<div class="cc-crt-vhold" id="cc-crt-vhold" aria-hidden="true"></div>
+
+<style is:global>
+  .cc-crt-vhold {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 4500;
+    opacity: 0;
+    background: linear-gradient(
+      to bottom,
+      transparent 0%,
+      rgba(0, 10, 40, 0.92) 42%,
+      rgba(255, 240, 0, 0.35) 50%,
+      rgba(0, 10, 40, 0.92) 58%,
+      transparent 100%
+    );
+    height: 28%;
+  }
+
+  body.is-screen-rolling .cc-crt-vhold {
+    animation: cc-vhold-sweep 1.2s cubic-bezier(0.3, 0, 0.2, 1) 1 forwards;
+  }
+
+  body.is-screen-rolling .cc-app {
+    animation: cc-screen-vroll 1.2s cubic-bezier(0.3, 0, 0.2, 1) 1 forwards;
+  }
+
+  @keyframes cc-vhold-sweep {
+    0%   { top: -30%; opacity: 0; }
+    15%  { opacity: 0.9; }
+    85%  { opacity: 0.9; }
+    100% { top: 105%; opacity: 0; }
+  }
+
+  @keyframes cc-screen-vroll {
+    0%   { transform: translateY(0); }
+    15%  { transform: translateY(16px); }
+    45%  { transform: translateY(-28px); filter: brightness(1.25); }
+    75%  { transform: translateY(10px); }
+    90%  { transform: translateY(-3px); }
+    100% { transform: translateY(0); filter: brightness(1); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cc-crt-vhold,
+    body.is-screen-rolling .cc-crt-vhold {
+      display: none !important;
+      animation: none !important;
+    }
+    body.is-screen-rolling .cc-app {
+      animation: none !important;
+      transform: none !important;
+    }
+  }
+</style>
+
+<script>
+  // @ts-nocheck
+  if (!window.__ccIdleRollInit) {
+    window.__ccIdleRollInit = true;
+
+    const IDLE_TIME = 20000; // 20s
+    let idleTimer = null;
+    let hasRolled = false;
+
+    function resetRoll() {
+      document.body.classList.remove('is-screen-rolling');
+      hasRolled = false;
+    }
+
+    function startTimer() {
+      clearTimeout(idleTimer);
+      idleTimer = setTimeout(() => {
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        hasRolled = true;
+        document.body.classList.add('is-screen-rolling');
+      }, IDLE_TIME);
+    }
+
+    function onActivity() {
+      if (hasRolled) {
+        resetRoll();
+      }
+      startTimer();
+    }
+
+    window.addEventListener('mousemove', onActivity);
+    window.addEventListener('keydown', onActivity);
+    startTimer();
+
+    // Clean up on page navigation (channel-wipe)
+    document.addEventListener('cc:channel-jump', () => {
+      clearTimeout(idleTimer);
+      resetRoll();
+      window.removeEventListener('mousemove', onActivity);
+      window.removeEventListener('keydown', onActivity);
+      window.__ccIdleRollInit = false;
+    });
+  }
+</script>

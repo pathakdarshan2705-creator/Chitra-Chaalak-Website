@@ -50,6 +50,17 @@ if (!window.__ccRemoteControlInit) {
       document.dispatchEvent(new CustomEvent('cc:card-selected', { detail: { group, card } }));
     }
 
+    function triggerChannelFlash() {
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      const burst = document.getElementById('cc-static-burst');
+      if (burst) {
+        burst.classList.remove('is-flashing');
+        void burst.offsetWidth;
+        burst.classList.add('is-flashing');
+        setTimeout(() => burst.classList.remove('is-flashing'), 160);
+      }
+    }
+
     document.addEventListener('keydown', (e) => {
       // 1. Mobile check: physical keyboard shortcuts are disabled on mobile viewports
       if (window.innerWidth <= 768 || window.matchMedia('(max-width: 768px)').matches) return;
@@ -69,6 +80,7 @@ if (!window.__ccRemoteControlInit) {
         if (cards.length > 0) {
           e.preventDefault();
           busy = true;
+          triggerChannelFlash();
           const current = cards.find((c) => c.classList.contains('is-selected'));
           // Dispatch in-page channel wipe transition
           document.dispatchEvent(new CustomEvent('cc:channel-jump', { detail: { inPage: true } }));
@@ -83,6 +95,7 @@ if (!window.__ccRemoteControlInit) {
           // Section not present on current page (e.g. on /about), navigate via channel wipe
           e.preventDefault();
           busy = true;
+          triggerChannelFlash();
           document.dispatchEvent(new CustomEvent('cc:channel-jump'));
           setTimeout(() => { window.location.href = SECTION_URLS[numberGroup]; }, 320);
           return;
@@ -126,7 +139,7 @@ if (!window.__ccRemoteControlInit) {
 
       busy = true;
       select(group, cards[next]);
-      setTimeout(() => { busy = false; }, 200);
+      setTimeout(() => { busy = false; }, 360);
     });
   }
 </script>

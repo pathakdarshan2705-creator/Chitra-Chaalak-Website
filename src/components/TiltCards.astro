@@ -3,10 +3,8 @@
 //
 // Every .cc-card tilts in 3D toward the cursor on hover, with a glare
 // highlight that tracks the mouse across its surface — like glass
-// catching light. Mounted once, applies globally via event delegation
-// so no other component needs to know about it. Uses GSAP quickTo for
-// buttery-smooth interpolation instead of directly setting styles
-// every mousemove frame.
+// catching light. Highly optimized with rAF throttling and cached rects
+// to prevent layout thrashing and maintain 60+ FPS.
 ---
 <style>
   .cc-card, .cc-cassette, .cc-slideshow, .cc-update-entry {
@@ -31,63 +29,95 @@
 
 <script>
   // @ts-nocheck
-if (!window.__ccTiltCardsInit) {
+  if (!window.__ccTiltCardsInit) {
     window.__ccTiltCardsInit = true;
 
-    import('gsap').then(({ gsap }) => {
-      const TARGETS = '.cc-card, .cc-cassette, .cc-slideshow, .cc-update-entry';
-      const MAX_TILT = 6; // degrees — subtle, not cartoonish
-      const registry = new WeakMap();
+    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      import('gsap').then(({ gsap }) => {
+        const TARGETS = '.cc-card, .cc-cassette, .cc-slideshow, .cc-update-entry';
+        const MAX_TILT = 5; // subtle, responsive tilt
+        const registry = new WeakMap();
 
-      function ensureGlare(el) {
-        let glare = el.querySelector('.cc-tilt-glare');
-        if (!glare) {
-          glare = document.createElement('div');
-          glare.className = 'cc-tilt-glare';
-          el.appendChild(glare);
+        function ensureGlare(el) {
+          let glare = el.querySelector('.cc-tilt-glare');
+          if (!glare) {
+            glare = document.createElement('div');
+            glare.className = 'cc-tilt-glare';
+            el.appendChild(glare);
+          }
+          return glare;
         }
-        return glare;
-      }
 
-      function setup(el) {
-        if (registry.has(el)) return registry.get(el);
-        const rotX = gsap.quickTo(el, 'rotationX', { duration: 0.4, ease: 'power2.out' });
-        const rotY = gsap.quickTo(el, 'rotationY', { duration: 0.4, ease: 'power2.out' });
-        gsap.set(el, { transformPerspective: 700, transformOrigin: 'center' });
-        const entry = { rotX, rotY, glare: ensureGlare(el) };
-        registry.set(el, entry);
-        return entry;
-      }
-
-      document.addEventListener('mousemove', (e) => {
-        const target = (e.target as HTMLElement).closest(TARGETS) as HTMLElement | null;
-        if (!target) return;
-        const { rotX, rotY, glare } = setup(target);
-        const r = target.getBoundingClientRect();
-        const px = (e.clientX - r.left) / r.width;  // 0..1
-        const py = (e.clientY - r.top) / r.height;  // 0..1
-
-        rotY(( px - 0.5) * MAX_TILT * 2);
-        rotX(-(py - 0.5) * MAX_TILT * 2);
-
-        glare.style.setProperty('--glare-x', `${px * 100}%`);
-        glare.style.setProperty('--glare-y', `${py * 100}%`);
-        glare.classList.add('is-active');
-      });
-
-      document.addEventListener('mouseout', (e) => {
-        const target = (e.target as HTMLElement).closest(TARGETS) as HTMLElement | null;
-        if (!target) return;
-        const related = e.relatedTarget as HTMLElement | null;
-        if (related && related.closest(TARGETS) === target) return;
-
-        const entry = registry.get(target);
-        if (entry) {
-          entry.rotX(0);
-          entry.rotY(0);
-          entry.glare.classList.remove('is-active');
+        function setup(el) {
+          if (registry.has(el)) return registry.get(el);
+          const rotX = gsap.quickTo(el, 'rotationX', { duration: 0.25, ease: 'power2.out' });
+          const rotY = gsap.quickTo(el, 'rotationY', { duration: 0.25, ease: 'power2.out' });
+          gsap.set(el, { transformPerspective: 800, transformOrigin: 'center' });
+          const entry = { rotX, rotY, glare: ensureGlare(el) };
+          registry.set(el, entry);
+          return entry;
         }
+
+        let activeCard = null;
+        let cardRect = null;
+        let currentEntry = null;
+        let lastX = 0;
+        let lastY = 0;
+        let rafId = null;
+
+        function renderTilt() {
+          rafId = null;
+          if (!activeCard || !cardRect || !currentEntry) return;
+
+          const px = (lastX - cardRect.left) / cardRect.width;
+          const py = (lastY - cardRect.top) / cardRect.height;
+
+          currentEntry.rotY((px - 0.5) * MAX_TILT * 2);
+          currentEntry.rotX(-(py - 0.5) * MAX_TILT * 2);
+
+          currentEntry.glare.style.setProperty('--glare-x', `${px * 100}%`);
+          currentEntry.glare.style.setProperty('--glare-y', `${py * 100}%`);
+          currentEntry.glare.classList.add('is-active');
+        }
+
+        // Cache bounding rect once on enter, avoiding layout thrashing during moves
+        document.addEventListener('mouseover', (e) => {
+          const target = (e.target as HTMLElement)?.closest(TARGETS);
+          if (target && target !== activeCard) {
+            activeCard = target;
+            cardRect = activeCard.getBoundingClientRect();
+            currentEntry = setup(activeCard);
+          }
+        }, { passive: true });
+
+        document.addEventListener('mousemove', (e) => {
+          if (!activeCard) return; // Zero work done when cursor is anywhere else
+          lastX = e.clientX;
+          lastY = e.clientY;
+          if (!rafId) {
+            rafId = requestAnimationFrame(renderTilt);
+          }
+        }, { passive: true });
+
+        document.addEventListener('mouseout', (e) => {
+          if (!activeCard) return;
+          const related = e.relatedTarget as HTMLElement | null;
+          if (related && related.closest(TARGETS) === activeCard) return;
+
+          if (currentEntry) {
+            currentEntry.rotX(0);
+            currentEntry.rotY(0);
+            currentEntry.glare.classList.remove('is-active');
+          }
+          activeCard = null;
+          cardRect = null;
+          currentEntry = null;
+        }, { passive: true });
+
+        window.addEventListener('scroll', () => {
+          if (activeCard) cardRect = activeCard.getBoundingClientRect();
+        }, { passive: true });
       });
-    });
+    }
   }
 </script>

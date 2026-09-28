@@ -1,13 +1,9 @@
 ---
 // src/components/ChannelWipe.astro
 //
-// Fires only when RemoteControl jumps between sections via number
-// keys — the viewport splits into horizontal bands that slide in
-// from alternating left/right and snap together, like a physical
-// channel dial flipping past static and landing on the new channel.
-// Distinct from a hover effect: this is a full-screen, once-per-jump
-// payoff, dispatched via a custom event so RemoteControl doesn't need
-// to know this component exists.
+// Directional channel-wipe transition based on canonical CH1-CH6 nav order.
+// Wipes left-to-right when navigating forward, and right-to-left when navigating
+// backward, falling back to forward for non-canonical subpages.
 ---
 <div class="cc-wipe" id="cc-wipe" aria-hidden="true">
   {Array.from({ length: 7 }).map((_, i) => (
@@ -29,7 +25,7 @@
     background: var(--navy-deep);
     border-bottom: 1px solid rgba(166,232,255,0.15);
     /* Default state: hidden off-screen */
-    transform: translateX(calc(100% * var(--dir, 1)));
+    transform: translateX(calc(100% * var(--dir, -1)));
   }
   
   /* Leaving the current page (wiping IN to cover the screen) */
@@ -45,31 +41,76 @@
   }
   
   @keyframes cc-wipe-band-leave {
-    0%   { transform: translateX(calc(100% * var(--dir, 1))); }
+    0%   { transform: translateX(calc(100% * var(--dir, -1))); }
     100% { transform: translateX(0); }
   }
   
   @keyframes cc-wipe-band-enter {
     0%   { transform: translateX(0); }
-    100% { transform: translateX(calc(-100% * var(--dir, 1))); }
+    100% { transform: translateX(calc(-100% * var(--dir, -1))); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cc-wipe {
+      display: none !important;
+      animation: none !important;
+    }
   }
 </style>
 
 <script>
   // @ts-nocheck
-if (!window.__ccChannelWipeInit) {
+  import { NAV_LINKS } from '../nav.config';
+
+  if (!window.__ccChannelWipeInit) {
     window.__ccChannelWipeInit = true;
 
     const wipe = document.getElementById('cc-wipe');
     if (wipe) {
       const bands = wipe.querySelectorAll<HTMLElement>('.cc-wipe__band');
-      bands.forEach((b, i) => {
-        b.style.setProperty('--dir', i % 2 === 0 ? '1' : '-1');
-      });
 
-      // When a jump is triggered, cover the screen
+      function getNavIndex(urlOrKey: string): number {
+        if (!urlOrKey) return -1;
+        const target = urlOrKey.toLowerCase().replace(/\/$/, '');
+        for (let i = 0; i < NAV_LINKS.length; i++) {
+          const item = NAV_LINKS[i];
+          const itemHref = item.href.toLowerCase().replace(/\/$/, '');
+          if (target === item.key.toLowerCase() || target === itemHref || target.startsWith(itemHref + '/')) {
+            return i;
+          }
+        }
+        return -1;
+      }
+
+      function resolveDirection(detail: any): string {
+        const dest = detail?.to || detail?.target;
+        if (detail?.direction === 'backward' || detail?.direction === -1) return '1';
+        if (detail?.direction === 'forward' || detail?.direction === 1) return '-1';
+
+        if (dest) {
+          const curIdx = getNavIndex(window.location.pathname);
+          const destIdx = getNavIndex(dest);
+          if (curIdx !== -1 && destIdx !== -1 && curIdx !== destIdx) {
+            // Forward (destIdx > curIdx): -1 (left-to-right wipe)
+            // Backward (destIdx < curIdx): 1 (right-to-left wipe)
+            return destIdx > curIdx ? '-1' : '1';
+          }
+        }
+        return '-1'; // Sensible default direction (forward)
+      }
+
+      // Default direction: forward
+      bands.forEach(b => b.style.setProperty('--dir', '-1'));
+
+      // When a jump is triggered, cover the screen in resolved direction
       document.addEventListener('cc:channel-jump', ((e: CustomEvent) => {
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
         const isInPage = e?.detail?.inPage;
+        const dirVal = resolveDirection(e?.detail);
+
+        bands.forEach(b => b.style.setProperty('--dir', dirVal));
+
         wipe.classList.remove('is-entering');
         wipe.classList.remove('is-leaving');
         void wipe.offsetWidth; // restart animation
@@ -88,28 +129,38 @@ if (!window.__ccChannelWipeInit) {
           }, 250);
         } else {
           sessionStorage.setItem('cc-nav-wipe-pending', '1');
+          sessionStorage.setItem('cc-nav-wipe-dir', dirVal);
           // Safety timeout in case navigation is delayed or cancelled
           setTimeout(() => {
             if (wipe.classList.contains('is-leaving')) {
               wipe.classList.remove('is-leaving');
               bands.forEach(b => b.style.transform = '');
               sessionStorage.removeItem('cc-nav-wipe-pending');
+              sessionStorage.removeItem('cc-nav-wipe-dir');
             }
           }, 2000);
         }
       }) as EventListener);
 
-      // When arriving at a new page after a jump, reveal the screen
+      // When arriving at a new page after a jump, reveal the screen in the same direction
       const cameFromChannelJump = sessionStorage.getItem('cc-nav-wipe-pending');
-      if (cameFromChannelJump) {
+      const savedDir = sessionStorage.getItem('cc-nav-wipe-dir') || '-1';
+
+      if (cameFromChannelJump && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
         sessionStorage.removeItem('cc-nav-wipe-pending');
-        // Start from covered state instantly
-        bands.forEach(b => b.style.transform = 'translateX(0)'); 
+        sessionStorage.removeItem('cc-nav-wipe-dir');
+        bands.forEach(b => {
+          b.style.setProperty('--dir', savedDir);
+          b.style.transform = 'translateX(0)';
+        });
         wipe.classList.add('is-entering');
         setTimeout(() => {
           wipe.classList.remove('is-entering');
           bands.forEach(b => b.style.transform = ''); // reset to default
         }, 600);
+      } else {
+        sessionStorage.removeItem('cc-nav-wipe-pending');
+        sessionStorage.removeItem('cc-nav-wipe-dir');
       }
     }
   }

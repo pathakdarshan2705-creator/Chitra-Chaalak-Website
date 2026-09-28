@@ -27,8 +27,8 @@ if (!window.__ccCardHandlersInit) {
             if (el !== card) el.classList.remove('is-selected');
           });
       }
-      card.classList.toggle('is-selected');
-      if (card.classList.contains('is-selected') && group) {
+      card.classList.add('is-selected');
+      if (group) {
         document.dispatchEvent(new CustomEvent('cc:card-selected', { detail: { group, card } }));
       }
     });

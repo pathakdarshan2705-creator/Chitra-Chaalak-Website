@@ -220,7 +220,13 @@ const {
       btn.setAttribute('aria-expanded', String(!!isOpen));
     });
     grid?.querySelectorAll('a').forEach((link) => {
-      link.addEventListener('click', () => {
+      link.addEventListener('click', (e) => {
+        const href = link.getAttribute('href');
+        if (href && href !== window.location.pathname) {
+          e.preventDefault();
+          document.dispatchEvent(new CustomEvent('cc:channel-jump', { detail: { to: href } }));
+          setTimeout(() => { window.location.href = href; }, 320);
+        }
         grid.classList.remove('is-open');
         btn?.setAttribute('aria-expanded', 'false');
       });

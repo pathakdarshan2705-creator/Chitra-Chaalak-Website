@@ -1,0 +1,96 @@
+---
+// src/components/CursorReticle.astro
+//
+// Camera autofocus reticle cursor with instant, hardware-matched 60/120fps GPU tracking over interactive elements.
+---
+<div class="cc-cursor-reticle" id="cc-cursor-reticle" aria-hidden="true">
+  <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 28 28">
+    <path d="M2,9 L2,2 L9,2" stroke="#fff000" stroke-width="2.2" fill="none" stroke-linecap="square"/>
+    <path d="M19,2 L26,2 L26,9" stroke="#fff000" stroke-width="2.2" fill="none" stroke-linecap="square"/>
+    <path d="M26,19 L26,26 L19,26" stroke="#fff000" stroke-width="2.2" fill="none" stroke-linecap="square"/>
+    <path d="M9,26 L2,26 L2,19" stroke="#fff000" stroke-width="2.2" fill="none" stroke-linecap="square"/>
+    <circle cx="14" cy="14" r="1.8" fill="#fff000"/>
+  </svg>
+</div>
+
+<style>
+  .cc-cursor-reticle {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 28px;
+    height: 28px;
+    margin-top: -14px;
+    margin-left: -14px;
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0;
+    transform: translate3d(-100px, -100px, 0);
+    will-change: transform, opacity;
+    transition: opacity 0.12s ease-out;
+  }
+  .cc-cursor-reticle.is-active {
+    opacity: 1;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cc-cursor-reticle {
+      display: none !important;
+    }
+  }
+</style>
+
+<script>
+  // @ts-nocheck
+  if (!window.__ccCursorReticleInit) {
+    window.__ccCursorReticleInit = true;
+
+    const reticle = document.getElementById('cc-cursor-reticle');
+    if (reticle) {
+      const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (!prefersReduced && window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+        document.body.classList.add('has-custom-cursor');
+
+        const TARGETS = 'a, button, [role="button"], .cc-card, .cc-btn, .cc-icon-btn, .cc-panel__viewall, .cc-contact-panel__list a';
+
+        let mouseX = -100;
+        let mouseY = -100;
+        let rafId = null;
+
+        function updatePosition() {
+          reticle.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0)`;
+          rafId = null;
+        }
+
+        // Real-time zero-lag tracking on mousemove with GPU translate3d
+        document.addEventListener('mousemove', (e) => {
+          mouseX = e.clientX;
+          mouseY = e.clientY;
+          if (!rafId) {
+            rafId = requestAnimationFrame(updatePosition);
+          }
+        }, { passive: true });
+
+        // Boundary crossing only for interactive element detection
+        let currentTarget = null;
+        document.addEventListener('mouseover', (e) => {
+          const target = (e.target as HTMLElement)?.closest(TARGETS);
+          if (target) {
+            if (target !== currentTarget) {
+              currentTarget = target;
+              reticle.classList.add('is-active');
+            }
+          } else if (currentTarget) {
+            currentTarget = null;
+            reticle.classList.remove('is-active');
+          }
+        }, { passive: true });
+
+        document.addEventListener('mouseleave', () => {
+          currentTarget = null;
+          reticle.classList.remove('is-active');
+        });
+      }
+    }
+  }
+</script>

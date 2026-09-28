@@ -1,0 +1,131 @@
+---
+// src/components/ChannelTicks.astro
+//
+// Persistent ambient row of 6 small channel ticks (CH1-CH6),
+// rendered from canonical NAV_LINKS, with the active channel lit yellow.
+import { NAV_LINKS } from '../nav.config';
+---
+<div class="cc-channel-ticks" id="cc-channel-ticks" aria-label="Channel Progress" role="status">
+  <span class="cc-channel-ticks__label">CH</span>
+  <div class="cc-channel-ticks__track">
+    {NAV_LINKS.map((item, idx) => (
+      <span
+        class="cc-channel-tick"
+        data-key={item.key}
+        data-index={idx}
+        title={`CH ${idx + 1}: ${item.label}`}
+      ></span>
+    ))}
+  </div>
+</div>
+
+<style>
+  .cc-channel-ticks {
+    position: fixed;
+    bottom: 20px;
+    left: var(--page-margin-left, 28px);
+    z-index: 3100;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 8px;
+    background: rgba(0, 10, 40, 0.8);
+    border: 1px solid rgba(166, 232, 255, 0.2);
+    box-shadow: 0 4px 12px rgba(0, 10, 40, 0.5);
+    pointer-events: none;
+    font-family: var(--font-ui, monospace);
+  }
+
+  .cc-channel-ticks__label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: var(--blue-lightest);
+    opacity: 0.6;
+  }
+
+  .cc-channel-ticks__track {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .cc-channel-tick {
+    width: 10px;
+    height: 3px;
+    background: rgba(166, 232, 255, 0.25);
+    border-radius: 1px;
+    transition: background 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+  }
+
+  .cc-channel-tick.is-active {
+    background: var(--yellow, #fff000);
+    box-shadow: 0 0 6px rgba(255, 240, 0, 0.8);
+    transform: scaleY(1.6);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cc-channel-tick {
+      transition: none !important;
+      transform: none !important;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .cc-channel-ticks {
+      left: 16px;
+      bottom: 14px;
+      padding: 3px 6px;
+    }
+  }
+</style>
+
+<script>
+  // @ts-nocheck
+  import { NAV_LINKS } from '../nav.config';
+
+  if (!window.__ccChannelTicksInit) {
+    window.__ccChannelTicksInit = true;
+
+    const ticks = document.querySelectorAll<HTMLElement>('.cc-channel-tick');
+
+    function updateActiveTick(keyOrPath?: string) {
+      const target = (keyOrPath || window.location.pathname).toLowerCase().replace(/\/$/, '');
+      let activeIndex = -1;
+
+      for (let i = 0; i < NAV_LINKS.length; i++) {
+        const link = NAV_LINKS[i];
+        const linkHref = link.href.toLowerCase().replace(/\/$/, '');
+        if (target === link.key.toLowerCase() || target === linkHref || target.startsWith(linkHref + '/')) {
+          activeIndex = i;
+          break;
+        }
+      }
+
+      ticks.forEach((tick, idx) => {
+        if (idx === activeIndex) {
+          tick.classList.add('is-active');
+        } else {
+          tick.classList.remove('is-active');
+        }
+      });
+    }
+
+    // Set initial active state based on route
+    updateActiveTick();
+
+    // Update on section/card selection
+    document.addEventListener('cc:card-selected', ((e: CustomEvent) => {
+      if (e.detail?.group) {
+        updateActiveTick(e.detail.group);
+      }
+    }) as EventListener);
+
+    // Update on channel jump
+    document.addEventListener('cc:channel-jump', ((e: CustomEvent) => {
+      if (e.detail?.to) {
+        updateActiveTick(e.detail.to);
+      }
+    }) as EventListener);
+  }
+</script>

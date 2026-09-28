@@ -137,4 +137,81 @@ const { frontmatter, Content } = aboutData;
     color: #fff;
     transform: translateX(-4px);
   }
+
+  .is-scrambling {
+    color: var(--yellow, #fff000) !important;
+    text-shadow: 0 0 6px rgba(255, 240, 0, 0.4);
+    opacity: 0.95;
+  }
 </style>
+
+<script>
+  // @ts-nocheck
+  import { gsap } from 'gsap';
+  import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+  gsap.registerPlugin(ScrollTrigger);
+
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (!reducedMotion) {
+    const GLYPHS = '0123456789ABCDEF!#@*[]/~_<>:+%&';
+    const scroller = document.querySelector('.about-content');
+    const targets = document.querySelectorAll(
+      '.glitch-title, .subtitle, .text-block h1, .text-block h2, .text-block h3, .text-block p'
+    );
+
+    function scrambleElement(el) {
+      if (el.__scrambled) return;
+      el.__scrambled = true;
+
+      const originalHTML = el.innerHTML;
+      const originalText = el.textContent || '';
+      if (!originalText.trim()) return;
+
+      const chars = originalText.split('');
+      const length = chars.length;
+      const duration = Math.min(0.55, Math.max(0.3, length * 0.003));
+      const obj = { progress: 0 };
+
+      el.classList.add('is-scrambling');
+
+      gsap.to(obj, {
+        progress: 1,
+        duration: duration,
+        ease: 'power1.inOut',
+        onUpdate: () => {
+          const p = obj.progress;
+          const cutoff = Math.floor(p * length);
+          let scrambled = '';
+          for (let i = 0; i < length; i++) {
+            const char = chars[i];
+            if (i < cutoff) {
+              scrambled += char;
+            } else if (char === ' ' || char === '\n' || char === '\t') {
+              scrambled += char;
+            } else {
+              scrambled += GLYPHS[Math.floor(Math.random() * GLYPHS.length)];
+            }
+          }
+          el.textContent = scrambled;
+        },
+        onComplete: () => {
+          el.classList.remove('is-scrambling');
+          el.innerHTML = originalHTML;
+        }
+      });
+    }
+
+    if (scroller) {
+      targets.forEach((el) => {
+        ScrollTrigger.create({
+          scroller: scroller,
+          trigger: el,
+          start: 'top 92%',
+          once: true,
+          onEnter: () => scrambleElement(el)
+        });
+      });
+    }
+  }
+</script>

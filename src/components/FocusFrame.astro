@@ -42,11 +42,52 @@
     0%   { border-color: #ffffff; }
     100% { border-color: var(--yellow); }
   }
+
+  /* Click lock-tighten: brackets snap ~2px inward before settling */
+  .cc-focus-frame.is-tightening .cc-focus-frame__corner--tl {
+    animation: cc-tighten-tl 0.22s cubic-bezier(0.2, 0.9, 0.3, 1) forwards;
+  }
+  .cc-focus-frame.is-tightening .cc-focus-frame__corner--tr {
+    animation: cc-tighten-tr 0.22s cubic-bezier(0.2, 0.9, 0.3, 1) forwards;
+  }
+  .cc-focus-frame.is-tightening .cc-focus-frame__corner--bl {
+    animation: cc-tighten-bl 0.22s cubic-bezier(0.2, 0.9, 0.3, 1) forwards;
+  }
+  .cc-focus-frame.is-tightening .cc-focus-frame__corner--br {
+    animation: cc-tighten-br 0.22s cubic-bezier(0.2, 0.9, 0.3, 1) forwards;
+  }
+
+  @keyframes cc-tighten-tl {
+    0%   { transform: translate(0, 0); }
+    45%  { transform: translate(2px, 2px); border-color: #ffffff; }
+    100% { transform: translate(0, 0); border-color: var(--yellow); }
+  }
+  @keyframes cc-tighten-tr {
+    0%   { transform: translate(0, 0); }
+    45%  { transform: translate(-2px, 2px); border-color: #ffffff; }
+    100% { transform: translate(0, 0); border-color: var(--yellow); }
+  }
+  @keyframes cc-tighten-bl {
+    0%   { transform: translate(0, 0); }
+    45%  { transform: translate(2px, -2px); border-color: #ffffff; }
+    100% { transform: translate(0, 0); border-color: var(--yellow); }
+  }
+  @keyframes cc-tighten-br {
+    0%   { transform: translate(0, 0); }
+    45%  { transform: translate(-2px, -2px); border-color: #ffffff; }
+    100% { transform: translate(0, 0); border-color: var(--yellow); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cc-focus-frame.is-tightening .cc-focus-frame__corner {
+      animation: none !important;
+    }
+  }
 </style>
 
 <script>
   // @ts-nocheck
-if (!window.__ccFocusFrameInit) {
+  if (!window.__ccFocusFrameInit) {
     window.__ccFocusFrameInit = true;
 
     const frame = document.getElementById('cc-focus-frame');
@@ -64,12 +105,37 @@ if (!window.__ccFocusFrameInit) {
         setTimeout(() => frame.classList.remove('is-locking'), 250);
       }
 
+      function triggerTighten() {
+        if (!frame.classList.contains('is-active')) return;
+        frame.classList.remove('is-tightening');
+        void frame.offsetWidth;
+        frame.classList.add('is-tightening');
+        setTimeout(() => frame.classList.remove('is-tightening'), 240);
+      }
+
       document.addEventListener('mouseover', (e) => {
         const target = e.target.closest(TARGETS);
         if (!target || target === current) return;
         current = target;
         place(target);
       });
+
+      document.addEventListener('click', (e) => {
+        const target = e.target.closest(TARGETS);
+        if (target) {
+          current = target;
+          place(target);
+          triggerTighten();
+        }
+      });
+
+      document.addEventListener('cc:card-selected', ((e) => {
+        if (e.detail?.card) {
+          current = e.detail.card;
+          place(e.detail.card);
+          triggerTighten();
+        }
+      }));
 
       document.addEventListener('mouseout', (e) => {
         const related = e.relatedTarget;
