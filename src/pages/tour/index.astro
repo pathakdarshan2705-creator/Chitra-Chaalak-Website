@@ -60,7 +60,12 @@ const tours = sorted.map((tour) => ({
 <style>
   .cc-tour-page {
     padding: 20px;
+    height: 100%;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
   }
+  .cc-tour-page::-webkit-scrollbar { display: none; }
 
   .cc-tour-grid {
     display: grid;

@@ -17,6 +17,15 @@ if (!window.__ccRemoteControlInit) {
       '4': 'tour', '5': 'collections', '6': 'portfolio',
     };
 
+    const SECTION_URLS: Record<string, string> = {
+      updates: '/updates',
+      films: '/films',
+      blog: '/blog',
+      tour: '/tour',
+      collections: '/collections',
+      portfolio: '/portfolio',
+    };
+
     let lastGroup: string | null = null;
     let busy = false;
 
@@ -24,7 +33,9 @@ if (!window.__ccRemoteControlInit) {
     // "last touched section" so arrow keys work immediately after a
     // mouse selection, not just after a keyboard one
     document.addEventListener('cc:card-selected', ((e: CustomEvent) => {
-      lastGroup = e.detail.group;
+      if (e.detail?.group) {
+        lastGroup = e.detail.group;
+      }
     }) as EventListener);
 
     function cardsIn(group: string): HTMLElement[] {
@@ -34,35 +45,63 @@ if (!window.__ccRemoteControlInit) {
     function select(group: string, card: HTMLElement) {
       cardsIn(group).forEach((c) => c.classList.remove('is-selected'));
       card.classList.add('is-selected');
-      card.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
+      card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       lastGroup = group;
+      document.dispatchEvent(new CustomEvent('cc:card-selected', { detail: { group, card } }));
     }
 
     document.addEventListener('keydown', (e) => {
+      // 1. Mobile check: physical keyboard shortcuts are disabled on mobile viewports
+      if (window.innerWidth <= 768 || window.matchMedia('(max-width: 768px)').matches) return;
+
+      // 2. Form/input check: don't intercept while user is typing in any text or editable field
       const active = document.activeElement;
-      if (active && ['INPUT', 'TEXTAREA'].includes(active.tagName)) return;
+      if (active && (['INPUT', 'TEXTAREA', 'SELECT'].includes(active.tagName) || (active as HTMLElement).isContentEditable)) return;
+
+      // 3. Modifier keys check: don't conflict with browser shortcuts (Ctrl+R, Alt+Left, Cmd+W, etc.)
       if (e.ctrlKey || e.metaKey || e.altKey) return;
 
-      // Number keys: jump straight to a section
+      // Number keys 1-6: jump straight to a section
       const numberGroup = KEYMAP[e.key];
-      if (numberGroup) {
+      if (numberGroup && !e.shiftKey) {
         if (busy) return;
         const cards = cardsIn(numberGroup);
-        if (!cards.length) return;
-        const current = cards.find((c) => c.classList.contains('is-selected'));
-        busy = true;
-        document.dispatchEvent(new CustomEvent('cc:channel-jump'));
-        select(numberGroup, current ?? cards[0]);
-        setTimeout(() => { busy = false; }, 200);
-        return;
+        if (cards.length > 0) {
+          e.preventDefault();
+          busy = true;
+          const current = cards.find((c) => c.classList.contains('is-selected'));
+          // Dispatch in-page channel wipe transition
+          document.dispatchEvent(new CustomEvent('cc:channel-jump', { detail: { inPage: true } }));
+          // Switch selection midway through the wipe covering the screen
+          setTimeout(() => {
+            select(numberGroup, current ?? cards[0]);
+          }, 200);
+          // Unlock after wipe has fully revealed
+          setTimeout(() => { busy = false; }, 600);
+          return;
+        } else if (SECTION_URLS[numberGroup] && window.location.pathname !== SECTION_URLS[numberGroup]) {
+          // Section not present on current page (e.g. on /about), navigate via channel wipe
+          e.preventDefault();
+          busy = true;
+          document.dispatchEvent(new CustomEvent('cc:channel-jump'));
+          setTimeout(() => { window.location.href = SECTION_URLS[numberGroup]; }, 320);
+          return;
+        }
       }
 
       // Enter: open whatever's currently selected in the last-used group
-      if (e.key === 'Enter' && lastGroup) {
-        const cards = cardsIn(lastGroup);
-        const sel = cards.find((c) => c.classList.contains('is-selected'));
+      if (e.key === 'Enter') {
+        const group = lastGroup ?? Object.values(KEYMAP).find((g) => cardsIn(g).length);
+        if (!group) return;
+        const cards = cardsIn(group);
+        const sel = cards.find((c) => c.classList.contains('is-selected')) ?? cards[0];
         const href = sel?.dataset.href;
-        if (href && href !== '#') window.location.href = href;
+        if (href && href !== '#') {
+          e.preventDefault();
+          busy = true;
+          document.dispatchEvent(new CustomEvent('cc:channel-jump'));
+          setTimeout(() => { window.location.href = href; }, 320);
+        }
         return;
       }
 

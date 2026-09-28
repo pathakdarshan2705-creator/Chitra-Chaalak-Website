@@ -92,7 +92,7 @@ const { title, artist, coverImage, spotifyLink = "#", youtubeLink = "#", year = 
     height: 100%;
     object-fit: cover;
     display: block;
-    filter: saturate(1.2) contrast(1.1); /* Slight retro punch */
+    filter: saturate(1.2) contrast(1.1);
   }
 
   /* Overlay for Track Info & Links */
@@ -101,7 +101,7 @@ const { title, artist, coverImage, spotifyLink = "#", youtubeLink = "#", year = 
     bottom: 0;
     left: 0;
     width: 100%;
-    background: linear-gradient(to top, var(--navy-deep) 0%, transparent 100%);
+    background: linear-gradient(to top, rgba(0, 10, 40, 0.95) 0%, rgba(0, 10, 40, 0.7) 60%, transparent 100%);
     padding: 20px 15px 15px;
     color: var(--blue-lightest);
     transform: translateY(100%);
@@ -111,29 +111,44 @@ const { title, artist, coverImage, spotifyLink = "#", youtubeLink = "#", year = 
     gap: 5px;
   }
 
-  .cc-music-card:hover .poster-overlay {
+  .cc-music-card:hover .poster-overlay,
+  .cc-music-card.is-active .poster-overlay {
     transform: translateY(0);
+  }
+
+  @media (max-width: 768px), (hover: none) {
+    .poster-overlay {
+      transform: translateY(0);
+      padding: 16px 12px 10px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .cc-music-card {
+      max-width: 290px;
+    }
   }
 
   .track-title {
     margin: 0;
     font-family: var(--font-ui);
-    font-size: 1.2rem;
+    font-size: 1.15rem;
     font-weight: 700;
     text-transform: uppercase;
     color: var(--yellow);
+    line-height: 1.2;
   }
 
   .track-artist {
     margin: 0;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     opacity: 0.9;
   }
 
   .links-container {
     display: flex;
-    gap: 10px;
-    margin-top: 10px;
+    gap: 12px;
+    margin-top: 6px;
   }
 
   .music-link {
@@ -201,7 +216,6 @@ const { title, artist, coverImage, spotifyLink = "#", youtubeLink = "#", year = 
 
   /* Interactions */
   .cc-music-card:hover .music-card-inner {
-    /* Slight lift on hover */
     transform: translateY(-5px);
   }
 </style>
@@ -209,20 +223,23 @@ const { title, artist, coverImage, spotifyLink = "#", youtubeLink = "#", year = 
 <script>
   import { gsap } from "gsap";
 
-  // We initialize the GSAP animations for the cards
-  document.addEventListener("DOMContentLoaded", () => {
+  const initCards = () => {
     const cards = document.querySelectorAll(".cc-music-card");
 
     cards.forEach((card) => {
       const vinyl = card.querySelector(".vinyl-record");
       const sleeve = card.querySelector(".poster-sleeve");
+      let isOpen = false;
+
+      const isMobile = window.innerWidth <= 768;
+      const slideDist = isMobile ? "28%" : "50%";
 
       // Setup timeline for each card
       const tl = gsap.timeline({ paused: true });
 
       // Slide vinyl out to the right and spin it
       tl.to(vinyl, {
-        x: "50%",
+        x: slideDist,
         rotation: 180,
         duration: 0.6,
         ease: "power2.out"
@@ -245,21 +262,51 @@ const { title, artist, coverImage, spotifyLink = "#", youtubeLink = "#", year = 
         paused: true
       });
 
-      card.addEventListener("mouseenter", () => {
+      const playAnimation = () => {
+        isOpen = true;
+        card.classList.add("is-active");
         tl.play();
-        // start spinning after slide out completes
         gsap.delayedCall(0.6, () => spin.play());
-      });
+      };
 
-      card.addEventListener("mouseleave", () => {
+      const reverseAnimation = () => {
+        isOpen = false;
+        card.classList.remove("is-active");
         spin.pause();
-        // Reset rotation so it reverses smoothly
         gsap.to(vinyl, {
           rotation: Math.round(gsap.getProperty(vinyl, "rotation") / 360) * 360,
           duration: 0.1,
           onComplete: () => tl.reverse()
         });
+      };
+
+      card.addEventListener("mouseenter", () => {
+        if (!window.matchMedia("(hover: none)").matches) {
+          playAnimation();
+        }
+      });
+
+      card.addEventListener("mouseleave", () => {
+        if (!window.matchMedia("(hover: none)").matches) {
+          reverseAnimation();
+        }
+      });
+
+      // Tap to toggle on mobile/touch
+      card.addEventListener("click", (e) => {
+        if ((e.target as HTMLElement).closest("a")) return;
+        if (isOpen) {
+          reverseAnimation();
+        } else {
+          playAnimation();
+        }
       });
     });
-  });
+  };
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initCards);
+  } else {
+    initCards();
+  }
 </script>

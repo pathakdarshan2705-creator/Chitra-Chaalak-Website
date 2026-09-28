@@ -1,10 +1,22 @@
 ---
-// The bottom two cards of visual tour and my collection which contain a slideshow of the items in the collection. The slideshow auto-advances every 7 seconds, and can be manually advanced with the left/right buttons. The slideshow is also linked to the card's href, so clicking on the card will take you to the first item in the slideshow.
+// src/components/SlideshowCard.astro
+//
+// The bottom two cards of visual tour and my collection which contain a slideshow
+// of the items in the collection. Reuses the shared cc-card system, auto-advances
+// every 7 seconds with GSAP crossfade, and supports manual prev/next via panel buttons.
 
-interface Item { title: string; meta: string; href: string; }
-interface Props { items: Item[]; group: string; }
+interface Item {
+  title: string;
+  meta: string;
+  href: string;
+  imageSrc?: string;
+}
+interface Props {
+  items: Item[];
+  group: string;
+}
 const { items, group } = Astro.props;
-const first = items[0] || { title: 'No items', meta: 'EMPTY', href: '#' };
+const first = items[0] || { title: 'No items', meta: 'EMPTY', href: '#', imageSrc: '' };
 ---
 <div
   class="cc-card is-selected cc-slideshow"
@@ -13,14 +25,21 @@ const first = items[0] || { title: 'No items', meta: 'EMPTY', href: '#' };
   data-group={group}
   data-title={first.title}
   data-meta={first.meta}
-  data-image=""
+  data-image={first.imageSrc || ''}
   data-items={JSON.stringify(items)}
   data-index="0"
   tabindex="0"
   role="button"
 >
-  <div class="cc-slideshow__index" id="cc-slideshow-index-{group}">01</div>
+  <div class="cc-slideshow__img-wrap">
+    {first.imageSrc ? (
+      <img src={first.imageSrc} alt={first.title} class="cc-slideshow__img" loading="lazy" />
+    ) : (
+      <div class="cc-slideshow__placeholder"></div>
+    )}
+  </div>
   <div class="cc-slideshow__body">
+    <div class="cc-slideshow__index" id={`cc-slideshow-index-${group}`}>01</div>
     <div class="cc-slideshow__title">{first.title}</div>
     <div class="cc-slideshow__meta">{first.meta}</div>
   </div>
@@ -29,83 +48,141 @@ const first = items[0] || { title: 'No items', meta: 'EMPTY', href: '#' };
   </div>
   <span class="cc-card__corner-br"></span>
 </div>
+
 <style>
   .cc-slideshow {
-  position: relative;
-  flex-direction: column;
-  justify-content: center;
-  align-items: flex-start;
-  height: 100%;
-  min-height: 0;
-  padding: 20px 22px;
-  background: var(--blue-card);
-  overflow: hidden;
-}
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    height: 100%;
+    min-height: 0;
+    padding: 10px 14px;
+    background: var(--blue-card);
+    gap: 12px;
+    overflow: hidden;
+  }
   .cc-slideshow.is-selected { background: var(--blue-card); }
   .cc-slideshow:hover.is-selected { background: var(--blue-card-hover); }
 
+  .cc-slideshow__img-wrap {
+    flex: 0 0 clamp(68px, 8vw, 88px);
+    aspect-ratio: 16 / 10;
+    background: var(--navy-deep);
+    border: 1px solid var(--blue-panel-light);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .cc-slideshow__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .cc-slideshow__placeholder {
+    width: 100%;
+    height: 100%;
+    background: var(--blue-column);
+  }
+
+  .cc-slideshow__body {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 2px;
+  }
+
   .cc-slideshow__index {
-  font-family: var(--font-ui);
-  font-weight: 700;
-  font-size: 2rem;
-  color: var(--blue-panel-light);
-  opacity: 0.35;
-  line-height: 1;
-  margin-bottom: 6px;
-}
+    font-family: var(--font-ui);
+    font-weight: 700;
+    font-size: 11px;
+    color: var(--blue-panel-light);
+    opacity: 0.6;
+    line-height: 1;
+    letter-spacing: 0.5px;
+  }
 
-.cc-slideshow__title {
-  font-family: var(--font-ui);
-  font-weight: 700;
-  font-size: 1.3rem;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
-  color: var(--blue-lightest);
-  margin-bottom: 4px;
-  line-height: 1.3;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
+  .cc-slideshow__title {
+    font-family: var(--font-ui);
+    font-weight: 700;
+    font-size: clamp(12px, 1.05vw, 15px);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: var(--blue-lightest);
+    line-height: 1.25;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 
-.cc-slideshow__meta {
-  font-family: var(--font-body);
-  font-weight: 600;
-  font-size: 0.85rem;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  color: var(--yellow);
-  opacity: 0.9;
-  line-height: 1.3;
-  display: -webkit-box;
-  -webkit-line-clamp: 1;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
+  .cc-slideshow__meta {
+    font-family: var(--font-body);
+    font-weight: 600;
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--yellow);
+    opacity: 0.9;
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 
   .cc-slideshow__dots {
-    position: absolute; bottom: 12px; right: 14px;
-    display: flex; gap: 5px; z-index: 4;
+    position: absolute;
+    bottom: 8px;
+    right: 12px;
+    display: flex;
+    gap: 4px;
+    z-index: 4;
   }
   .cc-slideshow__dots span {
-    width: 5px; height: 5px; border-radius: 50%;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
     background: rgba(166,232,255,0.4);
+    transition: background 0.2s ease;
   }
   .cc-slideshow__dots span.is-active { background: var(--yellow); }
+
+  @media (max-width: 768px) {
+    .cc-slideshow {
+      padding: 12px 14px;
+      gap: 14px;
+    }
+    .cc-slideshow__img-wrap {
+      flex: 0 0 90px;
+    }
+    .cc-slideshow__title {
+      font-size: 14px;
+      white-space: normal;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+    }
+  }
 </style>
+
 <script>
   // @ts-nocheck
-import { gsap } from 'gsap';
+  import { gsap } from 'gsap';
 
   document.querySelectorAll<HTMLElement>('.cc-slideshow').forEach((card) => {
-    const group = card.dataset.slideshowGroup!;
+    const group = card.dataset.slideshowGroup;
     const items = JSON.parse(card.dataset.items || '[]') as
-      { title: string; meta: string; href: string }[];
+      { title: string; meta: string; href: string; imageSrc?: string }[];
     if (items.length <= 1) return;
 
     let index = 0;
     let timer: ReturnType<typeof setInterval> | null = null;
+    const imgEl = card.querySelector('.cc-slideshow__img') as HTMLImageElement;
     const indexEl = card.querySelector('.cc-slideshow__index') as HTMLElement;
     const titleEl = card.querySelector('.cc-slideshow__title') as HTMLElement;
     const metaEl = card.querySelector('.cc-slideshow__meta') as HTMLElement;
@@ -114,27 +191,29 @@ import { gsap } from 'gsap';
     function goTo(i: number) {
       index = ((i % items.length) + items.length) % items.length;
       const item = items[index];
-      // slower, calmer crossfade — was 0.25s/0.35s, now a full second
-      // each way so it reads as a deliberate slide change, not a flicker
+      const animTargets = [indexEl, titleEl, metaEl];
+      if (imgEl) animTargets.push(imgEl);
+
       const tl = gsap.timeline();
-      tl.to([indexEl, titleEl, metaEl], { opacity: 0, y: -6, duration: 0.5, ease: 'power1.in' })
+      tl.to(animTargets, { opacity: 0, y: -4, duration: 0.35, ease: 'power1.in' })
         .call(() => {
-          indexEl.textContent = String(index + 1).padStart(2, '0');
-          titleEl.textContent = item.title;
-          metaEl.textContent = item.meta;
+          if (indexEl) indexEl.textContent = String(index + 1).padStart(2, '0');
+          if (titleEl) titleEl.textContent = item.title;
+          if (metaEl) metaEl.textContent = item.meta;
+          if (imgEl && item.imageSrc) imgEl.src = item.imageSrc;
           card.dataset.title = item.title;
           card.dataset.meta = item.meta;
+          card.dataset.image = item.imageSrc || '';
           card.dataset.href = item.href;
         })
-        .fromTo([indexEl, titleEl, metaEl],
-          { opacity: 0, y: 6 },
-          { opacity: 1, y: 0, duration: 0.6, ease: 'power1.out' }
+        .fromTo(animTargets,
+          { opacity: 0, y: 4 },
+          { opacity: 1, y: 0, duration: 0.45, ease: 'power1.out' }
         );
       dots.forEach((d, di) => d.classList.toggle('is-active', di === index));
     }
 
     function start() {
-      // was 4000ms — slowed to 7000ms so it doesn't feel rushed
       timer = setInterval(() => goTo(index + 1), 7000);
     }
     function stop() {

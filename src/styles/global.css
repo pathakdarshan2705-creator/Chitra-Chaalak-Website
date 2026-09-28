@@ -314,10 +314,14 @@ button{
   }
   .cc-col--center.is-active-mobile::-webkit-scrollbar { display: none; }
   .cc-col--center.is-active-mobile .cc-row--film,
-  .cc-col--center.is-active-mobile .cc-row--blog,
-  .cc-col--center.is-active-mobile .cc-row--bottom {
+  .cc-col--center.is-active-mobile .cc-row--blog {
     flex: none !important;
     min-height: 280px;
+  }
+  .cc-col--center.is-active-mobile .cc-row--bottom {
+    flex: none !important;
+    height: auto !important;
+    min-height: auto !important;
   }
   .cc-col--center.is-active-mobile .cc-row--blog {
     min-height: 560px;
@@ -325,7 +329,7 @@ button{
   .cc-col--center.is-active-mobile .cc-blog-preview__img-wrap {
     min-height: 220px !important;
   }
-  /* Blog's side-by-side list+preview doesn't fit a phone width â€”
+  /* Blog's side-by-side list+preview doesn't fit a phone width —
      stack them instead */
   .cc-col--center.is-active-mobile .cc-blog-split {
     flex-direction: column !important;
@@ -334,12 +338,17 @@ button{
     flex: 0 0 auto !important;
     max-height: 160px;
   }
-  /* Tour + Collections side-by-side also doesn't fit â€” stack, with
+  /* Tour + Collections side-by-side also doesn't fit — stack, with
      breathing room between them */
   .cc-col--center.is-active-mobile .cc-split-row {
-    grid-template-columns: 1fr !important;
+    display: flex !important;
+    flex-direction: column !important;
     height: auto !important;
     gap: 16px;
+    width: 100% !important;
+  }
+  .cc-col--center.is-active-mobile .cc-split-row > :global(.cc-panel) {
+    min-height: 160px !important;
   }
 
   /* Portfolio screen: allow it to scroll as a whole on mobile

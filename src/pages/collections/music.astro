@@ -65,4 +65,15 @@ const musicCollection = allMusic.map(item => ({
     gap: 40px 30px;
     padding-bottom: 50px;
   }
+
+  @media (max-width: 600px) {
+    .music-grid {
+      grid-template-columns: 1fr;
+      gap: 30px;
+      padding: 0 10px 40px;
+    }
+    .cc-music-page {
+      padding: 16px 8px;
+    }
+  }
 </style>

@@ -213,7 +213,7 @@ const portfolioSections = [
   .cc-row > :global(.cc-panel) { flex: 1; }
   .cc-row--film  { flex: 0 0 33%; }
   .cc-row--blog  { flex: 1 1 auto; }
-  .cc-row--bottom { flex: 0 0 22%; }
+  .cc-row--bottom { flex: 0 0 clamp(130px, 22%, 160px); min-height: 130px; }
 
   /* Portfolio column */
   .cc-col--portfolio {

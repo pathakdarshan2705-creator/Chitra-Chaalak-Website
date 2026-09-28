@@ -179,7 +179,7 @@ import Panel from '../../components/Panel.astro';
 
   .cc-accordion-title {
     font-family: var(--font-ui);
-    font-size: 2vw;
+    font-size: clamp(14px, 2vw, 22px);
     text-transform: uppercase;
     margin: 0 0 10px 0;
     letter-spacing: 2px;
@@ -228,7 +228,7 @@ import Panel from '../../components/Panel.astro';
   .cc-accordion-panel:hover .cc-accordion-title,
   .cc-accordion-panel.is-expanded .cc-accordion-title {
     transform: rotate(0deg) translateY(0);
-    font-size: 3vw;
+    font-size: clamp(20px, 3vw, 32px);
     color: var(--yellow);
     opacity: 1;
   }

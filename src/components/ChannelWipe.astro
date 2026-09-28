@@ -68,13 +68,36 @@ if (!window.__ccChannelWipeInit) {
       });
 
       // When a jump is triggered, cover the screen
-      document.addEventListener('cc:channel-jump', () => {
+      document.addEventListener('cc:channel-jump', ((e: CustomEvent) => {
+        const isInPage = e?.detail?.inPage;
         wipe.classList.remove('is-entering');
         wipe.classList.remove('is-leaving');
         void wipe.offsetWidth; // restart animation
         wipe.classList.add('is-leaving');
-        sessionStorage.setItem('cc-nav-wipe-pending', '1');
-      });
+
+        if (isInPage) {
+          // In-page section jump: wipe IN to cover, then wipe OUT to reveal
+          setTimeout(() => {
+            wipe.classList.remove('is-leaving');
+            void wipe.offsetWidth;
+            wipe.classList.add('is-entering');
+            setTimeout(() => {
+              wipe.classList.remove('is-entering');
+              bands.forEach(b => b.style.transform = ''); // reset to default
+            }, 500);
+          }, 250);
+        } else {
+          sessionStorage.setItem('cc-nav-wipe-pending', '1');
+          // Safety timeout in case navigation is delayed or cancelled
+          setTimeout(() => {
+            if (wipe.classList.contains('is-leaving')) {
+              wipe.classList.remove('is-leaving');
+              bands.forEach(b => b.style.transform = '');
+              sessionStorage.removeItem('cc-nav-wipe-pending');
+            }
+          }, 2000);
+        }
+      }) as EventListener);
 
       // When arriving at a new page after a jump, reveal the screen
       const cameFromChannelJump = sessionStorage.getItem('cc-nav-wipe-pending');
