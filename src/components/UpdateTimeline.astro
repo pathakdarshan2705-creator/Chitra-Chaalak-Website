@@ -3,12 +3,16 @@ import { getCollection, render } from 'astro:content';
 
 const allUpdates = await getCollection('updates');
 const sortedUpdates = allUpdates.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+const totalUpdates = sortedUpdates.length;
 
 const renderedUpdates = await Promise.all(
-  sortedUpdates.map(async (update) => {
+  sortedUpdates.map(async (update, index) => {
     const { Content } = await render(update);
+    // Assign sequential 3-digit teletext page numbers in increasing order from oldest (101) to newest (100 + totalUpdates)
+    const pageNumber = 101 + (totalUpdates - 1 - index);
     return {
       ...update,
+      pageNumber,
       Content
     };
   })
@@ -18,45 +22,423 @@ function displayDate(d: Date) {
   return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).toUpperCase();
 }
 ---
-<div class="cc-timeline">
-  <div class="cc-timeline__pulse-line"></div>
+<div class="cc-teletext-system">
   
-  {renderedUpdates.map((update, index) => (
-    <div class="cc-timeline__node-container" style={`--animation-order: ${index};`}>
-      <div class="cc-timeline__node"></div>
-      
-      <div class="cc-timeline__card" 
-           data-update-id={update.id}
-           data-title={update.data.title}
-           data-date={displayDate(update.data.date)}
-           data-location={update.data.location || ''}>
-           
-        <div class="cc-timeline__card-meta">
-          <span class="cc-timeline__card-date">{displayDate(update.data.date)}</span>
-          {update.data.location && <span class="cc-timeline__card-location">{update.data.location}</span>}
-        </div>
-        <h3 class="cc-timeline__card-title">{update.data.title}</h3>
-        {update.data.excerpt && <p class="cc-timeline__card-excerpt">{update.data.excerpt}</p>}
-        
-        <div class="cc-timeline__card-footer">
-          <span class="cc-timeline__card-readmore">READ MORE →</span>
-        </div>
-        
-        <div class="cc-timeline__card-glare"></div>
+  <!-- Teletext Controller: Display Box & On-Screen Numeric Keypad -->
+  <div class="cc-teletext-header" id="teletext-header">
+    <div class="cc-teletext-top-bar">
+      <div class="cc-teletext-station">
+        <span class="cc-tt-ch">P100</span>
+        <span class="cc-tt-name">CEEFAX // DAILY LOG BROADCAST</span>
       </div>
-      
-      <!-- Hidden content template -->
-      <template id={`content-${update.id}`}>
-        <update.Content />
-      </template>
+      <div class="cc-teletext-clock" id="teletext-clock">PAGE 101-{100 + totalUpdates} // ARCHIVE</div>
     </div>
-  ))}
+
+    <div class="cc-teletext-controls-wrap">
+      
+      <!-- 3-Digit Display Box with Blinking Underscore Cursor -->
+      <div class="cc-teletext-display-box" id="teletext-display-box">
+        <div class="cc-teletext-box-inner">
+          <span class="cc-teletext-prefix">P</span>
+          <div class="cc-teletext-input-wrap">
+            <input
+              type="text"
+              id="teletext-number-input"
+              class="cc-teletext-number-input"
+              maxlength="3"
+              placeholder="101"
+              inputmode="numeric"
+              autocomplete="off"
+              aria-label="Enter 3-digit teletext page number"
+            />
+            <span class="cc-teletext-cursor" id="teletext-cursor">_</span>
+          </div>
+          <!-- Invalid PAGE NOT FOUND block -->
+          <div class="cc-teletext-not-found" id="teletext-not-found">PAGE NOT FOUND</div>
+        </div>
+        <div class="cc-teletext-box-sub">DIRECT PAGE ACCESS (101 - {100 + renderedUpdates.length})</div>
+      </div>
+
+      <!-- On-Screen Numeric Keypad (0-9 + CLR + GO) -->
+      <div class="cc-teletext-keypad-panel">
+        <div class="cc-teletext-keypad" id="teletext-keypad">
+          <div class="cc-keypad-pulse-ring" id="keypad-pulse-ring" aria-hidden="true"></div>
+          
+          <button type="button" class="cc-keypad-btn" data-digit="1">1</button>
+          <button type="button" class="cc-keypad-btn" data-digit="2">2</button>
+          <button type="button" class="cc-keypad-btn" data-digit="3">3</button>
+          <button type="button" class="cc-keypad-btn" data-digit="4">4</button>
+          <button type="button" class="cc-keypad-btn" data-digit="5">5</button>
+          <button type="button" class="cc-keypad-btn" data-digit="6">6</button>
+          <button type="button" class="cc-keypad-btn" data-digit="7">7</button>
+          <button type="button" class="cc-keypad-btn" data-digit="8">8</button>
+          <button type="button" class="cc-keypad-btn" data-digit="9">9</button>
+          <button type="button" class="cc-keypad-btn cc-keypad-btn--clear" data-action="clear">CLR</button>
+          <button type="button" class="cc-keypad-btn" data-digit="0">0</button>
+          <button type="button" class="cc-keypad-btn cc-keypad-btn--enter" data-action="enter">GO</button>
+        </div>
+
+        <!-- Ghost hand guidance over keypad -->
+        <div class="cc-ghost-hand cc-keypad-ghost-hand" id="keypad-ghost-hand" aria-hidden="true">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff000" stroke-width="2">
+            <path d="M18 11V6a2 2 0 0 0-4 0v5" />
+            <path d="M14 10V4a2 2 0 0 0-4 0v7" />
+            <path d="M10 10.5V6a2 2 0 0 0-4 0v8" />
+            <path d="M6 14v1a6 6 0 0 0 12 0v-4" />
+          </svg>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Blocky Teletext Transition Overlay -->
+  <div class="cc-teletext-block-mosaic" id="teletext-block-mosaic" aria-hidden="true">
+    <div class="cc-mosaic-cell"></div><div class="cc-mosaic-cell"></div><div class="cc-mosaic-cell"></div><div class="cc-mosaic-cell"></div>
+    <div class="cc-mosaic-cell"></div><div class="cc-mosaic-cell"></div><div class="cc-mosaic-cell"></div><div class="cc-mosaic-cell"></div>
+    <div class="cc-mosaic-cell"></div><div class="cc-mosaic-cell"></div><div class="cc-mosaic-cell"></div><div class="cc-mosaic-cell"></div>
+    <div class="cc-mosaic-cell"></div><div class="cc-mosaic-cell"></div><div class="cc-mosaic-cell"></div><div class="cc-mosaic-cell"></div>
+  </div>
+
+  <!-- Timeline Body -->
+  <div class="cc-timeline" id="timeline-scroll-container">
+    <div class="cc-timeline__pulse-line"></div>
+    
+    {renderedUpdates.map((update, index) => (
+      <div
+        class="cc-timeline__node-container"
+        id={`update-node-${update.pageNumber}`}
+        style={`--animation-order: ${index};`}
+      >
+        <div class="cc-timeline__node"></div>
+        
+        <div
+          class="cc-timeline__card" 
+          data-update-id={update.id}
+          data-page-number={update.pageNumber}
+          data-title={update.data.title}
+          data-date={displayDate(update.data.date)}
+          data-location={update.data.location || ''}
+          tabindex="0"
+          role="button"
+        >
+          <div class="cc-timeline__card-meta">
+            <span class="cc-teletext-page-tag">P{update.pageNumber}</span>
+            <span class="cc-timeline__card-date">{displayDate(update.data.date)}</span>
+            {update.data.location && <span class="cc-timeline__card-location">{update.data.location}</span>}
+          </div>
+          <h3 class="cc-timeline__card-title">{update.data.title}</h3>
+          {update.data.excerpt && <p class="cc-timeline__card-excerpt">{update.data.excerpt}</p>}
+          
+          <div class="cc-timeline__card-footer">
+            <span class="cc-timeline__card-readmore">READ MORE →</span>
+          </div>
+          
+          <div class="cc-timeline__card-glare"></div>
+        </div>
+        
+        <!-- Hidden content template -->
+        <template id={`content-${update.id}`}>
+          <update.Content />
+        </template>
+      </div>
+    ))}
+  </div>
+
 </div>
 
 <style>
+  .cc-teletext-system {
+    position: relative;
+    max-width: 820px;
+    margin: 0 auto;
+    padding: 16px 0 40px;
+  }
+
+  /* Teletext Controller Header */
+  .cc-teletext-header {
+    background: #000c1e;
+    border: 2px solid var(--blue-panel-light);
+    border-radius: 4px;
+    margin-bottom: 28px;
+    padding: 14px 18px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
+  }
+
+  .cc-teletext-top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(103, 200, 255, 0.25);
+    padding-bottom: 8px;
+    margin-bottom: 14px;
+  }
+
+  .cc-teletext-station {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .cc-tt-ch {
+    background: var(--yellow);
+    color: var(--navy-deep);
+    font-family: var(--font-ui);
+    font-size: 10px;
+    font-weight: 700;
+    padding: 1px 5px;
+    border-radius: 2px;
+  }
+
+  .cc-tt-name {
+    font-family: var(--font-ui);
+    font-size: 11px;
+    color: var(--blue-lightest);
+    letter-spacing: 1.5px;
+  }
+
+  .cc-teletext-clock {
+    font-family: var(--font-ui);
+    font-size: 10px;
+    color: var(--yellow);
+    letter-spacing: 1px;
+  }
+
+  .cc-teletext-controls-wrap {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+  }
+
+  /* 3-Digit Display Box */
+  .cc-teletext-display-box {
+    flex: 1;
+    background: #000612;
+    border: 2px solid var(--navy-deep);
+    box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.9);
+    padding: 12px 16px;
+    border-radius: 4px;
+    position: relative;
+  }
+
+  .cc-teletext-box-inner {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    position: relative;
+    height: 40px;
+  }
+
+  .cc-teletext-prefix {
+    font-family: var(--font-ui);
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--yellow);
+    line-height: 1;
+  }
+
+  .cc-teletext-input-wrap {
+    display: flex;
+    align-items: center;
+    position: relative;
+  }
+
+  .cc-teletext-number-input {
+    background: none;
+    border: none;
+    outline: none;
+    font-family: var(--font-ui);
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--yellow);
+    width: 75px;
+    letter-spacing: 3px;
+    padding: 0;
+    margin: 0;
+  }
+
+  .cc-teletext-number-input::placeholder {
+    color: rgba(255, 240, 0, 0.35);
+  }
+
+  .cc-teletext-cursor {
+    font-family: var(--font-ui);
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--yellow);
+    animation: cc-cursor-blink 1s steps(2, start) infinite;
+    pointer-events: none;
+  }
+
+  @keyframes cc-cursor-blink {
+    to { visibility: hidden; }
+  }
+
+  /* Error state: PAGE NOT FOUND */
+  .cc-teletext-not-found {
+    position: absolute;
+    inset: 0;
+    background: #8b0000;
+    color: #ffffff;
+    font-family: var(--font-ui);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    border-radius: 2px;
+    box-shadow: 0 0 10px rgba(255, 0, 0, 0.6);
+  }
+
+  .cc-teletext-not-found.is-active {
+    display: flex;
+    animation: cc-glitch-flash 0.15s infinite alternate;
+  }
+
+  @keyframes cc-glitch-flash {
+    from { opacity: 0.9; }
+    to { opacity: 1; }
+  }
+
+  .cc-teletext-box-sub {
+    font-family: var(--font-ui);
+    font-size: 8px;
+    color: var(--blue-panel-light);
+    letter-spacing: 1px;
+    margin-top: 6px;
+    opacity: 0.7;
+  }
+
+  /* On-Screen Keypad */
+  .cc-teletext-keypad-panel {
+    position: relative;
+  }
+
+  .cc-teletext-keypad {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(3, 38px);
+    gap: 6px;
+    background: #000612;
+    padding: 8px;
+    border: 1px solid var(--blue-panel-light);
+    border-radius: 4px;
+  }
+
+  .cc-keypad-btn {
+    height: 32px;
+    background: #0d2850;
+    color: var(--blue-lightest);
+    border: 1px solid rgba(103, 200, 255, 0.3);
+    border-radius: 2px;
+    font-family: var(--font-ui);
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.12s ease;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .cc-keypad-btn:hover {
+    background: var(--yellow);
+    color: var(--navy-deep);
+    border-color: var(--yellow);
+    transform: translateY(-1px);
+  }
+
+  .cc-keypad-btn:active {
+    transform: translateY(1px);
+  }
+
+  .cc-keypad-btn--clear {
+    background: #3d0c14;
+    color: #ff9999;
+    font-size: 9px;
+  }
+
+  .cc-keypad-btn--enter {
+    background: #0c3d18;
+    color: #99ffaa;
+    font-size: 9px;
+  }
+
+  .cc-keypad-pulse-ring {
+    position: absolute;
+    inset: -4px;
+    border: 2px solid var(--yellow);
+    border-radius: 6px;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .cc-keypad-ghost-hand {
+    top: -12px;
+    left: -12px;
+  }
+
+  /* Blocky Teletext Hard-Cut Mosaic Overlay */
+  .cc-teletext-block-mosaic {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 998;
+    display: none;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(4, 1fr);
+    gap: 2px;
+    background: rgba(0, 8, 24, 0.4);
+  }
+
+  .cc-teletext-block-mosaic.is-active {
+    display: grid;
+    animation: mosaic-flicker 0.22s steps(2, start) forwards;
+  }
+
+  .cc-mosaic-cell {
+    background: #00122e;
+    opacity: 0.85;
+    border: 1px solid rgba(103, 200, 255, 0.15);
+  }
+
+  @keyframes mosaic-flicker {
+    0% { opacity: 0; }
+    20% { opacity: 0.95; }
+    60% { opacity: 0.8; }
+    100% { opacity: 0; }
+  }
+
+  /* Card Teletext Page Tag */
+  .cc-teletext-page-tag {
+    font-family: var(--font-ui);
+    font-size: 9px;
+    font-weight: 700;
+    background: var(--yellow);
+    color: var(--navy-deep);
+    padding: 1px 5px;
+    border-radius: 2px;
+    margin-right: 6px;
+  }
+
+  .cc-timeline__card.is-teletext-active {
+    border-color: var(--yellow) !important;
+    box-shadow: 0 0 0 2px var(--navy-deep), 0 0 16px var(--yellow) !important;
+    animation: teletext-border-pulse 1.2s ease-in-out infinite;
+  }
+
+  @keyframes teletext-border-pulse {
+    0%, 100% { border-color: var(--yellow); }
+    50% { border-color: #ffffff; }
+  }
+
+  /* Existing Timeline Styles */
   .cc-timeline {
     position: relative;
-    padding: 40px 0;
+    padding: 20px 0;
     max-width: 800px;
     margin: 0 auto;
   }
@@ -102,7 +484,10 @@ function displayDate(d: Date) {
   }
   
   @keyframes fade-in-slide {
-    to { opacity: 1; transform: translateX(0); }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
   }
 
   .cc-timeline__node {
@@ -111,91 +496,69 @@ function displayDate(d: Date) {
     top: 24px;
     width: 8px;
     height: 8px;
-    background: var(--yellow);
     border-radius: 50%;
+    background: var(--navy-deep);
+    border: 2px solid var(--blue-lightest);
     z-index: 2;
-    box-shadow: 0 0 0 4px var(--blue-card), 0 0 10px rgba(255, 240, 0, 0.5);
-    transition: transform 0.3s, box-shadow 0.3s;
-  }
-
-  .cc-timeline__node-container:hover .cc-timeline__node {
-    transform: scale(1.5);
-    box-shadow: 0 0 0 4px var(--blue-card), 0 0 15px var(--yellow);
+    transition: all 0.3s ease;
   }
 
   .cc-timeline__card {
     position: relative;
-    background: var(--navy-deep);
+    background: var(--blue-card);
     border: 1px solid var(--blue-panel-light);
+    border-radius: 4px;
     padding: 24px;
     cursor: pointer;
-    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-    transform-style: preserve-3d;
-    transform: perspective(1000px) rotateX(0) rotateY(0);
     overflow: hidden;
+    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
   }
   
   .cc-timeline__card:hover {
-    background: var(--navy-deep);
     border-color: var(--yellow);
-    box-shadow: inset 0 0 0 1px var(--yellow), 0 10px 30px rgba(0, 10, 40, 0.5);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
   }
   
+  .cc-timeline__card:hover ~ .cc-timeline__node,
+  .cc-timeline__node-container:hover .cc-timeline__node {
+    background: var(--yellow);
+    border-color: var(--yellow);
+    box-shadow: 0 0 10px var(--yellow);
+    transform: scale(1.4);
+  }
+
   .cc-timeline__card-glare {
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: radial-gradient(circle at 50% 50%, rgba(166, 232, 255, 0.1), transparent 60%);
-    opacity: 0;
+    inset: 0;
     pointer-events: none;
-    transition: opacity 0.3s;
-    mix-blend-mode: overlay;
-  }
-  
-  .cc-timeline__card:hover .cc-timeline__card-glare {
-    opacity: 1;
   }
 
   .cc-timeline__card-meta {
     display: flex;
-    gap: 12px;
-    font-size: 0.85rem;
-    font-family: var(--font-ui);
-    color: var(--blue-panel-light);
-    margin-bottom: 8px;
-    text-transform: uppercase;
-    font-weight: 600;
-    letter-spacing: 1px;
-  }
-  
-  .cc-timeline__card-location {
-    color: var(--blue-panel-light);
-    display: flex;
     align-items: center;
-    gap: 4px;
-  }
-  .cc-timeline__card-location::before {
-    content: '•';
+    gap: 12px;
+    margin-bottom: 12px;
+    font-family: var(--font-ui);
+    font-size: 0.8rem;
     color: var(--blue-panel-light);
+    letter-spacing: 1px;
   }
 
   .cc-timeline__card-title {
-    font-size: 1.4rem;
-    margin: 0 0 12px 0;
-    color: var(--yellow);
     font-family: var(--font-ui);
-    text-transform: uppercase;
-    font-weight: 700;
-  }
-  
-  .cc-timeline__card-excerpt {
-    font-size: 1.05rem;
+    font-size: 1.25rem;
     color: var(--blue-lightest);
+    margin: 0 0 12px 0;
+    line-height: 1.4;
+  }
+
+  .cc-timeline__card-excerpt {
     font-family: var(--font-body);
+    font-size: 1.05rem;
+    color: #ffffff;
+    line-height: 1.6;
     margin: 0;
-    line-height: 1.5;
+    opacity: 0.9;
   }
   
   .cc-timeline__card-footer {
@@ -223,6 +586,14 @@ function displayDate(d: Date) {
   }
   
   @media (max-width: 600px) {
+    .cc-teletext-controls-wrap {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 14px;
+    }
+    .cc-teletext-keypad {
+      grid-template-columns: repeat(6, 1fr);
+    }
     .cc-timeline__pulse-line { left: 10px; }
     .cc-timeline__node { left: 7px; }
     .cc-timeline__node-container { padding-left: 30px; }
@@ -230,82 +601,181 @@ function displayDate(d: Date) {
 </style>
 
 <script>
-  // @ts-nocheck
-document.addEventListener('DOMContentLoaded', () => {
-    const cards = document.querySelectorAll('.cc-timeline__card');
+  (async function initTeletextSystem() {
+    const inputEl = document.getElementById('teletext-number-input') as HTMLInputElement | null;
+    const notFoundEl = document.getElementById('teletext-not-found');
+    const clockEl = document.getElementById('teletext-clock');
+    const cursorEl = document.getElementById('teletext-cursor');
+    const keypadEl = document.getElementById('teletext-keypad');
+    const pulseRing = document.getElementById('keypad-pulse-ring');
+    const ghostHandEl = document.getElementById('keypad-ghost-hand');
+    const mosaicEl = document.getElementById('teletext-block-mosaic');
+    const keypadBtns = Array.from(document.querySelectorAll<HTMLElement>('.cc-keypad-btn'));
+    const cards = Array.from(document.querySelectorAll<HTMLElement>('.cc-timeline__card'));
+
+    if (!inputEl) return;
+
+    const { isReducedMotion } = await import('../utils/draggableHelper');
+    const { initGuidance } = await import('../utils/guidance');
+    const reducedMotion = isReducedMotion();
+
+    let currentEntered = '';
+    let lastValidPage = '101';
+    let errorTimer: any = null;
+
+    // Guidance: wiggle cursor blink rate, ghost hand typing demo, pulse ring on keypad
+    const guidance = initGuidance({
+      targetEl: cursorEl,
+      pulseEl: pulseRing,
+      ghostHandEl,
+      keypadButtons: keypadBtns,
+      wiggleType: 'cursorBlink',
+      ghostHandType: 'type',
+      idleDelayMs: 4000
+    });
+
+    // CRITICAL: Prevent keyboard number keys 1-6 or any other keystroke from triggering
+    // global section navigation while typing in this number entry box!
+    const stopNavProp = (e: KeyboardEvent) => {
+      e.stopPropagation();
+    };
+    inputEl.addEventListener('keydown', stopNavProp);
+    keypadEl?.addEventListener('keydown', stopNavProp);
+
+    function flipToPage(pageNumStr: string) {
+      guidance.stop();
+      guidance.resetTimer();
+
+      const targetCard = cards.find(c => c.getAttribute('data-page-number') === pageNumStr);
+
+      if (!targetCard) {
+        // Invalid page number: show brief PAGE NOT FOUND teletext block state
+        if (notFoundEl) {
+          notFoundEl.classList.add('is-active');
+          if (errorTimer) clearTimeout(errorTimer);
+          errorTimer = setTimeout(() => {
+            notFoundEl.classList.remove('is-active');
+            inputEl!.value = lastValidPage;
+            currentEntered = '';
+          }, 1200);
+        }
+        return;
+      }
+
+      // Valid page number: update state
+      lastValidPage = pageNumStr;
+      if (clockEl) clockEl.textContent = `${pageNumStr} / ARCHIVE`;
+
+      // Clear previous active teletext cards
+      cards.forEach(c => c.classList.remove('is-teletext-active'));
+
+      if (!reducedMotion && mosaicEl) {
+        // Hard-cut blocky teletext reveal (in-page micro-transition)
+        mosaicEl.classList.add('is-active');
+        setTimeout(() => {
+          mosaicEl.classList.remove('is-active');
+          targetCard.classList.add('is-teletext-active');
+          targetCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 180);
+      } else {
+        targetCard.classList.add('is-teletext-active');
+        targetCard.scrollIntoView({ behavior: 'auto', block: 'center' });
+      }
+    }
+
+    // Input typing listener
+    inputEl.addEventListener('input', () => {
+      currentEntered = inputEl.value.replace(/\D/g, '');
+      inputEl.value = currentEntered;
+      if (currentEntered.length === 3) {
+        flipToPage(currentEntered);
+      }
+    });
+
+    inputEl.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        if (inputEl.value.length >= 1) {
+          flipToPage(inputEl.value);
+        }
+      }
+    });
+
+    // Keypad button listeners
+    keypadBtns.forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const digit = btn.dataset.digit;
+        const action = btn.dataset.action;
+
+        if (digit !== undefined) {
+          if (currentEntered.length >= 3) currentEntered = '';
+          currentEntered += digit;
+          inputEl.value = currentEntered;
+          if (currentEntered.length === 3) {
+            flipToPage(currentEntered);
+          }
+        } else if (action === 'clear') {
+          currentEntered = '';
+          inputEl.value = '';
+          inputEl.focus();
+        } else if (action === 'enter') {
+          if (inputEl.value.length >= 1) {
+            flipToPage(inputEl.value);
+          }
+        }
+      });
+    });
+
+    // Existing modal setup for card click
     const modal = document.getElementById('holographic-canvas');
     const backdrop = document.getElementById('holographic-backdrop');
     const closeBtn = document.getElementById('holographic-close');
-    
     const mTitle = document.getElementById('holographic-title');
     const mDate = document.getElementById('holographic-date');
     const mLocation = document.getElementById('holographic-location');
     const mBody = document.getElementById('holographic-body');
-    
-    cards.forEach(card => {
-      // @ts-ignore
-      card.addEventListener('mousemove', (e: MouseEvent) => {
-        const rect = card.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-        
-        const centerX = rect.width / 2;
-        const centerY = rect.height / 2;
-        
-        const rotateX = ((y - centerY) / centerY) * -5;
-        const rotateY = ((x - centerX) / centerX) * 5;
-        
-        // @ts-ignore
-        card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
-        
-        const glare = card.querySelector('.cc-timeline__card-glare');
-        if (glare) {
-          // @ts-ignore
-          glare.style.background = `radial-gradient(circle at ${x}px ${y}px, rgba(255,255,255,0.15), transparent 50%)`;
-        }
-      });
-      
-      card.addEventListener('mouseleave', () => {
-        // @ts-ignore
-        card.style.transform = `perspective(1000px) rotateX(0) rotateY(0)`;
-      });
-      
+
+    cards.forEach((card) => {
       card.addEventListener('click', () => {
         const id = card.getAttribute('data-update-id');
         const title = card.getAttribute('data-title');
         const date = card.getAttribute('data-date');
         const location = card.getAttribute('data-location');
-        
         const template = document.getElementById(`content-${id}`) as HTMLTemplateElement;
-        
+
         if (template && modal && mTitle && mDate && mLocation && mBody) {
           mTitle.textContent = title;
           mDate.textContent = date;
           mLocation.textContent = location;
-          
           mLocation.style.display = location ? 'block' : 'none';
-          
           mBody.innerHTML = '';
           mBody.appendChild(template.content.cloneNode(true));
-          
           modal.classList.add('is-active');
           document.body.style.overflow = 'hidden';
         }
       });
     });
-    
+
     const closeModal = () => {
-      if(modal) {
+      if (modal) {
         modal.classList.remove('is-active');
         document.body.style.overflow = '';
       }
     };
-    
+
     if (closeBtn) closeBtn.addEventListener('click', closeModal);
     if (backdrop) backdrop.addEventListener('click', closeModal);
-    
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') closeModal();
     });
-  });
+
+    // Cleanup on cc:channel-jump navigation
+    const cleanup = () => {
+      guidance.destroy();
+      if (errorTimer) clearTimeout(errorTimer);
+      document.removeEventListener('cc:channel-jump', cleanup);
+    };
+    document.addEventListener('cc:channel-jump', cleanup);
+  })();
 </script>

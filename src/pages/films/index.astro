@@ -1,15 +1,15 @@
 ---
+// src/pages/films/index.astro
 import Layout from '../../layouts/Layout.astro';
 import SidebarNav from '../../components/SidebarNav.astro';
 import Panel from '../../components/Panel.astro';
-import VaultCard from '../../components/VaultCard.astro';
 import { getCollection } from 'astro:content';
 
 const films = await getCollection('films');
 const sortedFilms = films.sort((a, b) => b.data.year - a.data.year);
 ---
 
-<Layout title="Film Section — The Vault">
+<Layout title="Film Section — The Film Shelf">
   <div class="cc-inner-layout">
     <div class="cc-inner-layout__sidebar">
       <SidebarNav
@@ -24,38 +24,637 @@ const sortedFilms = films.sort((a, b) => b.data.year - a.data.year);
 
     <div class="cc-inner-content">
       <Panel title="The Film Shelf" showControls={false}>
-        <div class="cc-film-vault">
-          {sortedFilms.map((film, i) => (
-            <VaultCard 
-              id={film.id}
-              title={film.data.title}
-              director={film.data.director}
-              year={film.data.year}
-              image={film.data.image}
-              i={i}
-              group="films-archive"
-            />
-          ))}
+        <div class="cc-vcr-deck-container">
+          
+          <!-- Retro VCR tracking lines overlay -->
+          <div class="cc-vcr-tracking-overlay" id="vcr-tracking-overlay" aria-hidden="true">
+            <div class="cc-vcr-tracking-bar"></div>
+            <div class="cc-vcr-tracking-bar bar-2"></div>
+            <div class="cc-vcr-tracking-text">TRACKING // PLAY ▶</div>
+          </div>
+
+          <!-- VCR Player Unit -->
+          <div class="cc-vcr-player" id="vcr-player">
+            <div class="cc-vcr-player__bezel">
+              <div class="cc-vcr-player__top-strip">
+                <div class="cc-vcr-player__brand">CHITRA-CHAALAK <span class="cc-vcr-badge">VHS HQ</span></div>
+                <div class="cc-vcr-player__led-cluster">
+                  <span class="cc-vcr-led cc-vcr-led--power"></span>
+                  <span class="cc-vcr-display-text" id="vcr-status-text">INSERT TAPE</span>
+                </div>
+              </div>
+
+              <!-- VCR Slot with swinging spring flap -->
+              <div class="cc-vcr-slot-frame" id="vcr-slot-frame">
+                <div class="cc-vcr-slot-flap" id="vcr-slot-flap">
+                  <div class="cc-vcr-slot-line"></div>
+                  <span class="cc-vcr-slot-label">AUTO TRACKING / HIGH DENSITY HEAD</span>
+                </div>
+                <div class="cc-vcr-pulse-ring" id="vcr-pulse-ring" aria-hidden="true"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- The VHS Tape Shelf -->
+          <div class="cc-vhs-shelf-container">
+            <div class="cc-vhs-shelf-header">
+              <span class="cc-vhs-shelf-title">CASSETTE VAULT ARCHIVE</span>
+              <span class="cc-vhs-shelf-hint">[ DRAG TAPE TO VCR SLOT OR TAP TO INSERT ]</span>
+            </div>
+
+            <div class="cc-vhs-shelf" id="vhs-shelf">
+              {sortedFilms.map((film, index) => (
+                <div
+                  class="cc-vhs-spine"
+                  id={index === 0 ? "vhs-first-tape" : undefined}
+                  data-href={`/films/${film.id}`}
+                  data-title={film.data.title}
+                  tabindex="0"
+                  role="button"
+                  aria-label={`${film.data.title} (${film.data.year}), directed by ${film.data.director}. Press Enter or drag to VCR slot to play.`}
+                >
+                  <div class="cc-vhs-spine__ribs"></div>
+                  <div class="cc-vhs-spine__label">
+                    <div class="cc-vhs-spine__meta-top">
+                      <span class="cc-vhs-tag">VHS</span>
+                      <span class="cc-vhs-year">{film.data.year}</span>
+                    </div>
+                    <div class="cc-vhs-spine__title-wrap">
+                      <h3 class="cc-vhs-spine__title">{film.data.title}</h3>
+                      <p class="cc-vhs-spine__director">DIR: {film.data.director}</p>
+                    </div>
+                    <div class="cc-vhs-spine__thumb">
+                      <img src={film.data.image} alt={film.data.title} loading="lazy" />
+                    </div>
+                    <div class="cc-vhs-spine__barcode">
+                      <span></span><span></span><span></span><span></span><span></span>
+                    </div>
+                  </div>
+
+                  <!-- Ghost hand guide on first tape -->
+                  {index === 0 && (
+                    <div class="cc-ghost-hand cc-vhs-ghost-hand" id="vhs-ghost-hand" aria-hidden="true">
+                      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff000" stroke-width="2">
+                        <path d="M18 11V6a2 2 0 0 0-4 0v5" />
+                        <path d="M14 10V4a2 2 0 0 0-4 0v7" />
+                        <path d="M10 10.5V6a2 2 0 0 0-4 0v8" />
+                        <path d="M6 14v1a6 6 0 0 0 12 0v-4" />
+                      </svg>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+
+            <div class="cc-vhs-shelf-ledge"></div>
+          </div>
+
         </div>
       </Panel>
     </div>
   </div>
+
+  <script>
+    (async function initVcrInteraction() {
+      const slotFrame = document.getElementById('vcr-slot-frame');
+      const slotFlap = document.getElementById('vcr-slot-flap');
+      const pulseRing = document.getElementById('vcr-pulse-ring');
+      const statusText = document.getElementById('vcr-status-text');
+      const trackingOverlay = document.getElementById('vcr-tracking-overlay');
+      const firstTape = document.getElementById('vhs-first-tape');
+      const ghostHandEl = document.getElementById('vhs-ghost-hand');
+      const tapes = Array.from(document.querySelectorAll<HTMLElement>('.cc-vhs-spine'));
+
+      if (!slotFrame || tapes.length === 0) return;
+
+      const { getGsapDraggable, isReducedMotion, springBack } = await import('../../utils/draggableHelper');
+      const { initGuidance } = await import('../../utils/guidance');
+      const { gsap, Draggable } = await getGsapDraggable();
+
+      const reducedMotion = isReducedMotion();
+      let isInserting = false;
+
+      // Guidance on the topmost/first tape
+      const guidance = initGuidance({
+        targetEl: firstTape,
+        pulseEl: pulseRing,
+        ghostHandEl,
+        dragTargetEl: slotFrame,
+        wiggleType: 'translateY',
+        ghostHandType: 'drag',
+        idleDelayMs: 3600
+      });
+
+      // Reset all tapes, status text, and tracking overlay to normal state
+      function resetVcrState() {
+        isInserting = false;
+        if (trackingOverlay) {
+          trackingOverlay.classList.remove('is-active');
+        }
+        if (statusText) {
+          statusText.textContent = 'INSERT TAPE';
+        }
+        tapes.forEach((tape) => {
+          gsap.set(tape, { clearProps: 'all' });
+        });
+        if (slotFlap) {
+          gsap.set(slotFlap, { clearProps: 'all' });
+        }
+      }
+
+      // Handle browser back / forward cache restoration cleanly
+      window.addEventListener('pageshow', () => {
+        resetVcrState();
+        guidance.resetTimer();
+      });
+
+      // Insert tape sequence and navigation
+      function insertTape(tapeEl: HTMLElement, href: string) {
+        if (isInserting) return;
+        isInserting = true;
+
+        guidance.stop();
+        guidance.destroy();
+
+        if (statusText) statusText.textContent = 'LOADING...';
+
+        if (reducedMotion) {
+          // Instant navigation for reduced motion
+          document.dispatchEvent(new CustomEvent('cc:channel-jump'));
+          setTimeout(() => {
+            window.location.href = href;
+          }, 100);
+          setTimeout(() => {
+            resetVcrState();
+          }, 600);
+          return;
+        }
+
+        // Calculate offset to slot center
+        const tRect = tapeEl.getBoundingClientRect();
+        const sRect = slotFrame!.getBoundingClientRect();
+        const deltaX = (sRect.left + sRect.width / 2) - (tRect.left + tRect.width / 2);
+        const deltaY = (sRect.top + sRect.height / 2) - (tRect.top + tRect.height / 2);
+
+        // Clunk settle animation + flap response
+        gsap.timeline({
+          onComplete: () => {
+            if (statusText) statusText.textContent = 'PLAY ▶';
+            if (trackingOverlay) {
+              trackingOverlay.classList.add('is-active');
+            }
+
+            // Fire cc:channel-jump transition
+            document.dispatchEvent(new CustomEvent('cc:channel-jump'));
+            setTimeout(() => {
+              window.location.href = href;
+            }, 260);
+
+            // Safety restore: if user presses back or navigation is restored, revert DOM state
+            setTimeout(() => {
+              resetVcrState();
+            }, 600);
+          }
+        })
+        .to(tapeEl, {
+          x: deltaX,
+          y: deltaY,
+          scaleX: 0.88,
+          scaleY: 0.35,
+          opacity: 0.3,
+          duration: 0.32,
+          ease: 'power2.in'
+        })
+        .to(slotFlap!, {
+          rotateX: -55,
+          duration: 0.12,
+          yoyo: true,
+          repeat: 1,
+          ease: 'power1.inOut'
+        }, '-=0.15');
+      }
+
+      // Initialize GSAP Draggable for each tape spine
+      const draggables: any[] = [];
+      tapes.forEach((tape) => {
+        const href = tape.dataset.href;
+        if (!href) return;
+
+        const d = Draggable.create(tape, {
+          type: 'x,y',
+          edgeResistance: 0.65,
+          zIndexBoost: true,
+          onPress: function() {
+            guidance.stop();
+          },
+          onDragStart: function() {
+            gsap.set(tape, { zIndex: 999 });
+          },
+          onDragEnd: function() {
+            // Check hitTest against VCR slot opening with forgiving threshold
+            if (this.hitTest(slotFrame, '20%')) {
+              insertTape(tape, href);
+            } else {
+              springBack(gsap, tape, () => {
+                gsap.set(tape, { clearProps: 'zIndex' });
+                guidance.resetTimer();
+              });
+            }
+          },
+          // Draggable handles click separately from drag
+          onClick: function() {
+            insertTape(tape, href);
+          }
+        })[0];
+
+        draggables.push(d);
+
+        // Keyboard navigation: Enter or Space inserts tape
+        tape.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            insertTape(tape, href);
+          }
+        });
+      });
+
+      // Cleanup on cc:channel-jump navigation
+      const cleanup = () => {
+        resetVcrState();
+        guidance.destroy();
+        draggables.forEach((d) => d.kill());
+        document.removeEventListener('cc:channel-jump', cleanup);
+      };
+      document.addEventListener('cc:channel-jump', cleanup);
+    })();
+  </script>
 </Layout>
 
 <style>
-  .cc-film-vault {
-    padding: 40px;
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  .cc-vcr-deck-container {
+    position: relative;
+    padding: 24px;
+    height: 100%;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
     gap: 32px;
-    perspective: 1200px;
+  }
+
+  /* --- Tracking Lines Overlay --- */
+  .cc-vcr-tracking-overlay {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background: rgba(0, 20, 60, 0.4);
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+
+  .cc-vcr-tracking-overlay.is-active {
+    display: flex;
+    animation: tracking-flicker 0.28s steps(2, start) infinite;
+  }
+
+  .cc-vcr-tracking-bar {
+    width: 100%;
+    height: 12px;
+    background: rgba(255, 255, 255, 0.25);
+    filter: blur(2px);
+    margin-bottom: 40px;
+    animation: tracking-scroll 0.25s linear infinite;
+  }
+
+  .cc-vcr-tracking-bar.bar-2 {
+    height: 20px;
+    background: rgba(103, 200, 255, 0.3);
+  }
+
+  .cc-vcr-tracking-text {
+    font-family: var(--font-ui);
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--yellow);
+    letter-spacing: 3px;
+    text-shadow: 0 0 10px var(--yellow);
+  }
+
+  @keyframes tracking-flicker {
+    0%, 100% { opacity: 0.9; }
+    50% { opacity: 0.4; }
+  }
+
+  @keyframes tracking-scroll {
+    0% { transform: translateY(-50px); }
+    100% { transform: translateY(50px); }
+  }
+
+  /* --- VCR Player Unit --- */
+  .cc-vcr-player {
+    background: linear-gradient(180deg, #0f2b5c 0%, #001538 100%);
+    border: 2px solid var(--blue-panel-light);
+    border-radius: 4px;
+    padding: 16px 20px;
+    box-shadow:
+      0 8px 24px rgba(0, 0, 0, 0.5),
+      inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    position: relative;
+  }
+
+  .cc-vcr-player__top-strip {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+
+  .cc-vcr-player__brand {
+    font-family: var(--font-ui);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--blue-lightest);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .cc-vcr-badge {
+    background: var(--navy-deep);
+    border: 1px solid var(--yellow);
+    color: var(--yellow);
+    font-size: 8px;
+    padding: 1px 5px;
+    border-radius: 2px;
+  }
+
+  .cc-vcr-player__led-cluster {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .cc-vcr-led--power {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #00ff66;
+    box-shadow: 0 0 8px #00ff66;
+  }
+
+  .cc-vcr-display-text {
+    font-family: var(--font-ui);
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--yellow);
+    letter-spacing: 1.5px;
+    background: #000c1e;
+    padding: 3px 8px;
+    border: 1px solid rgba(103, 200, 255, 0.3);
+    border-radius: 2px;
+  }
+
+  /* VCR Slot Frame */
+  .cc-vcr-slot-frame {
+    position: relative;
+    width: 100%;
+    height: 52px;
+    background: #000814;
+    border: 2px solid var(--navy-deep);
+    box-shadow: inset 0 4px 10px rgba(0, 0, 0, 0.9);
+    border-radius: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    perspective: 500px;
+  }
+
+  .cc-vcr-slot-flap {
+    width: 92%;
+    height: 38px;
+    background: linear-gradient(180deg, #1c4b8f 0%, #082654 100%);
+    border: 1px solid var(--blue-panel-light);
+    border-top: 2px solid var(--yellow);
+    border-radius: 2px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transform-origin: top center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+  }
+
+  .cc-vcr-slot-line {
+    width: 70%;
+    height: 1px;
+    background: rgba(255, 240, 0, 0.5);
+    margin-bottom: 3px;
+  }
+
+  .cc-vcr-slot-label {
+    font-family: var(--font-ui);
+    font-size: 8px;
+    letter-spacing: 1.5px;
+    color: var(--blue-lightest);
+  }
+
+  .cc-vcr-pulse-ring {
+    position: absolute;
+    inset: -4px;
+    border: 2px solid var(--yellow);
+    border-radius: 4px;
+    pointer-events: none;
+    opacity: 0;
+  }
+
+  /* --- VHS Shelf Container --- */
+  .cc-vhs-shelf-container {
+    position: relative;
+    z-index: 50;
+    background: rgba(0, 18, 48, 0.6);
+    border: 1px solid var(--blue-panel-light);
+    padding: 20px;
+    border-radius: 4px;
+  }
+
+  .cc-vhs-shelf-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 18px;
+    border-bottom: 1px solid rgba(103, 200, 255, 0.2);
+    padding-bottom: 8px;
+  }
+
+  .cc-vhs-shelf-title {
+    font-family: var(--font-ui);
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--blue-lightest);
+    letter-spacing: 2px;
+  }
+
+  .cc-vhs-shelf-hint {
+    font-family: var(--font-ui);
+    font-size: 9px;
+    color: var(--yellow);
+    letter-spacing: 1px;
+  }
+
+  .cc-vhs-shelf {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    padding-bottom: 12px;
+  }
+
+  /* VHS Tape Spine */
+  .cc-vhs-spine {
+    position: relative;
+    width: 170px;
+    height: 250px;
+    background: #00122e;
+    border: 2px solid var(--blue-panel-light);
+    border-radius: 4px;
+    box-shadow:
+      4px 6px 14px rgba(0, 0, 0, 0.6),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+    cursor: grab;
+    user-select: none;
+    touch-action: none;
+    display: flex;
+    flex-direction: column;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .cc-vhs-spine:active {
+    cursor: grabbing;
+    box-shadow: 6px 12px 24px rgba(0, 0, 0, 0.7);
+  }
+
+  .cc-vhs-spine:focus-visible {
+    outline: none;
+    border-color: var(--yellow);
+    box-shadow: 0 0 0 2px var(--navy-deep), 0 0 12px var(--yellow);
+  }
+
+  .cc-vhs-spine__ribs {
+    height: 12px;
+    background: repeating-linear-gradient(
+      90deg,
+      #000c1e,
+      #000c1e 4px,
+      #0f2e62 4px,
+      #0f2e62 8px
+    );
+    border-bottom: 1px solid var(--blue-panel-light);
+  }
+
+  .cc-vhs-spine__label {
+    flex: 1;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background: linear-gradient(180deg, rgba(10, 75, 196, 0.9) 0%, rgba(0, 30, 80, 0.95) 100%);
+  }
+
+  .cc-vhs-spine__meta-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .cc-vhs-tag {
+    font-family: var(--font-ui);
+    font-size: 8px;
+    font-weight: 700;
+    background: var(--yellow);
+    color: var(--navy-deep);
+    padding: 1px 4px;
+    border-radius: 1px;
+  }
+
+  .cc-vhs-year {
+    font-family: var(--font-ui);
+    font-size: 9px;
+    color: var(--blue-lightest);
+  }
+
+  .cc-vhs-spine__title-wrap {
+    margin: 8px 0;
+  }
+
+  .cc-vhs-spine__title {
+    font-family: var(--font-ui);
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--yellow);
+    margin: 0 0 4px 0;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .cc-vhs-spine__director {
+    font-family: var(--font-ui);
+    font-size: 0.75rem;
+    color: var(--blue-panel-light);
+    margin: 0;
+  }
+
+  .cc-vhs-spine__thumb {
+    width: 100%;
+    height: 90px;
+    border: 1px solid rgba(103, 200, 255, 0.4);
+    overflow: hidden;
+    border-radius: 2px;
+    margin-top: auto;
+  }
+
+  .cc-vhs-spine__thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .cc-vhs-spine__barcode {
+    margin-top: 6px;
+    height: 8px;
+    display: flex;
+    gap: 3px;
+    opacity: 0.5;
+  }
+
+  .cc-vhs-spine__barcode span {
+    flex: 1;
+    background: var(--blue-lightest);
+  }
+
+  .cc-vhs-ghost-hand {
+    top: -12px;
+    left: 20px;
+  }
+
+  .cc-vhs-shelf-ledge {
+    height: 10px;
+    background: linear-gradient(180deg, #1c4b8f 0%, #00122e 100%);
+    border: 1px solid var(--blue-panel-light);
+    margin-top: 10px;
+    border-radius: 2px;
   }
 
   @media (max-width: 768px) {
-    .cc-film-vault {
-      padding: 20px;
-      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-      gap: 16px;
+    .cc-vcr-deck-container {
+      padding: 12px;
+      gap: 20px;
+    }
+    .cc-vhs-spine {
+      width: 100%;
+      height: auto;
+      min-height: 180px;
     }
   }
 </style>

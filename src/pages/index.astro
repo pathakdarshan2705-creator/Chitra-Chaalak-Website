@@ -33,12 +33,57 @@ import Layout from '../layouts/Layout.astro';
     <div class="hud-line hud-line-left"></div>
     <div class="hud-line hud-line-right"></div>
 
+    <!-- Noise / Detune overlay for CRT tuning effect -->
+    <div class="hero-detune-overlay" id="hero-detune-overlay" aria-hidden="true"></div>
+
     <!-- Buttons -->
     <a href="/about" class="hero-btn btn-top-right">
       <span>ABOUT</span>
       <div class="btn-border"></div>
     </a>
     
+    <!-- Tuning Knob (Tactile alternative entry) -->
+    <div class="hero-tuner-cluster" id="hero-tuner-cluster">
+      <div class="hero-tuner-dial-wrap">
+        <!-- Arc of tick marks showing turnable range (-90 deg to +90 deg with target at +60 deg) -->
+        <svg class="hero-tuner-ticks" viewBox="0 0 100 100" aria-hidden="true">
+          <circle cx="50" cy="50" r="42" fill="none" stroke="rgba(103,200,255,0.25)" stroke-width="2" stroke-dasharray="2 6" stroke-dashoffset="15" />
+          <line x1="50" y1="6" x2="50" y2="13" stroke="var(--yellow)" stroke-width="2.5" transform="rotate(60 50 50)" />
+          <circle cx="50" cy="8" r="2.5" fill="var(--yellow)" transform="rotate(60 50 50)" />
+        </svg>
+
+        <!-- Rotatable Knob Element -->
+        <div
+          class="hero-knob"
+          id="hero-tuning-knob"
+          role="slider"
+          tabindex="0"
+          aria-label="Tuning dial. Rotate to tune in broadcast or press Enter."
+          aria-valuemin="-90"
+          aria-valuemax="90"
+          aria-valuenow="-60"
+        >
+          <div class="hero-knob__face">
+            <div class="hero-knob__indicator"></div>
+            <div class="hero-knob__core">
+              <span class="hero-knob__dot"></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Ghost hand guidance -->
+        <div class="cc-ghost-hand hero-knob-ghost-hand" id="hero-knob-ghost-hand" aria-hidden="true">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff000" stroke-width="2">
+            <path d="M18 11V6a2 2 0 0 0-4 0v5" />
+            <path d="M14 10V4a2 2 0 0 0-4 0v7" />
+            <path d="M10 10.5V6a2 2 0 0 0-4 0v8" />
+            <path d="M6 14v1a6 6 0 0 0 12 0v-4" />
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- The existing ENTER button stays fully visible, unchanged, and fully functional -->
     <a href="/home" class="hero-btn btn-bottom-right pulse-btn" data-astro-prefetch="load">
       <span class="next-text">ENTER</span>
       <div class="arrow-box">
@@ -55,6 +100,9 @@ import Layout from '../layouts/Layout.astro';
   <script>
     // Listen for the 'Enter' key to navigate to the next page
     document.addEventListener('keydown', (event) => {
+      // If the knob itself is focused, knob's own listener handles Enter
+      if (document.activeElement?.id === 'hero-tuning-knob') return;
+
       if (event.key === 'Enter') {
         window.location.href = '/home';
       }
@@ -73,6 +121,154 @@ import Layout from '../layouts/Layout.astro';
         window.location.href = '/home';
       }
     });
+
+    // --- TASK 1: Tactile Tuning Knob Logic ---
+    (async function initHeroTuner() {
+      const knobEl = document.getElementById('hero-tuning-knob');
+      const ghostHandEl = document.getElementById('hero-knob-ghost-hand');
+      const detuneOverlay = document.getElementById('hero-detune-overlay');
+      const videoEl = document.querySelector('.hero-video') as HTMLElement | null;
+      if (!knobEl) return;
+
+      const { getGsapDraggable, isReducedMotion } = await import('../utils/draggableHelper');
+      const { initGuidance } = await import('../utils/guidance');
+      const { gsap, Draggable } = await getGsapDraggable();
+
+      const TARGET_ANGLE = 60;
+      const TOLERANCE = 14;
+      const MIN_ANGLE = -90;
+      const MAX_ANGLE = 90;
+      let currentAngle = -60;
+      let isLocked = false;
+      const reducedMotion = isReducedMotion();
+
+      // Apply initial rotation and detuned blur/noise
+      gsap.set(knobEl, { rotation: currentAngle });
+      if (!reducedMotion) {
+        if (detuneOverlay) detuneOverlay.style.opacity = '0.35';
+        if (videoEl) videoEl.style.filter = 'blur(4px)';
+      }
+
+      function updateTuningVisuals(angle: number) {
+        currentAngle = angle;
+        knobEl.setAttribute('aria-valuenow', Math.round(angle).toString());
+        const distance = Math.abs(angle - TARGET_ANGLE);
+
+        if (reducedMotion) {
+          // In reduced motion, skip gradual blur/noise tweening
+          if (distance <= TOLERANCE) {
+            triggerSnapAndEnter();
+          }
+          return;
+        }
+
+        // Crossfade static/noise overlay down to 0 and blur toward 0 as angle approaches target
+        const maxDist = 120;
+        const progress = Math.min(1, Math.max(0, 1 - (distance / maxDist)));
+        const blurAmount = Math.max(0, (1 - progress) * 4);
+        const noiseOpacity = Math.max(0, (1 - progress) * 0.35);
+
+        if (videoEl) videoEl.style.filter = blurAmount < 0.1 ? 'none' : `blur(${blurAmount.toFixed(1)}px)`;
+        if (detuneOverlay) detuneOverlay.style.opacity = noiseOpacity.toFixed(2);
+
+        if (distance <= TOLERANCE) {
+          triggerSnapAndEnter();
+        }
+      }
+
+      function triggerSnapAndEnter() {
+        if (isLocked) return;
+        isLocked = true;
+        guidance.stop();
+        guidance.destroy();
+
+        if (draggableInstance) {
+          draggableInstance.disable();
+        }
+
+        // Click sound-free thunk: quick scale/rotation settle
+        if (reducedMotion) {
+          if (videoEl) videoEl.style.filter = 'none';
+          if (detuneOverlay) detuneOverlay.style.opacity = '0';
+          window.location.href = '/home';
+          return;
+        }
+
+        gsap.timeline({
+          onComplete: () => {
+            // Trigger exact same entry transition/function that ENTER calls
+            window.location.href = '/home';
+          }
+        })
+        .to(knobEl, { rotation: TARGET_ANGLE, duration: 0.15, ease: 'power2.out' })
+        .to(knobEl, { scale: 0.94, duration: 0.1, yoyo: true, repeat: 1, ease: 'power1.inOut' });
+
+        if (videoEl) videoEl.style.filter = 'none';
+        if (detuneOverlay) detuneOverlay.style.opacity = '0';
+      }
+
+      // Initialize rotational GSAP Draggable
+      const draggableInstance = Draggable.create(knobEl, {
+        type: 'rotation',
+        bounds: { minRotation: MIN_ANGLE, maxRotation: MAX_ANGLE },
+        inertia: false,
+        onDrag: function() {
+          guidance.stop();
+          updateTuningVisuals(this.rotation);
+        },
+        onDragEnd: function() {
+          guidance.resetTimer();
+        }
+      })[0];
+
+      // Guidance: nudge wiggle, ghost hand arc trace, pulse on knob
+      const guidance = initGuidance({
+        targetEl: knobEl,
+        pulseEl: knobEl,
+        ghostHandEl,
+        wiggleType: 'rotation',
+        ghostHandType: 'arc',
+        idleDelayMs: 3800
+      });
+
+      // Keyboard support: ArrowLeft / ArrowRight rotate in fixed 15-deg increments
+      const onKeyDown = (e: KeyboardEvent) => {
+        if (isLocked) return;
+        if (e.key === 'ArrowRight') {
+          e.preventDefault();
+          guidance.stop();
+          const next = Math.min(MAX_ANGLE, currentAngle + 15);
+          gsap.to(knobEl, {
+            rotation: next,
+            duration: 0.2,
+            onUpdate: () => updateTuningVisuals(gsap.getProperty(knobEl, 'rotation') as number)
+          });
+        } else if (e.key === 'ArrowLeft') {
+          e.preventDefault();
+          guidance.stop();
+          const prev = Math.max(MIN_ANGLE, currentAngle - 15);
+          gsap.to(knobEl, {
+            rotation: prev,
+            duration: 0.2,
+            onUpdate: () => updateTuningVisuals(gsap.getProperty(knobEl, 'rotation') as number)
+          });
+        } else if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          triggerSnapAndEnter();
+        }
+      };
+
+      knobEl.addEventListener('keydown', onKeyDown);
+
+      // Cleanup on cc:channel-jump navigation
+      const cleanup = () => {
+        guidance.destroy();
+        if (draggableInstance) draggableInstance.kill();
+        knobEl.removeEventListener('keydown', onKeyDown);
+        document.removeEventListener('cc:channel-jump', cleanup);
+      };
+      document.addEventListener('cc:channel-jump', cleanup);
+    })();
   </script>
 </Layout>
 
@@ -254,6 +450,124 @@ import Layout from '../layouts/Layout.astro';
     100% { transform: scale(1.15); opacity: 0; }
   }
 
+  /* --- Noise / Detune Overlay --- */
+  .hero-detune-overlay {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image:
+      radial-gradient(rgba(103, 200, 255, 0.15) 1px, transparent 0),
+      linear-gradient(rgba(0, 59, 153, 0.1) 50%, rgba(0, 20, 60, 0.3) 50%);
+    background-size: 3px 3px, 100% 4px;
+    opacity: 0.35;
+    mix-blend-mode: screen;
+    z-index: 504;
+    transition: opacity 0.15s ease-out;
+  }
+
+  /* --- Tactile Tuning Knob Cluster --- */
+  .hero-tuner-cluster {
+    position: absolute;
+    bottom: 2.5rem;
+    right: 14rem;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    z-index: 510;
+  }
+
+  .hero-tuner-dial-wrap {
+    position: relative;
+    width: 64px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .hero-tuner-ticks {
+    position: absolute;
+    inset: -14px;
+    width: 92px;
+    height: 92px;
+    pointer-events: none;
+  }
+
+  .hero-knob {
+    position: relative;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #0d3875 0%, #00122e 90%);
+    border: 2px solid var(--blue-panel-light, #67c8ff);
+    box-shadow:
+      0 4px 14px rgba(0, 0, 0, 0.6),
+      inset 0 0 8px rgba(103, 200, 255, 0.3);
+    cursor: grab;
+    user-select: none;
+    touch-action: none;
+    outline: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .hero-knob:active {
+    cursor: grabbing;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.8), inset 0 0 12px rgba(255, 240, 0, 0.4);
+  }
+
+  .hero-knob:focus-visible {
+    border-color: var(--yellow);
+    box-shadow: 0 0 0 2px var(--navy-deep), 0 0 12px var(--yellow);
+  }
+
+  .hero-knob__face {
+    position: absolute;
+    inset: 4px;
+    border-radius: 50%;
+    border: 1px dashed rgba(103, 200, 255, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .hero-knob__indicator {
+    position: absolute;
+    top: 2px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 3px;
+    height: 8px;
+    background: var(--yellow);
+    border-radius: 1px;
+    box-shadow: 0 0 4px var(--yellow);
+  }
+
+  .hero-knob__core {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #001c44;
+    border: 1px solid rgba(103, 200, 255, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .hero-knob__dot {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--blue-lightest);
+  }
+
+  .hero-knob-ghost-hand {
+    top: -10px;
+    left: -10px;
+  }
+
   @media (max-width: 768px) {
     .video-wrapper { 
       /* Make it full bleed on mobile for a cinematic, immersive feel */
@@ -275,6 +589,13 @@ import Layout from '../layouts/Layout.astro';
       justify-content: center;
       padding: 1rem;
       font-size: 0.85rem;
+    }
+
+    /* Tuning knob positioned neatly above the full-width ENTER button on mobile */
+    .hero-tuner-cluster {
+      bottom: 6.8rem;
+      right: 1.5rem;
+      left: auto;
     }
     
     .btn-top-right { 

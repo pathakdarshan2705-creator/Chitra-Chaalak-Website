@@ -480,4 +480,33 @@ button{
   .cc-sidebar__grid.is-open{ display: grid !important; }
 }
 
+/* ==========================================================
+   Guidance System Cues & Ghost Hand
+   ========================================================== */
+.cc-guidance-pulsing {
+  box-shadow: 0 0 0 2px var(--yellow), 0 0 12px var(--yellow) !important;
+  animation: cc-pulse-glow 1.5s infinite ease-in-out !important;
+}
+
+@keyframes cc-pulse-glow {
+  0%, 100% { box-shadow: 0 0 0 2px var(--yellow), 0 0 8px rgba(255, 240, 0, 0.4); }
+  50% { box-shadow: 0 0 0 3px #ffffff, 0 0 16px rgba(255, 240, 0, 0.9); }
+}
+
+.cc-ghost-hand {
+  position: absolute;
+  pointer-events: none;
+  opacity: 0;
+  z-index: 999;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.6));
+}
+
+.cc-cursor-rapid-blink {
+  animation: cc-cursor-blink-fast 0.3s steps(2, start) infinite !important;
+}
+
+@keyframes cc-cursor-blink-fast {
+  to { visibility: hidden; }
+}
+
 @media (prefers-reduced-motion: reduce) { *, ::before, ::after { animation: none !important; transition: none !important; } }

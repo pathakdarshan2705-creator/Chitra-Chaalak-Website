@@ -28,8 +28,47 @@ import Panel from '../../components/Panel.astro';
           </svg>
           My Resume
         </a>
-        <div class="cc-portfolio-index">
-          <div class="cc-accordion-container">
+        <div class="cc-portfolio-index" id="portfolio-index-stage">
+
+          <!-- TASK 1: Hanging Pull-Cord Work Light Fixture -->
+          <div class="cc-light-fixture" id="portfolio-light-fixture">
+            <div class="cc-bulb-socket">
+              <div class="cc-bulb-mount"></div>
+              <div class="cc-filament-bulb" id="portfolio-bulb" aria-hidden="true">
+                <div class="cc-bulb-glass"></div>
+                <div class="cc-bulb-filament"></div>
+                <div class="cc-bulb-glow"></div>
+              </div>
+            </div>
+
+            <div class="cc-cord-track" id="cord-track">
+              <div class="cc-cord-string" id="cord-string"></div>
+              <div
+                class="cc-cord-handle"
+                id="cord-handle"
+                tabindex="0"
+                role="button"
+                aria-label="Light switch cord. Pull down or press Enter to toggle illumination."
+                aria-pressed="false"
+              >
+                <div class="cc-cord-bead"></div>
+                <div class="cc-cord-acorn"></div>
+                <div class="cc-cord-pulse-ring" id="cord-pulse-ring" aria-hidden="true"></div>
+              </div>
+
+              <!-- Ghost hand guidance -->
+              <div class="cc-ghost-hand cc-cord-ghost-hand" id="cord-ghost-hand" aria-hidden="true">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff000" stroke-width="2">
+                  <path d="M18 11V6a2 2 0 0 0-4 0v5" />
+                  <path d="M14 10V4a2 2 0 0 0-4 0v7" />
+                  <path d="M10 10.5V6a2 2 0 0 0-4 0v8" />
+                  <path d="M6 14v1a6 6 0 0 0 12 0v-4" />
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <div class="cc-accordion-container" id="portfolio-accordion-container">
             
             <!-- FILMMAKING -->
             <a href="/portfolio/filmmaking" class="cc-accordion-panel" data-section="filmmaking">
@@ -84,6 +123,7 @@ import Panel from '../../components/Panel.astro';
 
 <style>
   .cc-portfolio-index {
+    position: relative;
     width: 100%;
     height: 100%;
     overflow: hidden;
@@ -91,6 +131,161 @@ import Panel from '../../components/Panel.astro';
     align-items: center;
     justify-content: center;
     background: var(--navy-deep);
+    /* Baseline: Page is fully legible by default at ~78% brightness/contrast */
+    filter: brightness(0.78) contrast(0.95);
+    transition: filter 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  /* Full brightness upgrade when light cord is pulled */
+  .cc-portfolio-index.is-lit {
+    filter: brightness(1.06) contrast(1.04);
+  }
+
+  .cc-portfolio-index.is-lit .cc-accordion-container {
+    box-shadow: 0 10px 40px rgba(0, 59, 153, 0.8), 0 0 30px rgba(103, 200, 255, 0.25);
+    border-color: var(--yellow);
+  }
+
+  .cc-portfolio-index.is-lit .cc-accordion-title {
+    color: var(--yellow);
+    text-shadow: 0 0 10px rgba(255, 240, 0, 0.5);
+  }
+
+  /* Hanging Pull-Cord Work Light Fixture */
+  .cc-light-fixture {
+    position: absolute;
+    top: 0;
+    right: 36px;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    pointer-events: none;
+  }
+
+  .cc-bulb-socket {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .cc-bulb-mount {
+    width: 26px;
+    height: 10px;
+    background: linear-gradient(180deg, #1a1a1a 0%, #3a3a3a 100%);
+    border: 1px solid var(--blue-panel-light);
+    border-radius: 2px 2px 0 0;
+  }
+
+  .cc-filament-bulb {
+    position: relative;
+    width: 28px;
+    height: 38px;
+    border-radius: 50% 50% 35% 35% / 40% 40% 60% 60%;
+    background: radial-gradient(circle at 50% 35%, rgba(255, 255, 210, 0.15) 0%, rgba(0, 20, 60, 0.8) 85%);
+    border: 1.5px solid rgba(103, 200, 255, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .cc-filament-bulb.is-lit {
+    background: radial-gradient(circle at 50% 35%, #ffffff 0%, #fff799 40%, #ffaa00 85%);
+    border-color: #ffffff;
+    box-shadow: 0 0 24px rgba(255, 240, 0, 0.95), 0 0 50px rgba(255, 220, 0, 0.5);
+  }
+
+  .cc-bulb-filament {
+    width: 8px;
+    height: 12px;
+    border: 1.5px solid rgba(255, 255, 255, 0.3);
+    border-bottom: none;
+    border-radius: 4px 4px 0 0;
+    transition: all 0.2s ease;
+  }
+
+  .cc-filament-bulb.is-lit .cc-bulb-filament {
+    border-color: #ffffff;
+    box-shadow: 0 0 8px #ffffff;
+  }
+
+  /* Pull-Cord Track */
+  .cc-cord-track {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 2px;
+    pointer-events: auto;
+  }
+
+  .cc-cord-string {
+    width: 2px;
+    height: 60px;
+    background: repeating-linear-gradient(
+      180deg,
+      #c4a000 0px,
+      #c4a000 3px,
+      #554400 3px,
+      #554400 5px
+    );
+    box-shadow: 1px 0 2px rgba(0, 0, 0, 0.5);
+    transform-origin: top center;
+  }
+
+  .cc-cord-handle {
+    position: relative;
+    width: 24px;
+    height: 36px;
+    cursor: grab;
+    user-select: none;
+    touch-action: none;
+    outline: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .cc-cord-handle:active {
+    cursor: grabbing;
+  }
+
+  .cc-cord-handle:focus-visible .cc-cord-acorn {
+    box-shadow: 0 0 0 2px var(--navy-deep), 0 0 10px var(--yellow);
+    border-color: var(--yellow);
+  }
+
+  .cc-cord-bead {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #d4af37;
+    margin-bottom: 2px;
+  }
+
+  .cc-cord-acorn {
+    width: 14px;
+    height: 24px;
+    background: linear-gradient(180deg, #d4af37 0%, #8a7018 70%, #59470c 100%);
+    border: 1px solid #ffe880;
+    border-radius: 3px 3px 8px 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.6);
+  }
+
+  .cc-cord-pulse-ring {
+    position: absolute;
+    inset: -4px;
+    border: 2px solid var(--yellow);
+    border-radius: 12px;
+    pointer-events: none;
+    opacity: 0;
+  }
+
+  .cc-cord-ghost-hand {
+    top: 6px;
+    right: -24px;
   }
 
   .cc-resume-btn {
@@ -374,4 +569,145 @@ import { gsap } from 'gsap';
       }
     });
   }
+
+  // --- TASK 1: Pull-Cord Work Light Switch Logic ---
+  (async function initPullCord() {
+    const stage = document.getElementById('portfolio-index-stage');
+    const bulb = document.getElementById('portfolio-bulb');
+    const cordHandle = document.getElementById('cord-handle');
+    const cordString = document.getElementById('cord-string');
+    const pulseRing = document.getElementById('cord-pulse-ring');
+    const ghostHandEl = document.getElementById('cord-ghost-hand');
+    const accordionPanels = Array.from(document.querySelectorAll('.cc-accordion-panel'));
+
+    if (!cordHandle || !cordString || !stage) return;
+
+    const { getGsapDraggable, isReducedMotion, springBack } = await import('../../utils/draggableHelper');
+    const { initGuidance } = await import('../../utils/guidance');
+    const { gsap, Draggable } = await getGsapDraggable();
+
+    const reducedMotion = isReducedMotion();
+    const STORAGE_KEY = 'cc:workLightOn';
+    let isLit = false;
+
+    // Check stored state on load - render immediately without replay of flicker animation
+    try {
+      if (localStorage.getItem(STORAGE_KEY) === '1') {
+        isLit = true;
+        stage.classList.add('is-lit');
+        bulb?.classList.add('is-lit');
+        cordHandle.setAttribute('aria-pressed', 'true');
+      }
+    } catch (e) {}
+
+    function toggleLight() {
+      guidance.stop();
+      guidance.resetTimer();
+
+      isLit = !isLit;
+      cordHandle.setAttribute('aria-pressed', isLit ? 'true' : 'false');
+      try {
+        localStorage.setItem(STORAGE_KEY, isLit ? '1' : '0');
+      } catch (e) {}
+
+      if (reducedMotion) {
+        stage.classList.toggle('is-lit', isLit);
+        bulb?.classList.toggle('is-lit', isLit);
+        return;
+      }
+
+      if (isLit) {
+        // Filament flicker on bulb element
+        gsap.timeline()
+          .to(bulb, { opacity: 0.3, duration: 0.05 })
+          .to(bulb, { opacity: 1, duration: 0.06 })
+          .to(bulb, { opacity: 0.4, duration: 0.04 })
+          .to(bulb, { opacity: 1, duration: 0.08 })
+          .add(() => {
+            bulb?.classList.add('is-lit');
+            stage.classList.add('is-lit');
+          })
+          // Staggered light-up across the project cards
+          .fromTo(accordionPanels, 
+            { filter: 'brightness(0.85) contrast(0.95)' },
+            { 
+              filter: 'brightness(1.18) contrast(1.1)', 
+              duration: 0.35, 
+              stagger: 0.08, 
+              ease: 'power2.out',
+              onComplete: () => {
+                gsap.set(accordionPanels, { clearProps: 'filter' });
+              }
+            }
+          );
+      } else {
+        // Dim back to 75-80% baseline
+        bulb?.classList.remove('is-lit');
+        stage.classList.remove('is-lit');
+      }
+    }
+
+    // Draggable downward
+    const BASE_HEIGHT = 60;
+    const MAX_PULL = 45;
+    const PULL_THRESHOLD = 22;
+
+    const cordDraggable = Draggable.create(cordHandle, {
+      type: 'y',
+      bounds: { minY: 0, maxY: MAX_PULL },
+      edgeResistance: 0.75,
+      zIndexBoost: true,
+      onPress: function() {
+        guidance.stop();
+      },
+      onDrag: function() {
+        gsap.set(cordString, { height: BASE_HEIGHT + this.y });
+      },
+      onDragEnd: function() {
+        if (this.y >= PULL_THRESHOLD) {
+          // Cord click quick settle
+          gsap.timeline({
+            onComplete: () => {
+              toggleLight();
+            }
+          })
+          .to(cordHandle, { y: 0, duration: 0.22, ease: 'back.out(2.5)' })
+          .to(cordString, { height: BASE_HEIGHT, duration: 0.22, ease: 'back.out(2.5)' }, 0);
+        } else {
+          // Springs back if not pulled far enough
+          springBack(gsap, cordHandle, () => {
+            guidance.resetTimer();
+          });
+          gsap.to(cordString, { height: BASE_HEIGHT, duration: 0.28, ease: 'power2.out' });
+        }
+      }
+    })[0];
+
+    // Guidance on handle (wiggle = gentle sway, ghost hand = downward pull, pulse ring)
+    const guidance = initGuidance({
+      targetEl: cordHandle,
+      pulseEl: pulseRing,
+      ghostHandEl,
+      wiggleType: 'translateY',
+      ghostHandType: 'drag',
+      dragTargetEl: null,
+      idleDelayMs: 3800
+    });
+
+    // Keyboard support: Enter / Space toggles instantly
+    cordHandle.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        toggleLight();
+      }
+    });
+
+    // Cleanup on cc:channel-jump navigation
+    const cleanup = () => {
+      guidance.destroy();
+      if (cordDraggable) cordDraggable.kill();
+      document.removeEventListener('cc:channel-jump', cleanup);
+    };
+    document.addEventListener('cc:channel-jump', cleanup);
+  })();
 </script>
