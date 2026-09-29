@@ -29,11 +29,12 @@ const { href, label, group } = Astro.props;
 <style>
   .cc-cassette {
     position: relative;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    gap: 0;
-    padding: 8px 12px;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    justify-content: space-between !important;
+    gap: 0 !important;
+    padding: 7px 12px !important;
     background: var(--blue-card);
     border: 2px solid var(--navy-deep);
     box-shadow:
@@ -44,9 +45,11 @@ const { href, label, group } = Astro.props;
     flex: 1 1 0;
     min-height: 56px;
     max-height: 76px;
-    box-sizing: border-box;
+    width: 100% !important;
+    box-sizing: border-box !important;
     cursor: pointer;
     outline: none;
+    overflow: hidden;
     transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
   }
 
@@ -78,18 +81,22 @@ const { href, label, group } = Astro.props;
     opacity: 0.6;
     display: block;
     line-height: 1;
-    margin-bottom: 3px;
+    margin-bottom: 2px;
+    flex-shrink: 0;
   }
 
   .cc-cassette__body {
     display: flex;
     align-items: center;
     justify-content: center;
+    width: 100%;
     background: var(--blue-column);
-    padding: 5px 0;
-    margin-bottom: 5px;
-    box-shadow: inset 0 0 0 1px rgba(0,10,40,0.3);
+    padding: 4px 0;
+    margin: 2px 0 4px 0;
+    box-shadow: inset 0 0 0 1px rgba(0,10,40,0.35);
     border-radius: 2px;
+    box-sizing: border-box;
+    flex-shrink: 0;
   }
 
   .cc-cassette__reel {
@@ -102,7 +109,7 @@ const { href, label, group } = Astro.props;
   }
 
   .cc-cassette__tape {
-    width: clamp(22px, 2.2vw, 30px);
+    width: clamp(24px, 2.5vw, 36px);
     height: 3px;
     background: var(--blue-lightest);
     margin: 0 -1px;
@@ -112,18 +119,21 @@ const { href, label, group } = Astro.props;
   .cc-cassette__title {
     font-family: var(--font-ui);
     font-weight: 700;
-    font-size: clamp(10px, 0.85vw, 12px);
-    letter-spacing: 1px;
+    font-size: clamp(9px, 0.72vw, 10.5px);
+    letter-spacing: 0.75px;
     text-transform: uppercase;
-    color: var(--yellow);
+    color: var(--blue-lightest);
     text-align: center;
     width: 100%;
+    display: block;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     line-height: 1.2;
     margin: 0;
-    padding: 0;
+    padding: 0 6px;
+    box-sizing: border-box;
+    flex-shrink: 0;
     transition: color 0.15s ease;
   }
 
@@ -138,30 +148,26 @@ const { href, label, group } = Astro.props;
     transform: translateY(-1px);
   }
 
-  .cc-cassette.is-selected {
-    background: var(--yellow);
-    border-color: var(--navy-deep);
-    box-shadow:
-      inset 0 0 0 2px var(--navy-deep),
-      0 4px 12px rgba(255, 240, 0, 0.35);
+  .cc-cassette:hover .cc-cassette__title,
+  .cc-cassette:focus-visible .cc-cassette__title {
+    color: var(--yellow);
   }
 
-  .cc-cassette.is-selected .cc-cassette__title {
-    color: var(--navy-deep);
+  .cc-cassette.is-selected,
+  .cc-cassette.is-clicked {
+    border-color: var(--yellow);
+    box-shadow: 0 0 0 1px var(--yellow), inset 0 0 0 1px var(--yellow);
   }
 
-  .cc-cassette.is-selected .cc-cassette__dots {
-    color: var(--navy-deep);
-    opacity: 0.9;
-  }
-
-  .cc-cassette.is-selected .cc-cassette__body {
-    background: var(--blue-card-hover);
-    box-shadow: inset 0 0 0 1px rgba(0,10,40,0.4);
+  .cc-cassette.is-selected .cc-cassette__title,
+  .cc-cassette.is-clicked .cc-cassette__title {
+    color: var(--yellow);
   }
 
   .cc-cassette.is-selected::before,
-  .cc-cassette.is-selected .cc-card__corner-br {
-    border-color: var(--navy-deep);
+  .cc-cassette.is-selected .cc-card__corner-br,
+  .cc-cassette.is-clicked::before,
+  .cc-cassette.is-clicked .cc-card__corner-br {
+    border-color: var(--yellow);
   }
 </style>

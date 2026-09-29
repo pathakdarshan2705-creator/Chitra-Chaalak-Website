@@ -26,8 +26,8 @@
 
   .cc-focus-frame__corner {
     position: absolute;
-    width: 14px; height: 14px;
-    border: 2px solid var(--yellow);
+    width: 11px; height: 11px;
+    border: 1.5px solid var(--yellow);
   }
   .cc-focus-frame__corner--tl { top: -2px; left: -2px; border-right: none; border-bottom: none; }
   .cc-focus-frame__corner--tr { top: -2px; right: -2px; border-left: none; border-bottom: none; }
@@ -97,12 +97,12 @@
 
       function place(el) {
         const r = el.getBoundingClientRect();
-        const pad = 5;
+        const pad = 4;
         frame.style.width = `${r.width + pad * 2}px`;
         frame.style.height = `${r.height + pad * 2}px`;
         frame.style.transform = `translate(${r.left - pad}px, ${r.top - pad}px)`;
         frame.classList.add('is-active', 'is-locking');
-        setTimeout(() => frame.classList.remove('is-locking'), 250);
+        setTimeout(() => frame.classList.remove('is-locking'), 200);
       }
 
       function triggerTighten() {
@@ -110,25 +110,24 @@
         frame.classList.remove('is-tightening');
         void frame.offsetWidth;
         frame.classList.add('is-tightening');
-        setTimeout(() => frame.classList.remove('is-tightening'), 240);
+        setTimeout(() => frame.classList.remove('is-tightening'), 200);
       }
 
-      document.addEventListener('mouseover', (e) => {
-        const target = e.target.closest(TARGETS);
-        if (!target || target === current) return;
-        current = target;
-        place(target);
-      });
-
+      // Show momentarily on mouse click for visual feedback, then dismiss
       document.addEventListener('click', (e) => {
         const target = e.target.closest(TARGETS);
         if (target) {
           current = target;
           place(target);
           triggerTighten();
+          setTimeout(() => {
+            frame.classList.remove('is-active');
+            current = null;
+          }, 200);
         }
       });
 
+      // Show on keyboard selection
       document.addEventListener('cc:card-selected', ((e) => {
         if (e.detail?.card) {
           current = e.detail.card;
@@ -137,16 +136,16 @@
         }
       }));
 
-      document.addEventListener('mouseout', (e) => {
-        const related = e.relatedTarget;
-        if (related && related.closest(TARGETS)) return;
-        if (!e.target.closest(TARGETS)) return;
-        current = null;
-        frame.classList.remove('is-active');
+      // Dismiss frame on general mouse click/movement outside
+      document.addEventListener('mousedown', (e) => {
+        if (!e.target.closest(TARGETS)) {
+          frame.classList.remove('is-active');
+          current = null;
+        }
       });
 
       document.addEventListener('scroll', () => {
-        if (current) place(current);
+        if (current && frame.classList.contains('is-active')) place(current);
       }, true);
     }
   }

@@ -12,36 +12,72 @@
 ---
 <script>
   // @ts-nocheck
-if (!window.__ccCardHandlersInit) {
+  if (!window.__ccCardHandlersInit) {
     window.__ccCardHandlersInit = true;
 
+    // Single click interaction for mouse across the entire website
     document.addEventListener('click', (e) => {
+      // Don't intercept clicks inside buttons, inputs, textareas, or explicit jump links
+      if (e.target.closest('button, input, textarea, select, .cc-farmaish-jump-btn, [data-prevent-card-click]')) return;
+
       const card = e.target.closest('.cc-card');
       if (!card) return;
 
+      const href = card.dataset.href;
       const group = card.dataset.group;
-      if (group) {
-        document
-          .querySelectorAll(`.cc-card[data-group="${group}"].is-selected`)
-          .forEach((el) => {
-            if (el !== card) el.classList.remove('is-selected');
-          });
+
+      // Remove any lingering selection on other cards
+      document.querySelectorAll('.cc-card.is-selected').forEach((el) => {
+        el.classList.remove('is-selected');
+      });
+
+      // Momentary yellow box line for visual feedback (fraction of a second)
+      card.classList.add('is-clicked');
+
+      if (href && href !== '#') {
+        // Unified ChannelWipe transition for all cards across the site
+        document.dispatchEvent(new CustomEvent('cc:channel-jump'));
+        setTimeout(() => {
+          card.classList.remove('is-clicked');
+          window.location.href = href;
+        }, 220);
+      } else {
+        setTimeout(() => {
+          card.classList.remove('is-clicked');
+        }, 180);
       }
-      card.classList.add('is-selected');
+
       if (group) {
         document.dispatchEvent(new CustomEvent('cc:card-selected', { detail: { group, card } }));
       }
     });
 
-    document.addEventListener('dblclick', (e) => {
-      const card = e.target.closest('.cc-card');
-      if (!card) return;
-      const href = card.dataset.href;
-      if (!href || href === '#') return;
+    // Clear lingering keyboard selection on mousedown outside
+    document.addEventListener('mousedown', (e) => {
+      if (!e.target.closest('.cc-card')) {
+        document.querySelectorAll('.cc-card.is-selected').forEach((el) => {
+          el.classList.remove('is-selected');
+        });
+      }
+    });
 
-      // Unified ChannelWipe transition for all cards across the site
-      document.dispatchEvent(new CustomEvent('cc:channel-jump'));
-      setTimeout(() => { window.location.href = href; }, 320);
+    // Keyboard support: Enter or Space on a focused card opens it
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        const active = document.activeElement;
+        if (active && active.classList && active.classList.contains('cc-card')) {
+          const href = active.dataset.href;
+          if (href && href !== '#') {
+            e.preventDefault();
+            active.classList.add('is-clicked');
+            document.dispatchEvent(new CustomEvent('cc:channel-jump'));
+            setTimeout(() => {
+              active.classList.remove('is-clicked');
+              window.location.href = href;
+            }, 220);
+          }
+        }
+      }
     });
   }
 </script>

@@ -19,7 +19,7 @@ const { items, group } = Astro.props;
 const first = items[0] || { title: 'No items', meta: 'EMPTY', href: '#', imageSrc: '' };
 ---
 <div
-  class="cc-card is-selected cc-slideshow"
+  class="cc-card cc-slideshow"
   data-slideshow-group={group}
   data-href={first.href}
   data-group={group}

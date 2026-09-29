@@ -99,9 +99,23 @@ const postsMap = Object.fromEntries(
       </Panel>
     </div>
   </div>
+
+  <!-- Floating Circle Letter Icon: Quick jump directly to Farmaish Postbox -->
+  <button
+    type="button"
+    class="cc-farmaish-jump-btn"
+    id="farmaish-jump-btn"
+    aria-label="Jump to Farmaish request postcard"
+    title="Farmaish Postbox"
+  >
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <rect x="2" y="4" width="20" height="16" rx="2"></rect>
+      <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
+    </svg>
+  </button>
 </Layout>
 
-<style>
+<style is:global>
   .cc-blog-page{
     padding: 20px;
   }
@@ -112,15 +126,95 @@ const postsMap = Object.fromEntries(
     gap: 16px;
   }
 
+  /* Floating Circle Envelope/Letter Icon */
+  .cc-farmaish-jump-btn {
+    position: fixed !important;
+    bottom: 84px !important;
+    right: 36px !important;
+    width: 52px !important;
+    height: 52px !important;
+    border-radius: 50% !important;
+    background: var(--navy-deep) !important;
+    color: var(--yellow) !important;
+    border: 2px solid var(--yellow) !important;
+    box-shadow: 0 4px 20px rgba(0, 10, 40, 0.9), 0 0 14px rgba(255, 240, 0, 0.45) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    z-index: 9990 !important; /* above CRT layers & footer, below custom cursor */
+    pointer-events: auto !important;
+    transition: transform 0.2s cubic-bezier(0.2, 0.9, 0.3, 1), background 0.15s ease, color 0.15s ease, box-shadow 0.2s ease !important;
+  }
+
+  .cc-farmaish-jump-btn svg {
+    display: block !important;
+    width: 24px !important;
+    height: 24px !important;
+    stroke: currentColor !important;
+    pointer-events: none !important;
+  }
+
+  .cc-farmaish-jump-btn:hover {
+    background: var(--yellow) !important;
+    color: var(--navy-deep) !important;
+    transform: translateY(-3px) scale(1.08) !important;
+    box-shadow: 0 8px 26px rgba(0, 10, 40, 0.95), 0 0 22px rgba(255, 240, 0, 0.7) !important;
+  }
+
+  .cc-farmaish-jump-btn:active {
+    transform: translateY(1px) scale(0.95) !important;
+    box-shadow: 0 3px 10px rgba(0, 10, 40, 0.7) !important;
+  }
+
   @media (max-width: 1100px){
     .cc-blog-grid{ grid-template-columns: repeat(2, 1fr); }
   }
   @media (max-width: 768px){
     .cc-blog-grid{ grid-template-columns: 1fr; gap: 12px; }
     .cc-blog-page{ padding: 12px; }
+    .cc-farmaish-jump-btn {
+      bottom: 74px !important;
+      right: 20px !important;
+      width: 46px !important;
+      height: 46px !important;
+    }
+    .cc-farmaish-jump-btn svg {
+      width: 21px !important;
+      height: 21px !important;
+    }
   }
 </style>
 
 <script define:vars={{ postsMap }}>
   window.__ccBlogPosts = postsMap;
+
+  // Clear any default or lingering selection on blog cards
+  document.querySelectorAll('.cc-card.is-selected').forEach((el) => {
+    el.classList.remove('is-selected');
+  });
+
+  const jumpBtn = document.getElementById('farmaish-jump-btn');
+  if (jumpBtn) {
+    // Mount to document.body so fixed positioning is relative to viewport without clipping
+    if (jumpBtn.parentElement !== document.body) {
+      document.body.appendChild(jumpBtn);
+    }
+
+    jumpBtn.addEventListener('click', () => {
+      const postcard = document.getElementById('cc-postcard') || document.querySelector('.cc-farmaish-section');
+      if (postcard) {
+        postcard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        setTimeout(() => {
+          const textarea = document.getElementById('farmaish-message');
+          textarea?.focus();
+        }, 500);
+      }
+    });
+
+    // Clean up button when navigating away
+    document.addEventListener('cc:channel-jump', () => {
+      jumpBtn.remove();
+    }, { once: true });
+  }
 </script>
