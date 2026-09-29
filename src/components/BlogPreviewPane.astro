@@ -107,9 +107,6 @@ if (!window.__ccBlogPreviewInit) {
         document.querySelectorAll(`.cc-card[data-group="${group}"]`)
       ) as HTMLElement[];
       if (!cards.length) return;
-      if (!cards.some(c => c.classList.contains('is-selected'))) {
-        cards[0].classList.add('is-selected');
-      }
       const selected = cards.find(c => c.classList.contains('is-selected')) ?? cards[0];
       renderPreview(pane, selected);
       const observer = new MutationObserver(() => {

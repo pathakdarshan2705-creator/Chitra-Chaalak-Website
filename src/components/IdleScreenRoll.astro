@@ -66,7 +66,7 @@
   if (!window.__ccIdleRollInit) {
     window.__ccIdleRollInit = true;
 
-    const IDLE_TIME = 20000; // 20s
+    const IDLE_TIME = 120000; // 2 minutes (120s)
     let idleTimer = null;
     let hasRolled = false;
 
@@ -91,8 +91,12 @@
       startTimer();
     }
 
-    window.addEventListener('mousemove', onActivity);
-    window.addEventListener('keydown', onActivity);
+    window.addEventListener('mousemove', onActivity, { passive: true });
+    window.addEventListener('pointermove', onActivity, { passive: true });
+    window.addEventListener('scroll', onActivity, { passive: true });
+    window.addEventListener('click', onActivity, { passive: true });
+    window.addEventListener('touchstart', onActivity, { passive: true });
+    window.addEventListener('keydown', onActivity, { passive: true });
     startTimer();
 
     // Clean up on page navigation (channel-wipe)
@@ -100,6 +104,10 @@
       clearTimeout(idleTimer);
       resetRoll();
       window.removeEventListener('mousemove', onActivity);
+      window.removeEventListener('pointermove', onActivity);
+      window.removeEventListener('scroll', onActivity);
+      window.removeEventListener('click', onActivity);
+      window.removeEventListener('touchstart', onActivity);
       window.removeEventListener('keydown', onActivity);
       window.__ccIdleRollInit = false;
     });
