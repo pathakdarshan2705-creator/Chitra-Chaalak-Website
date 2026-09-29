@@ -1,4 +1,4 @@
-﻿---
+---
 title: Taal Taiyaar
 section: filmmaking
 date: 2026-05-09
@@ -33,7 +33,7 @@ _Taal Taiyaar_ is ultimately a film about making, but also about the knowledge c
 
 ## My Role
 
-**Research Â· Direction Â· Cinematography Â· Editing**
+**Research · Direction · Cinematography · Editing**
 
 ## Tools
 

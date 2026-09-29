@@ -1,4 +1,4 @@
-﻿---
+---
 title: NAVRATRI MUSIC VIDEO
 section: filmmaking
 date: 2024-10-23
@@ -7,9 +7,9 @@ description: A festive Navratri music video made under tight time and space cons
 youtubeId: https://youtu.be/yr47RUbBeIA?si=-wDXRVnWzHQF3bgY
 ---
 
-### _Production Â· Cinematography Â· Editing_
+### _Production · Cinematography · Editing_
 
-> **â€œSometimes the limitation is what makes you find a better way.â€**
+> **“Sometimes the limitation is what makes you find a better way.”**
 
 ## The Process
 
@@ -27,7 +27,7 @@ The challenge was to make the studio feel larger, more energetic and visually va
 
 As cinematographer, I worked around these limitations through framing, camera movement, composition and coverage. As producer, I was involved in keeping the production moving within the available time. The edit then brought the different performances and shots together into the final music video.
 
-> **â€œYou don't always need more space. Sometimes you just need to see the space differently.â€**
+> **“You don't always need more space. Sometimes you just need to see the space differently.”**
 
 ## The Film
 
@@ -37,7 +37,7 @@ For me, the project was a valuable experience in **working fast without losing v
 
 ## My Role
 
-**Producer Â· Cinematographer Â· Editor**
+**Producer · Cinematographer · Editor**
 
 I was involved throughout the production, from planning and coordination to shooting and the final edit.
 
@@ -50,5 +50,5 @@ Depending on the project, my responsibilities included **production, writing, re
 This music video in particular was an opportunity to work in a much faster and more performance-driven format, where decisions had to be made quickly and the available resources had to be used carefully.
 
 **Production House:** Jalso Production House
-**Period:** July 2024 â€“ November 2025
-**My Role on this project:** Producer Â· Cinematographer Â· Editor
+**Period:** July 2024 – November 2025
+**My Role on this project:** Producer · Cinematographer · Editor

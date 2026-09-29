@@ -1,4 +1,4 @@
-﻿---
+---
 title: Abhivyakti - Making an Art Festival Speak
 section: design
 date: 2023-11-18
@@ -9,7 +9,7 @@ youtubeId: ''
 
 # **Abhivyakti - Making an Arts Festival Speak**
 
-> **â€œAn arts festival is not only what happens on stage. It is everything that makes people want to walk in.â€**
+> **“An arts festival is not only what happens on stage. It is everything that makes people want to walk in.”**
 
 Abhivyakti - The City Arts Project is a multidisciplinary arts initiative bringing together different forms of artistic expression, including art, music, dance, theatre and literature. This project involved designing communication around the festival and finding ways to make a large amount of information feel accessible, recognisable and connected to the larger identity of Abhivyakti.
 
@@ -39,7 +39,7 @@ The five discipline cards became one of the clearest examples of this approach -
 
 A large part of the work was translating the festival into a language that could work quickly on social media.
 
-Posts such as **â€œCalling All Dancers,â€ â€œCalling All Visual Artists,â€ â€œMusic Curator,â€ â€œTheatre Curator,â€** and artist application announcements had very different messages, but they needed to work as part of the same visual world.
+Posts such as **“Calling All Dancers,” “Calling All Visual Artists,” “Music Curator,” “Theatre Curator,”** and artist application announcements had very different messages, but they needed to work as part of the same visual world.
 
 ![](/src/assets/uploads/Screenshot_20260729-193656.png)
 
@@ -65,7 +65,7 @@ For me, the more useful question was:
 
 Not everything had to be an announcement.
 
-One of the posts asked the audience **â€œWhat elements do you see?â€**, turning the visual identity itself into something to interact with rather than simply something to look at.
+One of the posts asked the audience **“What elements do you see?”**, turning the visual identity itself into something to interact with rather than simply something to look at.
 
 ![Different element designs](/src/assets/uploads/Screenshot_20260729-193340.png)
 
@@ -98,6 +98,6 @@ Working on Abhivyakti allowed me to think about design beyond individual composi
 ### **Project Details**
 
 **Project:** Abhivyakti - The City Arts Project
-**Focus:** Visual Identity Â· Communication Design Â· Social Media Â· Cultural Communication
+**Focus:** Visual Identity · Communication Design · Social Media · Cultural Communication
 **Role:** Designer
-**Mediums:** Digital Design Â· Typography Â· Illustration Â· Photography Â· Social Media Communication
+**Mediums:** Digital Design · Typography · Illustration · Photography · Social Media Communication

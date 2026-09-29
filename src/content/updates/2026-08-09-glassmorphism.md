@@ -1,4 +1,4 @@
-﻿---
+---
 title: Injurious Day
 date: 2026-08-11
 location: Gandhinagar

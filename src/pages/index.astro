@@ -272,23 +272,19 @@ import Layout from '../layouts/Layout.astro';
   </script>
 </Layout>
 
-<style is:global>
-  /* Completely hide the footer and its spacer on the hero page to prevent it from popping up during load/refresh */
-  .cc-footer, .cc-app__footer-spacer {
-    display: none !important;
-  }
-</style>
-
 <style>
   .hero-container {
     position: fixed;
-    inset: 0;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: calc(var(--footer-height) + var(--footer-bottom-margin));
     display: flex;
     justify-content: center;
     align-items: center;
     overflow: hidden;
     background-color: var(--navy-deep, #003b99);
-    z-index: 500;
+    z-index: 10;
   }
 
   .ambient-glow {

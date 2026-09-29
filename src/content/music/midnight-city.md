@@ -1,4 +1,4 @@
-﻿---
+---
 title: Tu Hai
 artist: Indian Ocean Band
 coverImage: /src/assets/uploads/TuHai.jpg.jpg

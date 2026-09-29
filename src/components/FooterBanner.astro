@@ -3,6 +3,43 @@
 // Broadcast ticker — matches the double-border/bevel language used
 // everywhere else, plus a live signal-bar meter (same visual family
 // as UpdateEntryCard) so it reads as part of the same system.
+
+const pathname = Astro.url.pathname.replace(/\/$/, '') || '/';
+
+const PORTFOLIO_SECTIONS: Record<string, string> = {
+  filmmaking: "Filmmaking",
+  photography: "Photography",
+  design: "Design",
+  art: "Art"
+};
+
+let serverChannel = "In the Meantime";
+
+const portfolioMatch = pathname.match(/^\/portfolio\/([^/]+)(?:\/([^/]+))?/);
+if (portfolioMatch) {
+  const sectionSlug = portfolioMatch[1].toLowerCase();
+  serverChannel = PORTFOLIO_SECTIONS[sectionSlug] || (sectionSlug.charAt(0).toUpperCase() + sectionSlug.slice(1));
+} else if (pathname === '/portfolio') {
+  serverChannel = "My Work";
+} else if (pathname.startsWith('/blog')) {
+  serverChannel = "Making Sense";
+} else if (pathname.startsWith('/films')) {
+  serverChannel = "The Film Shelf";
+} else if (pathname.startsWith('/tour')) {
+  serverChannel = "Visual Tours";
+} else if (pathname.startsWith('/collections')) {
+  serverChannel = "The Collection";
+} else if (pathname.startsWith('/updates')) {
+  serverChannel = "In the Meantime";
+} else if (pathname.startsWith('/about')) {
+  serverChannel = "Transmission";
+} else if (pathname === '/' || pathname === '') {
+  serverChannel = "Welcome";
+} else if (pathname.startsWith('/home')) {
+  serverChannel = "In the Meantime";
+}
+
+const initialChannelMsg = `YOU ARE ON '${serverChannel.toUpperCase()}' CHANNEL`;
 ---
 <div class="cc-footer">
   <span class="cc-footer__corner cc-footer__corner--tl"></span>
@@ -29,7 +66,7 @@
   <div class="cc-footer__segment cc-footer__channel-monitor" id="cc-footer-channel-monitor">
     <span class="cc-footer__channel-live-dot"></span>
     <span class="cc-footer__channel-tag">[ CHANNEL // </span>
-    <span class="cc-footer__channel-msg" id="cc-footer-channel-msg">YOU ARE ON 'IN THE MEANTIME' CHANNEL</span>
+    <span class="cc-footer__channel-msg" id="cc-footer-channel-msg">{initialChannelMsg}</span>
     <span class="cc-footer__channel-tag"> ]</span>
   </div>
   
@@ -61,6 +98,7 @@
     box-shadow:
       inset 0 1px 0 rgba(255,255,255,0.1),
       0 -4px 20px rgba(0, 10, 40, 0.5);
+    z-index: 520;
   }
 
   .cc-footer__corner{
@@ -391,20 +429,81 @@
     }
   });
 
+  const PORTFOLIO_SECTIONS = {
+    filmmaking: "Filmmaking",
+    photography: "Photography",
+    design: "Design",
+    art: "Art"
+  };
+
   // 4. Initial Channel determination on page load
   function initFooterChannel() {
-    const pathname = window.location.pathname;
-    let initialChannel = "";
-    for (const [path, name] of Object.entries(PATH_CHANNEL_MAP)) {
-      if (pathname.startsWith(path)) {
-        initialChannel = name;
-        break;
-      }
-    }
+    const pathname = window.location.pathname.replace(/\/$/, '') || '/';
     
-    if (initialChannel) {
-      updateFooterChannel(initialChannel);
-    } else {
+    // Check portfolio sub-sections and projects
+    const portfolioMatch = pathname.match(/^\/portfolio\/([^/]+)(?:\/([^/]+))?/);
+    if (portfolioMatch) {
+      const sectionSlug = portfolioMatch[1].toLowerCase();
+      const projectSlug = portfolioMatch[2];
+      const sectionName = PORTFOLIO_SECTIONS[sectionSlug] || (sectionSlug.charAt(0).toUpperCase() + sectionSlug.slice(1));
+      
+      let itemTitle = '';
+      if (projectSlug) {
+        const titleEl = document.querySelector('.cc-hero-title, .js-split-text, h1');
+        itemTitle = titleEl?.textContent?.trim() || '';
+      }
+      updateFooterChannel(sectionName, itemTitle);
+      return;
+    }
+
+    if (pathname === '/portfolio') {
+      updateFooterChannel("My Work");
+      return;
+    }
+
+    if (pathname.startsWith('/blog')) {
+      const titleEl = document.querySelector('.cc-blog-detail__title, h1');
+      const itemTitle = pathname !== '/blog' ? (titleEl?.textContent?.trim() || '') : '';
+      updateFooterChannel("Making Sense", itemTitle);
+      return;
+    }
+
+    if (pathname.startsWith('/films')) {
+      const titleEl = document.querySelector('.cc-detail-title, h1');
+      const itemTitle = pathname !== '/films' ? (titleEl?.textContent?.trim() || '') : '';
+      updateFooterChannel("The Film Shelf", itemTitle);
+      return;
+    }
+
+    if (pathname.startsWith('/tour')) {
+      const titleEl = document.querySelector('.cc-detail-title, h1');
+      const itemTitle = pathname !== '/tour' ? (titleEl?.textContent?.trim() || '') : '';
+      updateFooterChannel("Visual Tours", itemTitle);
+      return;
+    }
+
+    if (pathname.startsWith('/collections')) {
+      const isMusic = pathname.includes('/music');
+      updateFooterChannel("The Collection", isMusic ? "Music" : "");
+      return;
+    }
+
+    if (pathname.startsWith('/updates')) {
+      updateFooterChannel("In the Meantime");
+      return;
+    }
+
+    if (pathname.startsWith('/about')) {
+      updateFooterChannel("Transmission");
+      return;
+    }
+
+    if (pathname === '/' || pathname === '') {
+      updateFooterChannel("Welcome");
+      return;
+    }
+
+    if (pathname.startsWith('/home')) {
       const selected = document.querySelector('.cc-card.is-selected');
       if (selected) {
         const group = selected.dataset.group;
@@ -416,7 +515,18 @@
         }
       }
       updateFooterChannel("In the Meantime");
+      return;
     }
+
+    // Check PATH_CHANNEL_MAP fallback
+    for (const [path, name] of Object.entries(PATH_CHANNEL_MAP)) {
+      if (pathname.startsWith(path)) {
+        updateFooterChannel(name);
+        return;
+      }
+    }
+
+    updateFooterChannel("In the Meantime");
   }
 
   if (document.readyState === 'loading') {

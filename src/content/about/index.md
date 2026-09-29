@@ -1,4 +1,4 @@
-﻿---
+---
 title: My Manifesto
 subtitle: EST. 2026 // VISUAL ARCHIVE
 ---

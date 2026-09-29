@@ -1,4 +1,4 @@
-﻿---
+---
 title: Citizen Kane - A Study in Type
 section: design
 date: 2025-10-07
@@ -85,7 +85,7 @@ The project became an exercise in understanding when typography should simply co
 
 I also deliberately kept the visual system restrained. The posters were designed in **A4, CMYK**, with a limited typographic system and subtle grain used to give the work a printed, slightly imperfect quality.
 
-> **â€œThe type doesn't have to sit on the poster. Sometimes, it can become the poster.â€**
+> **“The type doesn't have to sit on the poster. Sometimes, it can become the poster.”**
 
 ***
 

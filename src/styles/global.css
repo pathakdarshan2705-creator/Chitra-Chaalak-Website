@@ -1,5 +1,5 @@
 /* ==========================================================
-   Chitra-Chaalak â€” Global Design Tokens
+   Chitra-Chaalak — Global Design Tokens
    Import once in Layout.astro: import '../styles/global.css';
    ========================================================== */
 
@@ -12,8 +12,8 @@
   --blue-card: #0a4bc4;      /* card fill, default - deepened for better contrast */
   --blue-card-hover: #2d83ff;/* card fill, hover */
   --blue-panel-light: #67c8ff; /* inner panel / border / chrome fill */
-  --blue-lightest: #a6e8ff;  /* lightest â€” text on dark */
-  --yellow: #fff000;         /* accent â€” selected / active / live only */
+  --blue-lightest: #a6e8ff;  /* lightest — text on dark */
+  --yellow: #fff000;         /* accent — selected / active / live only */
 
   /* ---- type roles ---- */
   --font-ui: 'IBM Plex Mono', monospace;     /* buttons, headings, chrome, footer data */
@@ -27,7 +27,7 @@
 
   /* ---- page margins & gaps ----
      Measured from the 1920x1080 hi-fi reference. These stay fixed
-     px regardless of screen width (standard practice â€” gutters don't
+     px regardless of screen width (standard practice — gutters don't
      scale, content does). Column widths are fr-based in index.astro,
      derived from the same reference's measured ratio: 396 : 1012 : 380 */
   --page-margin-left: 29px;
@@ -89,7 +89,7 @@ button{
 }
 
 /* ==========================================================
-   App shell â€” full-viewport flex column: content area (flexible)
+   App shell — full-viewport flex column: content area (flexible)
    + footer (fixed height, own bottom margin). Fully fluid, no
    fixed-canvas scaling.
    ========================================================== */
@@ -114,7 +114,7 @@ button{
 }
 
 /* ==========================================================
-   Ambient motion â€” comfortable, not disruptive.
+   Ambient motion — comfortable, not disruptive.
    ========================================================== */
 
 .cc-scanlines{
@@ -168,7 +168,7 @@ button{
   99%{ opacity:0.008; }
 }
 
-/* Static CRT screen vignette â€” darkened, slightly warped-feeling
+/* Static CRT screen vignette — darkened, slightly warped-feeling
    corners, like light falling off toward the edge of a tube. No
    animation: this is a cosmetic constant, not a motion effect. */
 .cc-crt-edge{
@@ -183,7 +183,7 @@ button{
 }
 
 /* ==========================================================
-   Preview popover â€” shown on hovering a panel's info icon.
+   Preview popover — shown on hovering a panel's info icon.
    ========================================================== */
 
 .cc-preview-popover{
@@ -255,7 +255,7 @@ button{
 .cc-btn:active{ transform:translate(1px,1px); }
 
 /* ==========================================================
-   Mobile layout â€” 3 swipeable/tappable "channels" instead of
+   Mobile layout — 3 swipeable/tappable "channels" instead of
    3 side-by-side columns. Flexbox throughout (no hardcoded
    heights) so it never depends on exact tab/dot sizing.
    ========================================================== */
@@ -309,7 +309,7 @@ button{
   }
 
   /* The "Watch" screen (Film + Blog + Tour/Collections) has too much
-     content for one fixed-height screen â€” let it scroll as a whole
+     content for one fixed-height screen — let it scroll as a whole
      instead of crushing every section into a sliver. */
   .cc-col--center.is-active-mobile {
     display: flex !important;
@@ -361,7 +361,7 @@ button{
   }
 
   /* Portfolio screen: allow it to scroll as a whole on mobile
-     specifically (desktop keeps scroll inside the cassette list only â€”
+     specifically (desktop keeps scroll inside the cassette list only —
      mobile has much less vertical room, so a screen-level scroll here
      is the right tradeoff) */
   .cc-col--portfolio.is-active-mobile {
@@ -390,7 +390,7 @@ button{
 }
 
 /* ==========================================================
-   Inner page shell â€” sidebar pinned, content scrolls
+   Inner page shell — sidebar pinned, content scrolls
    independently. Used by every non-home page.
    ========================================================== */
 

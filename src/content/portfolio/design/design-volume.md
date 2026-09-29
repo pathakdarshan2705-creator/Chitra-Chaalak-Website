@@ -1,19 +1,19 @@
-﻿---
+---
 title: The Thumbnail Game
 section: design
 date: 2024-09-15
 image: /src/assets/uploads/1.png
-description: A collection of fast-turnaround YouTube thumbnails created for Jalso, where every 30â€“45 minute exercise was about finding the hook, building hierarchy and making a story impossible to miss.
+description: A collection of fast-turnaround YouTube thumbnails created for Jalso, where every 30–45 minute exercise was about finding the hook, building hierarchy and making a story impossible to miss.
 youtubeId: https://www.youtube.com/@jalsopodcasts
 ---
 
 A collection of YouTube thumbnails designed for Jalso, turning conversations, films, people and ideas into visuals that have to make sense in a second.
 
-> **â€œYou get a few seconds to make someone stop scrolling.â€**
+> **“You get a few seconds to make someone stop scrolling.”**
 
 _The Thumbnail Game_ is a collection of YouTube thumbnail designs I created while working with **Jalso Production House**. What started as one of my responsibilities within the production team became a regular exercise in understanding how much information a single image can carry, and how quickly it has to communicate.
 
-These were not designs that had days to develop. Most thumbnails were made within **30â€“45 minutes**, often around ongoing productions and changing requirements. The challenge was to understand the subject quickly, identify the strongest hook, find the right image, build a clear hierarchy and make the whole thing work at a glance.
+These were not designs that had days to develop. Most thumbnails were made within **30–45 minutes**, often around ongoing productions and changing requirements. The challenge was to understand the subject quickly, identify the strongest hook, find the right image, build a clear hierarchy and make the whole thing work at a glance.
 
 ## **The Context**
 
@@ -37,7 +37,7 @@ The goal wasn't to make every thumbnail look beautiful in isolation.
 
 The goal was to make it **clear, recognisable and difficult to ignore when surrounded by dozens of other videos.**
 
-> **â€œA thumbnail isn't the whole story. It's the reason someone decides to hear the story.â€**
+> **“A thumbnail isn't the whole story. It's the reason someone decides to hear the story.”**
 
 ## **01 - The First Batch**
 
@@ -65,7 +65,7 @@ For example, a film discussion could be built around the film itself, while a co
 
 These are examples of the quick-turnaround work that became part of the production process.
 
-With roughly **30â€“45 minutes per thumbnail**, there wasn't much room for endless experimentation. Decisions had to happen quickly, which photograph to use, what to remove, what to enlarge, where the headline should sit, and what colour would make it visible immediately.
+With roughly **30–45 minutes per thumbnail**, there wasn't much room for endless experimentation. Decisions had to happen quickly, which photograph to use, what to remove, what to enlarge, where the headline should sit, and what colour would make it visible immediately.
 
 That constraint became part of the exercise.
 
@@ -84,7 +84,7 @@ That meant learning to prioritise.
 **Hierarchy before decoration.**
 **Recognition before detail.**
 
-The speed also became valuable. Designing repeatedly under real production conditions taught me to make decisions without getting overly attached to them â€” something that has carried into my other design and filmmaking work.
+The speed also became valuable. Designing repeatedly under real production conditions taught me to make decisions without getting overly attached to them — something that has carried into my other design and filmmaking work.
 
 ## **Working with Jalso**
 
@@ -97,8 +97,8 @@ The thumbnails were a small part of that larger role, but they gave me a differe
 ### **Project Details**
 
 **Production House:** Jalso Production House
-**Period:** July 2024 â€“ November 2025
+**Period:** July 2024 – November 2025
 **Role:** Designer
-**Typical turnaround:** 30â€“45 minutes
+**Typical turnaround:** 30–45 minutes
 **Medium:** Digital design
 **Work:** YouTube thumbnails for podcasts, interviews, films, and other Jalso productions
