@@ -64,35 +64,43 @@ const postsMap = Object.fromEntries(
     <div class="cc-inner-content">
       <Panel title="Making Sense" showControls={false}>
         <Fragment slot="header-extra">
-          <BlogCalendar availableDates={availableDates} initialDate={featured.iso} />
+          <BlogCalendar availableDates={availableDates} initialDate={featured?.iso ?? todayIso} />
         </Fragment>
 
         <div class="cc-blog-page">
-          <BlogFeatured
-            title={featured.title}
-            date={featured.dateDisplay}
-            topic={featured.topic}
-            excerpt={featured.excerpt}
-            imageSrc={featured.image}
-            imageAlt={featured.imageAlt}
-            href={featured.href}
-          />
+          {featured ? (
+            <BlogFeatured
+              title={featured.title}
+              date={featured.dateDisplay}
+              topic={featured.topic}
+              excerpt={featured.excerpt}
+              imageSrc={featured.image}
+              imageAlt={featured.imageAlt}
+              href={featured.href}
+            />
+          ) : (
+            <div style="padding: 40px 20px; text-align: center; color: var(--yellow); font-family: var(--font-mono); letter-spacing: 1px; font-size: 13px;">
+              [ ARCHIVE EMPTY // NO DISPATCHES FOUND ]
+            </div>
+          )}
 
           {POSTCARD_PLACEMENT === 'above' && <FarmaishPostcard />}
 
-          <div class="cc-blog-grid">
-            {posts.map((p) => (
-              <BlogGridCard
-                href={p.href}
-                title={p.title}
-                date={p.dateDisplay}
-                topic={p.topic}
-                imageSrc={p.image}
-                imageAlt={p.imageAlt}
-                group="blog-archive"
-              />
-            ))}
-          </div>
+          {posts.length > 0 && (
+            <div class="cc-blog-grid">
+              {posts.map((p) => (
+                <BlogGridCard
+                  href={p.href}
+                  title={p.title}
+                  date={p.dateDisplay}
+                  topic={p.topic}
+                  imageSrc={p.image}
+                  imageAlt={p.imageAlt}
+                  group="blog-archive"
+                />
+              ))}
+            </div>
+          )}
 
           {POSTCARD_PLACEMENT === 'below' && <FarmaishPostcard />}
         </div>
